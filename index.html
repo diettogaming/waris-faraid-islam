@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kalkulator Waris Islam - 4 Mazhab</title>
 
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -23,11 +23,9 @@
     <button id="btn-en" class="px-4 py-2 rounded bg-blue-300 text-blue-800 font-semibold">EN</button>
   </div>
 
-  <!-- Main Container -->
-  <div class="bg-white dark:bg-gray-800 rounded-2xl p-10 max-w-xl w-full shadow-2xl space-y-8" id="landingPage">
-    <h1 class="title text-3xl font-extrabold text-blue-900 dark:text-blue-300 text-center mb-2">
-      Kalkulator Waris Islam - 4 Mazhab
-    </h1>
+  <!-- Landing Page -->
+  <div id="landingPage" class="bg-white dark:bg-gray-800 rounded-2xl p-10 max-w-xl w-full shadow-2xl space-y-8">
+    <h1 class="title text-3xl font-extrabold text-blue-900 dark:text-blue-300 text-center mb-2">Kalkulator Waris Islam - 4 Mazhab</h1>
     <p class="subtitle text-center text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
       Aplikasi ini membantu Anda menghitung pembagian waris sesuai hukum Islam berdasarkan Al-Quran dan Sunnah dengan pendapat 4 Mazhab.
     </p>
@@ -55,28 +53,28 @@
     </button>
   </div>
 
-  <!-- Step 1 (hidden awalnya) -->
-  <div class="hidden max-w-xl w-full p-10 rounded-2xl bg-white dark:bg-gray-800 shadow-2xl space-y-8" id="step1">
-    <h2 class="text-2xl font-bold text-center text-blue-900 dark:text-blue-300 mb-6">Pilih Mazhab & Data Pewaris</h2>
+  <!-- Step 1: Form Pilih Mazhab & Jenis Kelamin -->
+  <div id="step1" class="hidden max-w-xl w-full p-10 rounded-2xl bg-white dark:bg-gray-800 shadow-2xl space-y-8 mx-auto mt-10">
+    <h2 class="text-2xl font-bold text-center mb-6 text-blue-900 dark:text-blue-300">Pilih Mazhab & Data Pewaris</h2>
     <form id="formStep1" class="space-y-6">
       <fieldset>
         <legend class="font-semibold mb-2 text-gray-700 dark:text-gray-300">Pilih Mazhab</legend>
-        <label><input name="mazhab" type="radio" value="jumhur" checked> Jumhur Ulama (Default)</label><br/>
-        <label><input name="mazhab" type="radio" value="hanafi"> Mazhab Hanafi</label><br/>
-        <label><input name="mazhab" type="radio" value="maliki"> Mazhab Maliki</label><br/>
-        <label><input name="mazhab" type="radio" value="syafii"> Mazhab Syafi'i</label><br/>
-        <label><input name="mazhab" type="radio" value="hanbali"> Mazhab Hanbali</label>
+        <label><input type="radio" name="mazhab" value="jumhur" checked> Jumhur Ulama (Default)</label><br/>
+        <label><input type="radio" name="mazhab" value="hanafi"> Mazhab Hanafi</label><br/>
+        <label><input type="radio" name="mazhab" value="maliki"> Mazhab Maliki</label><br/>
+        <label><input type="radio" name="mazhab" value="syafii"> Mazhab Syafi'i</label><br/>
+        <label><input type="radio" name="mazhab" value="hanbali"> Mazhab Hanbali</label>
       </fieldset>
 
       <fieldset>
         <legend class="font-semibold mb-2 text-gray-700 dark:text-gray-300">Siapa yang meninggal?</legend>
-        <label><input name="gender" type="radio" value="male" checked> Laki-laki</label><br/>
-        <label><input name="gender" type="radio" value="female"> Perempuan</label>
+        <label><input type="radio" name="gender" value="male" checked> Laki-laki</label><br/>
+        <label><input type="radio" name="gender" value="female"> Perempuan</label>
       </fieldset>
 
       <div class="flex justify-between mt-6">
-        <button type="button" id="backStep1" class="btn-secondary px-5 py-2 rounded">Kembali</button>
-        <button type="submit" class="btn-primary px-6 py-2 rounded">Lanjut</button>
+        <button type="button" id="backStep1" class="btn-secondary rounded px-5 py-2">Kembali</button>
+        <button type="submit" class="btn-primary rounded px-6 py-2">Lanjut</button>
       </div>
     </form>
   </div>
