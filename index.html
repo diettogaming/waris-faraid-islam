@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth" >
+<html lang="id" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,7 +9,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
-    /* Enable dark mode toggling manually */
     html.dark {
       color-scheme: dark;
       background-color: #1e293b;
@@ -25,38 +24,61 @@
   </div>
 
   <!-- Main Container -->
-  <div class="bg-white dark:bg-gray-800 rounded-2xl p-10 max-w-xl w-full shadow-2xl space-y-8">
-    <header class="flex flex-col items-center space-y-2">
-      <span class="text-5xl">📖</span>
-      <h1 class="text-3xl font-extrabold text-blue-900 dark:text-blue-300 text-center">
-        Kalkulator Waris Islam - 4 Mazhab
-      </h1>
-      <p class="text-center text-gray-600 dark:text-gray-400 max-w-md">
-        Aplikasi ini membantu Anda menghitung pembagian waris sesuai hukum Islam berdasarkan Al-Quran dan Sunnah dengan pendapat 4 Mazhab.
-      </p>
-    </header>
+  <div class="bg-white dark:bg-gray-800 rounded-2xl p-10 max-w-xl w-full shadow-2xl space-y-8" id="landingPage">
+    <h1 class="title text-3xl font-extrabold text-blue-900 dark:text-blue-300 text-center mb-2">
+      Kalkulator Waris Islam - 4 Mazhab
+    </h1>
+    <p class="subtitle text-center text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
+      Aplikasi ini membantu Anda menghitung pembagian waris sesuai hukum Islam berdasarkan Al-Quran dan Sunnah dengan pendapat 4 Mazhab.
+    </p>
 
-    <section class="bg-blue-100 dark:bg-blue-900 rounded-lg p-6 space-y-3 border-l-8 border-blue-500">
-      <h2 class="font-semibold text-xl text-blue-800 dark:text-blue-400">✨ Fitur Aplikasi:</h2>
-      <ul class="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
+    <div class="text-center text-6xl mb-6">📖</div>
+
+    <div class="info-box bg-blue-100 dark:bg-blue-900 rounded-lg p-6 space-y-3 border-l-8 border-blue-500 text-blue-700 dark:text-blue-300">
+      <h2 class="font-semibold text-xl">✨ Fitur Aplikasi:</h2>
+      <ul class="list-disc list-inside space-y-1">
         <li>Perhitungan akurat sesuai 4 mazhab (Hanafi, Maliki, Syafi'i, Hanbali)</li>
         <li>Penjelasan lengkap dengan dalil Al-Quran & Hadits</li>
         <li>Export PDF dengan detail lengkap</li>
         <li>Multi-bahasa (Indonesia & English)</li>
         <li>Deteksi otomatis penghalangan (Mahjub)</li>
       </ul>
-    </section>
+    </div>
 
-    <section class="bg-yellow-100 dark:bg-yellow-900 rounded-lg p-6 space-y-3 border-l-8 border-yellow-400 text-yellow-900 dark:text-yellow-300">
-      <h3 class="font-bold text-lg">⚠️ Disclaimer:</h3>
-      <p>
-        Aplikasi ini adalah alat bantu perhitungan. Untuk kasus kompleks atau sengketa, konsultasikan dengan ulama atau hakim syariah yang kompeten.
-      </p>
-    </section>
+    <div class="warning-box bg-yellow-100 dark:bg-yellow-900 rounded-lg p-6 border-l-8 border-yellow-400 text-yellow-900 dark:text-yellow-300 font-semibold">
+      ⚠️ Disclaimer:
+      <p class="font-normal mt-2">Aplikasi ini adalah alat bantu perhitungan. Untuk kasus kompleks atau sengketa, konsultasikan dengan ulama atau hakim syariah yang kompeten.</p>
+    </div>
 
-    <button id="btnStart" class="bg-gradient-to-br from-blue-700 to-blue-500 hover:from-blue-600 hover:to-blue-400 text-white font-semibold rounded-xl py-4 w-full transition-transform active:scale-95">
+    <button id="btnStart" class="w-full py-4 rounded-xl font-bold text-white bg-gradient-to-br from-blue-700 to-blue-500 hover:from-blue-600 hover:to-blue-400 active:scale-95 transition-transform">
       Mulai Perhitungan →
     </button>
+  </div>
+
+  <!-- Step 1 (hidden awalnya) -->
+  <div class="hidden max-w-xl w-full p-10 rounded-2xl bg-white dark:bg-gray-800 shadow-2xl space-y-8" id="step1">
+    <h2 class="text-2xl font-bold text-center text-blue-900 dark:text-blue-300 mb-6">Pilih Mazhab & Data Pewaris</h2>
+    <form id="formStep1" class="space-y-6">
+      <fieldset>
+        <legend class="font-semibold mb-2 text-gray-700 dark:text-gray-300">Pilih Mazhab</legend>
+        <label><input name="mazhab" type="radio" value="jumhur" checked> Jumhur Ulama (Default)</label><br/>
+        <label><input name="mazhab" type="radio" value="hanafi"> Mazhab Hanafi</label><br/>
+        <label><input name="mazhab" type="radio" value="maliki"> Mazhab Maliki</label><br/>
+        <label><input name="mazhab" type="radio" value="syafii"> Mazhab Syafi'i</label><br/>
+        <label><input name="mazhab" type="radio" value="hanbali"> Mazhab Hanbali</label>
+      </fieldset>
+
+      <fieldset>
+        <legend class="font-semibold mb-2 text-gray-700 dark:text-gray-300">Siapa yang meninggal?</legend>
+        <label><input name="gender" type="radio" value="male" checked> Laki-laki</label><br/>
+        <label><input name="gender" type="radio" value="female"> Perempuan</label>
+      </fieldset>
+
+      <div class="flex justify-between mt-6">
+        <button type="button" id="backStep1" class="btn-secondary px-5 py-2 rounded">Kembali</button>
+        <button type="submit" class="btn-primary px-6 py-2 rounded">Lanjut</button>
+      </div>
+    </form>
   </div>
 
   <script src="script.js"></script>
