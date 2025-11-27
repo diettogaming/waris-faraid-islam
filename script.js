@@ -1,97 +1,83 @@
-// Inisialisasi
+// Inisialisasi bahasa dan elemen yang akan diubah
 let currentLang = 'id';
-let currentStepNum = 0;
-const totalSteps = 7;
 
-// Dalil tambahan
-const haditsHutang = {
-  arab: "مَا مِنْ مُسْلِمٍ يَتَوَفَّاهُ اللَّهُ وَعَلَيْهِ دَيْنٌ إِلَّا حُرِمَتْ عَلَيْهِ الصَّلَاةُ",
-  terjemah_id: "Tidaklah seorang muslim meninggal dunia dengan meninggalkan hutang, kecuali shalat jenazahnya diharamkan.",
-  riwayat: "HR. Abu Daud dan Tirmidzi"
-};
-const dalilUrutan = {
-  arab: "مِن بَعْدِ وَصِيَّةٍ يُوصِى بِهَا أَوْ دَيْنٍ",
-  terjemah_id: "Sesudah dipenuhi wasiat yang ia buat atau sesudah dibayar hutangnya...",
-  surah: "An-Nisa",
-  ayat: 11
-};
-
-// Change language UI
+// Fungsi mengubah bahasa dengan pengecekan eksistensi elemen
 function changeLang(lang) {
   currentLang = lang;
-  document.getElementById('btn-id').classList.toggle('bg-blue-600', lang==='id');
-  document.getElementById('btn-id').classList.toggle('text-white', lang==='id');
-  document.getElementById('btn-en').classList.toggle('bg-blue-600', lang==='en');
-  document.getElementById('btn-en').classList.toggle('text-white', lang==='en');
-  // Update teks UI sesuai bahasa (implementasi i18n bisa ditambah nanti)
-  // Contoh sederhana:
-  document.querySelector('.title').textContent = lang==='id' ? 'Kalkulator Waris Islam - 4 Mazhab' : 'Islamic Inheritance Calculator - 4 Madhabs';
+
+  const titleEl = document.querySelector('.title');
+  if (titleEl) {
+    titleEl.textContent = lang === 'id' ? 'Kalkulator Waris Islam - 4 Mazhab' : 'Islamic Inheritance Calculator - 4 Madhabs';
+  }
+
+  const subtitleEl = document.querySelector('.subtitle');
+  if (subtitleEl) {
+    subtitleEl.textContent = lang === 'id'
+      ? 'Aplikasi ini membantu Anda menghitung pembagian waris sesuai hukum Islam berdasarkan Al-Quran dan Sunnah dengan pendapat 4 Mazhab.'
+      : 'This application helps you calculate inheritance distribution according to Islamic law based on the Quran and Sunnah with the opinions of 4 Madhabs.';
+  }
+
+  const fiturTitle = document.querySelector('#fiturTitle');
+  const fiturList = document.querySelectorAll('.fitur-item');
+  if (fiturTitle && fiturList.length) {
+    if (lang === 'id') {
+      fiturTitle.textContent = '✨ Fitur Aplikasi:';
+      fiturList[0].textContent = 'Perhitungan akurat sesuai 4 mazhab (Hanafi, Maliki, Syafi\'i, Hanbali)';
+      fiturList[1].textContent = 'Penjelasan lengkap dengan dalil Al-Quran & Hadits';
+      fiturList[2].textContent = 'Export PDF dengan detail lengkap';
+      fiturList[3].textContent = 'Multi-bahasa (Indonesia & English)';
+      fiturList[4].textContent = 'Deteksi otomatis penghalangan (Mahjub)';
+    } else {
+      fiturTitle.textContent = '✨ Features:';
+      fiturList[0].textContent = 'Accurate calculation according to 4 madhabs (Hanafi, Maliki, Shafi\'i, Hanbali)';
+      fiturList[1].textContent = 'Complete explanation with Quran & Hadith evidence';
+      fiturList[2].textContent = 'Export PDF with detailed report';
+      fiturList[3].textContent = 'Multi-language (Indonesian & English)';
+      fiturList[4].textContent = 'Automatic blocking detection (Mahjub)';
+    }
+  }
+
+  const disclaimerTitle = document.querySelector('#disclaimerTitle');
+  const disclaimerText = document.querySelector('#disclaimerText');
+  if (disclaimerTitle && disclaimerText) {
+    if (lang === 'id') {
+      disclaimerTitle.textContent = '⚠️ Disclaimer:';
+      disclaimerText.textContent = 'Aplikasi ini adalah alat bantu perhitungan. Untuk kasus kompleks atau sengketa, konsultasikan dengan ulama atau hakim syariah yang kompeten.';
+    } else {
+      disclaimerTitle.textContent = '⚠️ Disclaimer:';
+      disclaimerText.textContent = 'This app is a calculation tool. For complex cases or disputes, consult competent scholars or sharia judges.';
+    }
+  }
+
+  const btnStart = document.getElementById('btnStart');
+  if (btnStart) {
+    btnStart.textContent = lang === 'id' ? 'Mulai Perhitungan →' : 'Start Calculation →';
+  }
 }
 
-// Step navigation
-function nextStep(step) {
-  if(step<0 || step>totalSteps) return;
-  document.querySelector(`.step.active`).classList.remove('active');
-  const next = document.getElementById(`step${step}`);
-  if(next) next.classList.add('active');
-  currentStepNum = step;
-  window.scrollTo({top:0, behavior: 'smooth'});
-}
-function prevStep(step) {
-  nextStep(step);
-}
-
-// Format Rupiah
-function formatRupiah(input) {
-  let val = input.value.replace(/[^0-9]/g, '');
-  if(val==='') {input.value='';return;}
-  input.value = parseInt(val).toLocaleString('id-ID');
-}
-function parseCurrency(val) {
-  if(!val) return 0;
-  return parseInt(val.toString().replace(/[^0-9]/g, '')) || 0;
-}
-
-// Toggle dark mode
-const htmlEl = document.documentElement;
-document.getElementById('btnStart').addEventListener('dblclick', () => {
-  htmlEl.classList.toggle('dark');
-});
-
-// Fungsi tampilkan dalil di ringkasan hasil
-function tampilkanDalilHutangDanUrutan() {
-  const resultSummary = document.getElementById('resultSummary');
-  if(!resultSummary) return;
-  
-  const html = `
-    <div class="dalil-section mt-6 p-4 bg-blue-50 dark:bg-blue-800 rounded-xl text-blue-800 dark:text-blue-200">
-      <h4 class="font-semibold mb-2">📜 Dalil Hadits Tentang Hutang dan Urutan Pembagian</h4>
-      <p style="font-family:'Amiri', serif; font-size:18px; text-align:right; direction:rtl;">${haditsHutang.arab}</p>
-      <p class="italic">"${haditsHutang.terjemah_id}"</p>
-      <p class="font-bold">${haditsHutang.riwayat}</p>
-      <hr class="my-4 border-blue-400 dark:border-blue-600">
-      <p style="font-family:'Amiri', serif; font-size:18px; text-align:right; direction:rtl;">${dalilUrutan.arab}</p>
-      <p class="italic">"${dalilUrutan.terjemah_id}"</p>
-      <p class="font-bold">QS. ${dalilUrutan.surah}: ${dalilUrutan.ayat}</p>
-    </div>
-  `;
-  resultSummary.insertAdjacentHTML('beforeend', html);
-}
-
-// Fungsi reset perhitungan
-function resetCalculation() {
-  location.reload();
-}
-
-// Fungsi utama hitung perhitungan dan tampil hasil (placeholder)
-function calculate() {
-  alert('Fungsi hitung belum diimplementasi di contoh ini.');
-}
-
-// Event listeners bahasa dan start (demo)
+// Event listeners untuk tombol bahasa
 document.getElementById('btn-id').addEventListener('click', () => changeLang('id'));
 document.getElementById('btn-en').addEventListener('click', () => changeLang('en'));
-document.getElementById('btnStart').addEventListener('click', () => nextStep(1));
 
-// Inisialisasi bahasa default
+// Inisialisasi tampilan bahasa default
 changeLang('id');
+
+// Dark mode toggle (contoh jika Anda mau tambahkan tombol toggle nanti)
+function toggleDarkMode() {
+  document.documentElement.classList.toggle('dark');
+}
+
+// Contoh Anda bisa panggil toggleDarkMode() dari tombol,  
+// Jika mau saya buatkan fitur toggle tombol nanti bisa saya kirimkan.
+
+// Fungsi format rupiah
+function formatRupiah(input) {
+  let val = input.value.replace(/[^0-9]/g, '');
+  if (val === '') {
+    input.value = '';
+    return;
+  }
+  input.value = parseInt(val).toLocaleString('id-ID');
+}
+
+// Ekspor fungsi jika diperlukan
