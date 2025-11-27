@@ -1,22 +1,17 @@
+/* Anda dapat mengosongkan file ini jika ingin hanya menggunakan Tailwind */
+
+/* Contoh styling tombol custom kalau mau override default Tailwind */
 .btn-primary {
-  background: linear-gradient(135deg, #1e3c72, #2a5298);
-  color: white;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease;
+  @apply bg-gradient-to-r from-blue-600 to-blue-800 text-white font-bold rounded-lg px-6 py-3 transition duration-300;
 }
 .btn-primary:hover {
-  background: linear-gradient(135deg, #144078, #1a3c78);
+  @apply from-blue-700 to-blue-900;
 }
 .btn-secondary {
-  background: #e5e7eb;
-  color: #1e293b;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s ease;
+  @apply bg-gray-200 text-gray-800 rounded-lg px-5 py-2 font-semibold transition duration-300;
 }
 .btn-secondary:hover {
-  background: #cbd5e1;
+  @apply bg-gray-300;
 }
+
+/* Penyesuaian warna dan tampilan lainnya bisa di sini */
