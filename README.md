@@ -1,1 +1,0 @@
-# waris-faraid-islam
