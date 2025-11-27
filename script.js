@@ -1,3 +1,17 @@
+// Hadits Rasul tidak mensolatkan jenazah yang berhutang
+const haditsHutang = {
+  arab: "مَا مِنْ مُسْلِمٍ يَتَوَفَّاهُ اللَّهُ وَعَلَيْهِ دَيْنٌ إِلَّا حُرِمَتْ عَلَيْهِ الصَّلَاةُ",
+  terjemah_id: "Tidaklah seorang muslim meninggal dunia dengan meninggalkan hutang, kecuali shalat jenazahnya diharamkan.",
+  riwayat: "HR. Abu Daud dan Tirmidzi"
+};
+// Dalil urutan pembagian harta - hutang - wasiat
+const dalilUrutan = {
+  arab: "مِن بَعْدِ وَصِيَّةٍ يُوصِى بِهَا أَوْ دَيْنٍ",
+  terjemah_id: "Sesudah dipenuhi wasiat yang ia buat atau sesudah dibayar hutangnya...",
+  terjemah_en: "After any bequest he [may have] made or debt...",
+  surah: "An-Nisa",
+  ayat: 11
+};
 // ===== GLOBAL VARIABLES =====
 let currentLang = 'id';
 let currentStepNum = 0;
@@ -1357,6 +1371,23 @@ function displayResult(calculationResult, hartaBersih, data) {
   `;
   
   document.getElementById('resultSummary').innerHTML = summaryHTML;
+  function tampilkanDalilHutangDanUrutan() {
+  const resultSummary = document.getElementById('resultSummary');
+  
+  const html = `
+    <div class="dalil-section" style="margin-top:20px; padding:10px; background:#eaf2ff; border-radius:8px;">
+      <h4>📜 Dalil Hadits Tentang Hutang dan Urutan Pembagian</h4>
+      <p style="font-family:'Amiri', serif; font-size:18px; text-align:right; direction:rtl;">${haditsHutang.arab}</p>
+      <p><em>"${haditsHutang.terjemah_id}"</em></p>
+      <p><strong>${haditsHutang.riwayat}</strong></p>
+      <hr>
+      <p style="font-family:'Amiri', serif; font-size:18px; text-align:right; direction:rtl;">${dalilUrutan.arab}</p>
+      <p><em>"${dalilUrutan.terjemah_id}"</em></p>
+      <p><strong>QS. ${dalilUrutan.surah}: ${dalilUrutan.ayat}</strong></p>
+    </div>
+  `;
+  resultSummary.insertAdjacentHTML('beforeend', html);
+}
   
   // ===== HEIRS =====
   let heirsHTML = `
