@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id" class="scroll-smooth" >
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kalkulator Waris Islam - 4 Mazhab</title>
 
@@ -20,8 +20,8 @@
 
   <!-- Bahasa Toggle -->
   <div class="fixed top-5 left-5 flex gap-3 z-50">
-    <button id="btn-id" class="px-4 py-2 rounded bg-blue-600 text-white font-bold">ID ID</button>
-    <button id="btn-en" class="px-4 py-2 rounded bg-blue-300 text-blue-800 font-semibold">GB EN</button>
+    <button id="btn-id" class="px-4 py-2 rounded bg-blue-600 text-white font-bold">ID</button>
+    <button id="btn-en" class="px-4 py-2 rounded bg-blue-300 text-blue-800 font-semibold">EN</button>
   </div>
 
   <!-- Main Container -->
@@ -59,37 +59,6 @@
     </button>
   </div>
 
-  <script>
-    // Dark mode toggle & language button listeners
-    const htmlEl = document.documentElement;
-    const btnStart = document.getElementById('btnStart');
-    const btnId = document.getElementById('btn-id');
-    const btnEn = document.getElementById('btn-en');
-
-    // Default dark mode off
-    htmlEl.classList.remove('dark');
-
-    // Language button styles and events for demo purposes
-    btnId.addEventListener('click', () => {
-      btnId.classList.add('bg-blue-600', 'text-white', 'font-bold');
-      btnId.classList.remove('bg-blue-300', 'text-blue-800', 'font-semibold');
-      btnEn.classList.remove('bg-blue-600', 'text-white', 'font-bold');
-      btnEn.classList.add('bg-blue-300', 'text-blue-800', 'font-semibold');
-      // call your changeLang('id') function here
-    });
-    btnEn.addEventListener('click', () => {
-      btnEn.classList.add('bg-blue-600', 'text-white', 'font-bold');
-      btnEn.classList.remove('bg-blue-300', 'text-blue-800', 'font-semibold');
-      btnId.classList.remove('bg-blue-600', 'text-white', 'font-bold');
-      btnId.classList.add('bg-blue-300', 'text-blue-800', 'font-semibold');
-      // call your changeLang('en') function here
-    });
-
-    // Example dark mode toggle on double-click start button (you can add separate button)
-    btnStart.addEventListener('dblclick', () => {
-      htmlEl.classList.toggle('dark');
-    });
-
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
