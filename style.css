@@ -1,118 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;900&display=swap');
-
-body {
-  font-family: 'Poppins', sans-serif;
-}
-
-/* Scrollbar kustom */
-::-webkit-scrollbar {
-  width: 10px;
-}
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-::-webkit-scrollbar-thumb {
-  background: #3b82f6; /* biru terang */
-  border-radius: 5px;
-}
-body.dark::-webkit-scrollbar-track {
-  background: #1e293b;
-}
-body.dark::-webkit-scrollbar-thumb {
-  background: #60a5fa; /* biru gelap */
-}
-
-/* Container dan tampilan */
-
-.container {
-  background: white;
-  max-width: 600px;
-  padding: 30px 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  margin-top: 30px;
-  color: #1e3c72;
-}
-body.dark .container {
-  background: #1e293b;
-  color: #cbd5e1;
-}
-
-h1.title {
-  font-size: 1.875rem;
-  font-weight: 900;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-p.subtitle {
-  font-weight: 600;
-  color: #475569;
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.icon-book {
-  font-size: 60px;
-  text-align: center;
-  display: block;
-  margin-bottom: 20px;
-  color: #3b82f6;
-}
-
-.info-box {
-  background-color: #bfdbfe;
-  padding: 20px 25px;
-  border-radius: 15px;
-  color: #1e40af;
-  border-left: 8px solid #2563eb;
-  margin-bottom: 25px;
-  font-size: 1rem;
-}
-
-.info-box ul {
-  list-style-type: disc;
-  margin-left: 1.5rem;
-}
-
-.info-box li {
-  margin-bottom: 8px;
-}
-
-body.dark .info-box {
-  background-color: #2563eb;
-  color: #dbeafe;
-  border-left-color: #3b82f6;
-}
-
-.warning-box {
-  background-color: #fef3c7;
-  padding: 20px 25px;
-  border-radius: 15px;
-  border-left: 8px solid #facc15;
-  color: #713f12;
-  margin-bottom: 30px;
-  font-size: 1rem;
-}
-
-button#btnStart {
-  width: 100%;
-  padding: 17px 0;
-  font-size: 1.2rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+.btn-primary {
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
   color: white;
   border: none;
-  border-radius: 25px;
+  font-weight: 600;
   cursor: pointer;
   transition: background 0.3s ease;
 }
-button#btnStart:hover {
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+.btn-primary:hover {
+  background: linear-gradient(135deg, #144078, #1a3c78);
 }
-body.dark button#btnStart {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+.btn-secondary {
+  background: #e5e7eb;
+  color: #1e293b;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
-body.dark button#btnStart:hover {
-  background: linear-gradient(135deg, #2563eb, #1e40af);
+.btn-secondary:hover {
+  background: #cbd5e1;
 }
