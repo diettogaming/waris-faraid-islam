@@ -1,523 +1,95 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="scroll-smooth" >
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Kalkulator Waris Islam - 4 Mazhab</title>
-<link rel="stylesheet" href="style.css" />
-<script src="script.js" defer></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kalkulator Waris Islam - 4 Mazhab</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    /* Enable dark mode toggling manually */
+    html.dark {
+      color-scheme: dark;
+      background-color: #1e293b;
+    }
+  </style>
 </head>
-<body>
+<body class="bg-gradient-to-r from-blue-800 to-blue-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col items-center p-5">
 
-<!-- Language Selector -->
-<div class="language-selector">
-  <button onclick="changeLang('id')" class="lang-btn active" id="lang-id">ID ID</button>
-  <button onclick="changeLang('en')" class="lang-btn" id="lang-en">GB EN</button>
-</div>
-
-<!-- Main Container -->
-<div class="container" id="app">
-  
-  <!-- Header -->
-  <div class="header">
-    <h1 class="title">🕌 <span data-i18n="title">Kalkulator Waris Islam - 4 Mazhab</span></h1>
-    <p class="subtitle" data-i18n="subtitle">Perhitungan Faraid Sesuai Syariat</p>
+  <!-- Bahasa Toggle -->
+  <div class="fixed top-5 left-5 flex gap-3 z-50">
+    <button id="btn-id" class="px-4 py-2 rounded bg-blue-600 text-white font-bold">ID ID</button>
+    <button id="btn-en" class="px-4 py-2 rounded bg-blue-300 text-blue-800 font-semibold">GB EN</button>
   </div>
 
-  <!-- Progress Bar -->
-  <div class="progress-container" id="progressBar" style="display: none;">
-    <div class="progress-bar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-    <p class="progress-text"><span data-i18n="step">Langkah</span> <span id="currentStep">1</span> <span data-i18n="of">dari</span> 6</p>
+  <!-- Main Container -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl p-10 max-w-xl w-full shadow-2xl space-y-8">
+    <header class="flex flex-col items-center space-y-2">
+      <span class="text-5xl">📖</span>
+      <h1 class="text-3xl font-extrabold text-blue-900 dark:text-blue-300 text-center">
+        Kalkulator Waris Islam - 4 Mazhab
+      </h1>
+      <p class="text-center text-gray-600 dark:text-gray-400 max-w-md">
+        Aplikasi ini membantu Anda menghitung pembagian waris sesuai hukum Islam berdasarkan Al-Quran dan Sunnah dengan pendapat 4 Mazhab.
+      </p>
+    </header>
+
+    <section class="bg-blue-100 dark:bg-blue-900 rounded-lg p-6 space-y-3 border-l-8 border-blue-500">
+      <h2 class="font-semibold text-xl text-blue-800 dark:text-blue-400">✨ Fitur Aplikasi:</h2>
+      <ul class="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
+        <li>Perhitungan akurat sesuai 4 mazhab (Hanafi, Maliki, Syafi'i, Hanbali)</li>
+        <li>Penjelasan lengkap dengan dalil Al-Quran & Hadits</li>
+        <li>Export PDF dengan detail lengkap</li>
+        <li>Multi-bahasa (Indonesia & English)</li>
+        <li>Deteksi otomatis penghalangan (Mahjub)</li>
+      </ul>
+    </section>
+
+    <section class="bg-yellow-100 dark:bg-yellow-900 rounded-lg p-6 space-y-3 border-l-8 border-yellow-400 text-yellow-900 dark:text-yellow-300">
+      <h3 class="font-bold text-lg">⚠️ Disclaimer:</h3>
+      <p>
+        Aplikasi ini adalah alat bantu perhitungan. Untuk kasus kompleks atau sengketa, konsultasikan dengan ulama atau hakim syariah yang kompeten.
+      </p>
+    </section>
+
+    <button id="btnStart" class="bg-gradient-to-br from-blue-700 to-blue-500 hover:from-blue-600 hover:to-blue-400 text-white font-semibold rounded-xl py-4 w-full transition-transform active:scale-95">
+      Mulai Perhitungan →
+    </button>
   </div>
 
-  <!-- STEP 0: Welcome -->
-  <div class="step active" id="step0">
-    <div class="welcome-card">
-      <div class="welcome-icon">📖</div>
-      <h2 data-i18n="welcome_title">Assalamu'alaikum Warahmatullahi Wabarakatuh</h2>
-      <p data-i18n="welcome_desc">Aplikasi ini membantu Anda menghitung pembagian waris sesuai hukum Islam berdasarkan Al-Quran dan Sunnah dengan pendapat 4 Mazhab.</p>
-      
-      <div class="info-box">
-        <h3>✨ <span data-i18n="features">Fitur Aplikasi</span>:</h3>
-        <ul>
-          <li data-i18n="feature1">📊 Perhitungan akurat sesuai 4 mazhab (Hanafi, Maliki, Syafi'i, Hanbali)</li>
-          <li data-i18n="feature2">📖 Penjelasan lengkap dengan dalil Al-Quran & Hadits</li>
-          <li data-i18n="feature3">📄 Export PDF dengan detail lengkap</li>
-          <li data-i18n="feature4">🌐 Multi-bahasa (Indonesia & English)</li>
-          <li data-i18n="feature5">⚖️ Deteksi otomatis penghalangan (Mahjub)</li>
-        </ul>
-      </div>
+  <script>
+    // Dark mode toggle & language button listeners
+    const htmlEl = document.documentElement;
+    const btnStart = document.getElementById('btnStart');
+    const btnId = document.getElementById('btn-id');
+    const btnEn = document.getElementById('btn-en');
 
-      <div class="warning-box">
-        <strong>⚠️ <span data-i18n="disclaimer_title">Disclaimer</span>:</strong>
-        <p data-i18n="disclaimer_text">Aplikasi ini adalah alat bantu perhitungan. Untuk kasus kompleks atau sengketa, konsultasikan dengan ulama atau hakim syariah yang kompeten.</p>
-      </div>
+    // Default dark mode off
+    htmlEl.classList.remove('dark');
 
-      <button class="btn-primary btn-large" onclick="nextStep(1)">
-        <span data-i18n="start">Mulai Perhitungan</span> →
-      </button>
-    </div>
-  </div>
+    // Language button styles and events for demo purposes
+    btnId.addEventListener('click', () => {
+      btnId.classList.add('bg-blue-600', 'text-white', 'font-bold');
+      btnId.classList.remove('bg-blue-300', 'text-blue-800', 'font-semibold');
+      btnEn.classList.remove('bg-blue-600', 'text-white', 'font-bold');
+      btnEn.classList.add('bg-blue-300', 'text-blue-800', 'font-semibold');
+      // call your changeLang('id') function here
+    });
+    btnEn.addEventListener('click', () => {
+      btnEn.classList.add('bg-blue-600', 'text-white', 'font-bold');
+      btnEn.classList.remove('bg-blue-300', 'text-blue-800', 'font-semibold');
+      btnId.classList.remove('bg-blue-600', 'text-white', 'font-bold');
+      btnId.classList.add('bg-blue-300', 'text-blue-800', 'font-semibold');
+      // call your changeLang('en') function here
+    });
 
-  <!-- STEP 1: Mazhab & Pewaris -->
-  <div class="step" id="step1">
-    <h2 class="step-title">
-      <span class="step-number">1</span>
-      <span data-i18n="step1_title">Pilih Mazhab & Data Pewaris</span>
-    </h2>
+    // Example dark mode toggle on double-click start button (you can add separate button)
+    btnStart.addEventListener('dblclick', () => {
+      htmlEl.classList.toggle('dark');
+    });
 
-    <!-- Pilih Mazhab -->
-    <div class="section">
-      <label class="section-label">
-        ⚖️ <span data-i18n="mazhab_label">Pilih Mazhab</span>
-      </label>
-      <div class="radio-group-vertical">
-        <label class="radio-card-horizontal">
-          <input type="radio" name="mazhab" value="jumhur" checked>
-          <div class="radio-content">
-            <div class="radio-title" data-i18n="mazhab_jumhur">✅ Jumhur Ulama (Default)</div>
-            <div class="radio-desc" data-i18n="mazhab_jumhur_desc">Konsensus mayoritas 4 mazhab - Direkomendasikan untuk kasus umum</div>
-          </div>
-        </label>
-        <label class="radio-card-horizontal">
-          <input type="radio" name="mazhab" value="hanafi">
-          <div class="radio-content">
-            <div class="radio-title">Mazhab Hanafi</div>
-            <div class="radio-desc" data-i18n="mazhab_hanafi_desc">Imam Abu Hanifah - Berbeda dalam kasus Dzawil Arham</div>
-          </div>
-        </label>
-        <label class="radio-card-horizontal">
-          <input type="radio" name="mazhab" value="maliki">
-          <div class="radio-content">
-            <div class="radio-title">Mazhab Maliki</div>
-            <div class="radio-desc" data-i18n="mazhab_maliki_desc">Imam Malik bin Anas</div>
-          </div>
-        </label>
-        <label class="radio-card-horizontal">
-          <input type="radio" name="mazhab" value="syafii">
-          <div class="radio-content">
-            <div class="radio-title">Mazhab Syafi'i</div>
-            <div class="radio-desc" data-i18n="mazhab_syafii_desc">Imam Muhammad bin Idris asy-Syafi'i</div>
-          </div>
-        </label>
-        <label class="radio-card-horizontal">
-          <input type="radio" name="mazhab" value="hanbali">
-          <div class="radio-content">
-            <div class="radio-title">Mazhab Hanbali</div>
-            <div class="radio-desc" data-i18n="mazhab_hanbali_desc">Imam Ahmad bin Hanbal</div>
-          </div>
-        </label>
-      </div>
-      <div class="info-note">
-        💡 <span data-i18n="mazhab_note">Jika tidak yakin, gunakan Jumhur (default). Perbedaan mazhab hanya pada kasus-kasus khusus tertentu.</span>
-      </div>
-    </div>
-
-    <!-- Jenis Kelamin Pewaris -->
-    <div class="section">
-      <label class="section-label">
-        👤 <span data-i18n="gender_label">Siapa yang Meninggal Dunia?</span>
-      </label>
-      <div class="radio-group-inline">
-        <label class="radio-card-inline">
-          <input type="radio" name="gender" value="male" checked onchange="updateSpouseOptions()">
-          <div class="radio-content">
-            <div class="radio-icon">👨</div>
-            <div class="radio-title" data-i18n="male">Laki-laki</div>
-          </div>
-        </label>
-        <label class="radio-card-inline">
-          <input type="radio" name="gender" value="female" onchange="updateSpouseOptions()">
-          <div class="radio-content">
-            <div class="radio-icon">👩</div>
-            <div class="radio-title" data-i18n="female">Perempuan</div>
-          </div>
-        </label>
-      </div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn-secondary" onclick="prevStep(0)">
-        ← <span data-i18n="back">Kembali</span>
-      </button>
-      <button class="btn-primary" onclick="nextStep(2)">
-        <span data-i18n="next">Lanjut</span> →
-      </button>
-    </div>
-  </div>
-
-  <!-- STEP 2: Harta & Kewajiban -->
-  <div class="step" id="step2">
-    <h2 class="step-title">
-      <span class="step-number">2</span>
-      <span data-i18n="step2_title">Harta & Kewajiban</span>
-    </h2>
-
-    <!-- Total Harta -->
-    <div class="section">
-      <label class="section-label">
-        💰 <span data-i18n="total_harta">Total Harta Warisan</span>
-        <span class="info-icon" onclick="showInfoModal('harta')" title="Klik untuk info">ℹ️</span>
-      </label>
-      <div class="input-group">
-        <span class="input-prefix">Rp</span>
-        <input type="text" id="totalHarta" class="input-currency" placeholder="0" oninput="formatCurrency(this)" value="100.000.000">
-      </div>
-      <div class="input-hint" data-i18n="harta_hint">Masukkan total semua harta yang ditinggalkan (uang, properti, kendaraan, dll)</div>
-    </div>
-
-    <!-- Biaya Jenazah -->
-    <div class="section">
-      <label class="section-label">
-        ⚰️ <span data-i18n="biaya_jenazah">Biaya Pengurusan Jenazah</span>
-      </label>
-      <div class="checkbox-item">
-        <input type="checkbox" id="biayaDitanggung" onchange="toggleBiayaJenazah()">
-        <label for="biayaDitanggung" data-i18n="biaya_ditanggung">Sudah ditanggung keluarga sebagai sedekah (tidak dipotong dari harta waris)</label>
-      </div>
-      <div class="input-group" id="biayaJenazahInput">
-        <span class="input-prefix">Rp</span>
-        <input type="text" id="biayaJenazah" class="input-currency" placeholder="0" oninput="formatCurrency(this)" value="5.000.000">
-      </div>
-      <div class="input-hint" data-i18n="biaya_hint">Biaya memandikan, mengkafani, dan menguburkan jenazah</div>
-    </div>
-
-    <!-- Hutang -->
-    <div class="section">
-      <label class="section-label">
-        💳 <span data-i18n="hutang">Hutang yang Belum Lunas</span>
-      </label>
-      <div class="input-group">
-        <span class="input-prefix">Rp</span>
-        <input type="text" id="hutang" class="input-currency" placeholder="0" oninput="formatCurrency(this)" value="50.000.000">
-      </div>
-      <div class="input-hint" data-i18n="hutang_hint">Semua hutang harus dilunasi sebelum harta dibagi</div>
-    </div>
-
-    <!-- Asuransi -->
-    <div class="section">
-      <label class="section-label">
-        🛡️ <span data-i18n="asuransi">Klaim Asuransi</span>
-        <span class="info-icon" onclick="showInfoModal('asuransi')" title="Klik untuk info">ℹ️</span>
-      </label>
-      <div class="radio-group-vertical">
-        <label class="radio-card-horizontal">
-          <input type="radio" name="asuransi" value="none" checked onchange="toggleAsuransi()">
-          <div class="radio-content">
-            <div class="radio-title" data-i18n="asuransi_none">❌ Tidak Ada Asuransi</div>
-          </div>
-        </label>
-        <label class="radio-card-horizontal">
-          <input type="radio" name="asuransi" value="syariah" onchange="toggleAsuransi()">
-          <div class="radio-content">
-            <div class="radio-title" data-i18n="asuransi_syariah">✅ Asuransi Syariah (Takaful)</div>
-            <div class="radio-desc" data-i18n="asuransi_syariah_desc">Halal dan masuk sebagai harta waris</div>
-          </div>
-        </label>
-        <label class="radio-card-horizontal">
-          <input type="radio" name="asuransi" value="konvensional" onchange="toggleAsuransi()">
-          <div class="radio-content">
-            <div class="radio-title" data-i18n="asuransi_konvensional">⚠️ Asuransi Konvensional</div>
-            <div class="radio-desc" data-i18n="asuransi_konvensional_desc">Tidak masuk harta waris (disarankan disedekahkan)</div>
-          </div>
-        </label>
-      </div>
-      <div class="input-group" id="asuransiInput" style="display: none;">
-        <span class="input-prefix">Rp</span>
-        <input type="text" id="nilaiAsuransi" class="input-currency" placeholder="0" oninput="formatCurrency(this)" value="50.000.000">
-      </div>
-    </div>
-
-    <!-- Wasiat -->
-    <div class="section">
-      <label class="section-label">
-        📝 <span data-i18n="wasiat">Wasiat (Opsional)</span>
-      </label>
-      <div class="input-group">
-        <span class="input-prefix">Rp</span>
-        <input type="text" id="wasiat" class="input-currency" placeholder="0" oninput="formatCurrency(this); validateWasiat()">
-      </div>
-      <div class="input-hint" data-i18n="wasiat_hint">Maksimal 1/3 dari harta setelah biaya jenazah dan hutang</div>
-      <div class="warning-note" id="wasiatWarning" style="display: none;">
-        ⚠️ <span data-i18n="wasiat_warning">Wasiat melebihi 1/3 harta! Akan disesuaikan otomatis sesuai syariat.</span>
-      </div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn-secondary" onclick="prevStep(1)">
-        ← <span data-i18n="back">Kembali</span>
-      </button>
-      <button class="btn-primary" onclick="nextStep(3)">
-        <span data-i18n="next">Lanjut</span> →
-      </button>
-        </div>
-  </div>
-
-  <!-- STEP 3: Ahli Waris - Pasangan -->
-  <div class="step" id="step3">
-    <h2 class="step-title">
-      <span class="step-number">3</span>
-      <span data-i18n="step3_title">Ahli Waris - Pasangan</span>
-    </h2>
-
-    <div class="section">
-      <label class="section-label">
-        💑 <span data-i18n="pasangan">Pasangan (Suami/Istri)</span>
-      </label>
-      
-      <!-- Suami (hanya muncul jika pewaris perempuan) -->
-      <div id="suamiOption" style="display: none;">
-        <div class="checkbox-item">
-          <input type="checkbox" id="suami">
-          <label for="suami" data-i18n="suami">👨 Suami</label>
-        </div>
-      </div>
-
-      <!-- Istri (hanya muncul jika pewaris laki-laki) -->
-      <div id="istriOption">
-        <div class="checkbox-item">
-          <input type="checkbox" id="istri" onchange="toggleIstriCount()">
-          <label for="istri" data-i18n="istri">👩 Istri</label>
-        </div>
-        <div class="input-group-small" id="istriCountInput" style="display: none; margin-top: 10px; margin-left: 30px;">
-          <label data-i18n="istri_count">Jumlah istri:</label>
-          <input type="number" id="istriCount" min="1" max="4" value="1" class="input-number">
-          <span class="input-note" data-i18n="istri_note">(Maks. 4)</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn-secondary" onclick="prevStep(2)">
-        ← <span data-i18n="back">Kembali</span>
-      </button>
-      <button class="btn-primary" onclick="nextStep(4)">
-        <span data-i18n="next">Lanjut</span> →
-      </button>
-    </div>
-  </div>
-
-  <!-- STEP 4: Ahli Waris - Orang Tua -->
-  <div class="step" id="step4">
-    <h2 class="step-title">
-      <span class="step-number">4</span>
-      <span data-i18n="step4_title">Ahli Waris - Orang Tua</span>
-    </h2>
-
-    <div class="section">
-      <label class="section-label">
-        👴👵 <span data-i18n="orangtua">Orang Tua</span>
-      </label>
-      
-      <div class="checkbox-grid">
-        <div class="checkbox-item">
-          <input type="checkbox" id="ayah" onchange="toggleKakek()">
-          <label for="ayah" data-i18n="ayah">👴 Ayah</label>
-        </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="ibu" onchange="toggleNenek()">
-          <label for="ibu" data-i18n="ibu">👵 Ibu</label>
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <label class="section-label">
-        👴👵 <span data-i18n="kakek_nenek">Kakek & Nenek (jika orang tua sudah meninggal)</span>
-      </label>
-      
-      <div class="checkbox-grid">
-        <div class="checkbox-item">
-          <input type="checkbox" id="kakek" disabled>
-          <label for="kakek" data-i18n="kakek">👴 Kakek (dari ayah)</label>
-        </div>
-        <div class="checkbox-item">
-          <input type="checkbox" id="nenek" disabled>
-          <label for="nenek" data-i18n="nenek">👵 Nenek</label>
-        </div>
-      </div>
-      <div class="input-hint" data-i18n="kakek_hint">Kakek/Nenek hanya dapat waris jika ayah/ibu sudah meninggal</div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn-secondary" onclick="prevStep(3)">
-        ← <span data-i18n="back">Kembali</span>
-      </button>
-      <button class="btn-primary" onclick="nextStep(5)">
-        <span data-i18n="next">Lanjut</span> →
-      </button>
-    </div>
-  </div>
-
-  <!-- STEP 5: Ahli Waris - Anak -->
-  <div class="step" id="step5">
-    <h2 class="step-title">
-      <span class="step-number">5</span>
-      <span data-i18n="step5_title">Ahli Waris - Keturunan</span>
-    </h2>
-
-    <div class="section">
-      <label class="section-label">
-        👶 <span data-i18n="anak">Anak Kandung</span>
-      </label>
-      
-      <div class="input-group-number">
-        <div class="number-input-wrapper">
-          <label data-i18n="anak_laki">👦 Anak Laki-laki:</label>
-          <input type="number" id="anakLaki" min="0" value="0" class="input-number" onchange="toggleCucu()">
-        </div>
-        <div class="number-input-wrapper">
-          <label data-i18n="anak_perempuan">👧 Anak Perempuan:</label>
-          <input type="number" id="anakPerempuan" min="0" value="0" class="input-number" onchange="toggleCucu()">
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <label class="section-label">
-        👦👧 <span data-i18n="cucu">Cucu (dari anak laki-laki yang sudah meninggal)</span>
-      </label>
-      
-      <div class="input-group-number">
-        <div class="number-input-wrapper">
-          <label data-i18n="cucu_laki">👦 Cucu Laki-laki:</label>
-          <input type="number" id="cucuLaki" min="0" value="0" class="input-number" disabled>
-        </div>
-        <div class="number-input-wrapper">
-          <label data-i18n="cucu_perempuan">👧 Cucu Perempuan:</label>
-          <input type="number" id="cucuPerempuan" min="0" value="0" class="input-number" disabled>
-        </div>
-      </div>
-      <div class="input-hint" data-i18n="cucu_hint">Cucu hanya dapat waris jika tidak ada anak kandung atau sebagai pengganti anak yang meninggal</div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn-secondary" onclick="prevStep(4)">
-        ← <span data-i18n="back">Kembali</span>
-      </button>
-      <button class="btn-primary" onclick="nextStep(6)">
-        <span data-i18n="next">Lanjut</span> →
-      </button>
-    </div>
-  </div>
-
-  <!-- STEP 6: Ahli Waris - Saudara -->
-  <div class="step" id="step6">
-    <h2 class="step-title">
-      <span class="step-number">6</span>
-      <span data-i18n="step6_title">Ahli Waris - Saudara</span>
-    </h2>
-
-    <div class="section">
-      <label class="section-label">
-        👫 <span data-i18n="saudara_kandung">Saudara Kandung (Seibu Seayah)</span>
-      </label>
-      
-      <div class="input-group-number">
-        <div class="number-input-wrapper">
-          <label data-i18n="saudara_laki_kandung">👨 Saudara Laki-laki:</label>
-          <input type="number" id="saudaraLakiKandung" min="0" value="0" class="input-number">
-        </div>
-        <div class="number-input-wrapper">
-          <label data-i18n="saudara_perempuan_kandung">👩 Saudara Perempuan:</label>
-          <input type="number" id="saudaraPerempuanKandung" min="0" value="0" class="input-number">
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <label class="section-label">
-        👫 <span data-i18n="saudara_seayah">Saudara Seayah (Beda Ibu)</span>
-      </label>
-      
-      <div class="input-group-number">
-        <div class="number-input-wrapper">
-          <label data-i18n="saudara_laki_seayah">👨 Saudara Laki-laki:</label>
-          <input type="number" id="saudaraLakiSeayah" min="0" value="0" class="input-number">
-        </div>
-        <div class="number-input-wrapper">
-          <label data-i18n="saudara_perempuan_seayah">👩 Saudara Perempuan:</label>
-          <input type="number" id="saudaraPerempuanSeayah" min="0" value="0" class="input-number">
-        </div>
-      </div>
-    </div>
-
-    <div class="section">
-      <label class="section-label">
-        👫 <span data-i18n="saudara_seibu">Saudara Seibu (Beda Ayah)</span>
-      </label>
-      
-      <div class="input-group-number">
-        <div class="number-input-wrapper">
-          <label data-i18n="saudara_laki_seibu">👨 Saudara Laki-laki:</label>
-          <input type="number" id="saudaraLakiSeibu" min="0" value="0" class="input-number">
-        </div>
-        <div class="number-input-wrapper">
-          <label data-i18n="saudara_perempuan_seibu">👩 Saudara Perempuan:</label>
-          <input type="number" id="saudaraPerempuanSeibu" min="0" value="0" class="input-number">
-        </div>
-      </div>
-    </div>
-
-    <div class="btn-group">
-      <button class="btn-secondary" onclick="prevStep(5)">
-        ← <span data-i18n="back">Kembali</span>
-      </button>
-      <button class="btn-primary" onclick="calculate()">
-        🧮 <span data-i18n="calculate">Hitung Waris</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- STEP 7: Hasil -->
-  <div class="step" id="step7">
-    <h2 class="step-title">
-      <span class="step-number">📊</span>
-      <span data-i18n="result_title">Hasil Pembagian Waris</span>
-    </h2>
-
-    <!-- Ringkasan Harta -->
-    <div class="result-summary" id="resultSummary"></div>
-
-    <!-- Daftar Ahli Waris -->
-    <div class="result-heirs" id="resultHeirs"></div>
-
-    <!-- Ahli Waris Terhalang -->
-    <div class="result-blocked" id="resultBlocked"></div>
-
-    <!-- Action Buttons -->
-    <div class="btn-group">
-      <button class="btn-secondary" onclick="resetCalculation()">
-        🔄 <span data-i18n="reset">Hitung Ulang</span>
-      </button>
-      <button class="btn-primary" onclick="exportPDF()">
-        📄 <span data-i18n="export_pdf">Download PDF</span>
-      </button>
-      <button class="btn-success" onclick="shareResult()">
-        📤 <span data-i18n="share">Bagikan</span>
-      </button>
-    </div>
-  </div>
-
-</div>
-
-<!-- Info Modal -->
-<div class="modal" id="infoModal" onclick="closeModal()">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <span class="modal-close" onclick="closeModal()">&times;</span>
-    <div id="modalBody"></div>
-  </div>
-</div>
-
-<!-- Loading Overlay -->
-<div class="loading-overlay" id="loadingOverlay" style="display: none;">
-  <div class="loading-spinner"></div>
-  <p data-i18n="loading">Memproses...</p>
-</div>
-<script src="script.js"></script>
+  </script>
 </body>
-
 </html>
-
