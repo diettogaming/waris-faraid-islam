@@ -1662,42 +1662,156 @@ function renderBlockedHeir(blocked) {
   `;
 }
 
-// ===== FUNGSI DISPLAY RESULT (PERBAIKAN LENGKAP) =====
+// ===== FUNGSI DISPLAY RESULT - PART 1: INISIALISASI & SUMMARY =====
 
 function displayResult(result) {
-  // ... (kode summary tetap sama) ...
+  // PART 1A: Inisialisasi variabel
+  let summaryHTML = '';
+  let heirsHTML = '';
+  let blockedHTML = '';
+  let verificationHTML = '';
   
+  // PART 1B: Build Summary HTML - Harta Awal
+  summaryHTML = `
+    <div class="summary-table">
+      <div class="summary-row">
+        <span class="summary-label">${currentLang === 'id' ? 'Harta Awal' : 'Initial Assets'}</span>
+        <span class="summary-value">${formatRupiah(result.hartaBersih.awal)}</span>
+      </div>
+  `;
+  
+  // PART 1C: Biaya Jenazah (jika ada)
+  if (result.hartaBersih.biayaJenazah > 0) {
+    summaryHTML += `
+      <div class="summary-row">
+        <span class="summary-label">${currentLang === 'id' ? 'Biaya Jenazah' : 'Funeral Expenses'}</span>
+        <span class="summary-value" style="color: #ef4444;">- ${formatRupiah(result.hartaBersih.biayaJenazah)}</span>
+      </div>
+    `;
+  }
+  
+  // PART 1D: Hutang (jika ada)
+  if (result.hartaBersih.hutang > 0) {
+    summaryHTML += `
+      <div class="summary-row">
+        <span class="summary-label">${currentLang === 'id' ? 'Hutang' : 'Debts'}</span>
+        <span class="summary-value" style="color: #ef4444;">- ${formatRupiah(result.hartaBersih.hutang)}</span>
+      </div>
+    `;
+  }
+  
+  // PART 1E: Asuransi Syariah (jika ada)
+  if (result.hartaBersih.asuransi > 0) {
+    summaryHTML += `
+      <div class="summary-row">
+        <span class="summary-label">${currentLang === 'id' ? 'Asuransi Syariah' : 'Sharia Insurance'}</span>
+        <span class="summary-value" style="color: #10b981;">+ ${formatRupiah(result.hartaBersih.asuransi)}</span>
+      </div>
+    `;
+  }
+
+  // PART 1F: Wasiat (jika ada)
+  if (result.hartaBersih.wasiat > 0) {
+    summaryHTML += `
+      <div class="summary-row">
+        <span class="summary-label">${currentLang === 'id' ? 'Wasiat (maks 1/3)' : 'Will (max 1/3)'}</span>
+        <span class="summary-value" style="color: #ef4444;">- ${formatRupiah(result.hartaBersih.wasiat)}</span>
+      </div>
+    `;
+  }
+  
+  // PART 1G: Harta Bersih (Total yang dibagi)
+  summaryHTML += `
+      <div class="summary-row" style="background: #dbeafe; font-weight: bold;">
+        <span class="summary-label">${currentLang === 'id' ? 'HARTA YANG DIBAGI' : 'DISTRIBUTABLE ASSETS'}</span>
+        <span class="summary-value">${formatRupiah(result.hartaBersih.bersih)}</span>
+      </div>
+    </div>
+  `;
+  
+  // PART 1H: Dalil Hutang
+  summaryHTML += `
+    <div class="dalil-section mt-6">
+      <h4 class="font-bold text-lg mb-3">
+        ${currentLang === 'id' ? '📜 Dalil Hadits Tentang Hutang' : '📜 Hadith About Debt'}
+      </h4>
+      ${renderDalil(getDalil('hutang'))}
+    </div>
+  `;
+  
+  // PART 1I: Dalil Urutan Pembagian
+  summaryHTML += `
+    <div class="dalil-section mt-4">
+      <h4 class="font-bold text-lg mb-3">
+        ${currentLang === 'id' ? '📜 Dalil Urutan Pembagian Harta' : '📜 Evidence for Order of Distribution'}
+      </h4>
+      ${renderDalil(getDalil('urutan'))}
+      <p class="mt-2 text-sm">
+        ${currentLang === 'id' 
+          ? 'Ayat ini menunjukkan urutan pembagian harta: 1) Biaya jenazah, 2) Hutang, 3) Wasiat (maksimal 1/3), 4) Waris' 
+          : 'This verse shows the order: 1) Funeral expenses, 2) Debts, 3) Will (max 1/3), 4) Inheritance'}
+      </p>
+    </div>
+  `;
+  
+  // PART 1J: Render Summary ke DOM
   document.getElementById('resultSummary').innerHTML = summaryHTML;
   
-  // PERBAIKAN: Jika terjadi 'Aul, tampilkan 2 perhitungan
+  // Lanjut ke PART 2...
+}
+  // ===== PART 2: DISPLAY DETAIL 'AUL (JIKA TERJADI) =====
+  
   if (result.aul && result.aul.occurred) {
-    const aulDetailHTML = `
+    // PART 2A: Header 'Aul
+    let aulHTML = `
       <div class="bg-purple-50 dark:bg-purple-900 p-6 rounded-xl border-l-4 border-purple-500 mt-6">
         <h4 class="font-bold text-lg mb-3 text-purple-900 dark:text-purple-300">
           ⚖️ ${currentLang === 'id' ? 'Kasus \'Aul Terdeteksi' : '\'Aul Case Detected'}
         </h4>
-        
+    `;
+    
+    // PART 2B: Penjelasan 'Aul
+    aulHTML += `
         <div class="bg-white dark:bg-gray-800 p-4 rounded-lg mb-4">
-          <p class="font-semibold mb-2">${currentLang === 'id' ? '📊 Penjelasan:' : '📊 Explanation:'}</p>
-          <p class="text-sm mb-3">${currentLang === 'id' ? result.aul.explanation.id : result.aul.explanation.en}</p>
+          <p class="font-semibold mb-2">
+            ${currentLang === 'id' ? '📊 Penjelasan:' : '📊 Explanation:'}
+          </p>
+          <p class="text-sm mb-3">
+            ${currentLang === 'id' ? result.aul.explanation.id : result.aul.explanation.en}
+          </p>
         </div>
-        
+    `;
+    
+    // PART 2C: Grid Perbandingan (Sebelum vs Sesudah 'Aul)
+    aulHTML += `
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          <!-- PERHITUNGAN SEBELUM 'AUL -->
+    `;
+    
+    // PART 2D: Kolom Kiri - Sebelum 'Aul (Merah)
+    aulHTML += `
           <div class="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
             <h5 class="font-bold mb-3 text-red-900 dark:text-red-300">
               ${currentLang === 'id' ? '❌ Sebelum \'Aul (Tidak Valid)' : '❌ Before \'Aul (Invalid)'}
             </h5>
             <div class="space-y-2 text-sm">
-              ${result.aul.beforeAul.map(h => `
-                <div class="flex justify-between">
-                  <span>${h.name}</span>
-                  <span class="font-bold">${formatRupiah(Math.round(h.totalBefore))}</span>
-                </div>
-              `).join('')}
+    `;
+    
+    // PART 2E: List ahli waris sebelum 'Aul
+    result.aul.beforeAul.forEach(h => {
+      aulHTML += `
+              <div class="flex justify-between">
+                <span>${h.name}</span>
+                <span class="font-bold">${formatRupiah(Math.round(h.totalBefore))}</span>
+              </div>
+      `;
+    });
+    
+    // PART 2F: Total sebelum 'Aul
+    const totalBeforeAul = result.aul.beforeAul.reduce((sum, h) => sum + h.totalBefore, 0);
+    aulHTML += `
               <div class="flex justify-between pt-2 border-t-2 border-red-300 font-bold text-red-700 dark:text-red-300">
                 <span>TOTAL:</span>
-                <span>${formatRupiah(Math.round(result.aul.beforeAul.reduce((sum, h) => sum + h.totalBefore, 0)))}</span>
+                <span>${formatRupiah(Math.round(totalBeforeAul))}</span>
               </div>
               <div class="text-xs text-red-600 dark:text-red-400 mt-2">
                 ${currentLang === 'id' 
@@ -1706,25 +1820,37 @@ function displayResult(result) {
               </div>
             </div>
           </div>
-          
-          <!-- PERHITUNGAN SETELAH 'AUL -->
+    `;
+    
+    // PART 2G: Kolom Kanan - Setelah 'Aul (Hijau)
+    aulHTML += `
           <div class="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
             <h5 class="font-bold mb-3 text-green-900 dark:text-green-300">
               ${currentLang === 'id' ? '✅ Setelah \'Aul (Valid)' : '✅ After \'Aul (Valid)'}
             </h5>
             <div class="space-y-2 text-sm">
-              ${result.heirs.filter(h => h.aulApplied).map(h => `
-                <div class="flex justify-between">
-                  <span>${h.name}</span>
-                  <span class="font-bold">${formatRupiah(Math.round(h.total))}</span>
-                </div>
-                <div class="text-xs text-gray-600 dark:text-gray-400 ml-2">
-                  ${fractionToString(h.originalShare)} × ${h.aulFactor.toFixed(4)} = ${fractionToString(h.share)}
-                </div>
-              `).join('')}
+    `;
+    
+    // PART 2H: List ahli waris setelah 'Aul
+    const heirsAfterAul = result.heirs.filter(h => h.aulApplied);
+    heirsAfterAul.forEach(h => {
+      aulHTML += `
+              <div class="flex justify-between">
+                <span>${h.name}</span>
+                <span class="font-bold">${formatRupiah(Math.round(h.total))}</span>
+              </div>
+              <div class="text-xs text-gray-600 dark:text-gray-400 ml-2">
+                ${fractionToString(h.originalShare)} × ${h.aulFactor.toFixed(4)} = ${fractionToString(h.share)}
+              </div>
+      `;
+    });
+    
+    // PART 2I: Total setelah 'Aul
+    const totalAfterAul = heirsAfterAul.reduce((sum, h) => sum + h.total, 0);
+    aulHTML += `
               <div class="flex justify-between pt-2 border-t-2 border-green-300 font-bold text-green-700 dark:text-green-300">
                 <span>TOTAL:</span>
-                <span>${formatRupiah(Math.round(result.heirs.filter(h => h.aulApplied).reduce((sum, h) => sum + h.total, 0)))}</span>
+                <span>${formatRupiah(Math.round(totalAfterAul))}</span>
               </div>
               <div class="text-xs text-green-600 dark:text-green-400 mt-2">
                 ${currentLang === 'id' 
@@ -1734,10 +1860,17 @@ function displayResult(result) {
             </div>
           </div>
         </div>
-        
-        <!-- DETAIL PENYESUAIAN PER AHLI WARIS -->
+    `;
+    
+    // Lanjut ke PART 3 untuk tabel detail...
+    // ===== PART 3: TABEL DETAIL PENYESUAIAN 'AUL =====
+    
+    // PART 3A: Header Tabel
+    aulHTML += `
         <div class="bg-white dark:bg-gray-800 p-4 rounded-lg mb-4">
-          <h5 class="font-bold mb-3">${currentLang === 'id' ? '📋 Detail Penyesuaian Per Ahli Waris:' : '📋 Adjustment Details Per Heir:'}</h5>
+          <h5 class="font-bold mb-3">
+            ${currentLang === 'id' ? '📋 Detail Penyesuaian Per Ahli Waris:' : '📋 Adjustment Details Per Heir:'}
+          </h5>
           <div class="overflow-x-auto">
             <table class="w-full text-sm">
               <thead class="bg-gray-100 dark:bg-gray-700">
@@ -1751,41 +1884,65 @@ function displayResult(result) {
                 </tr>
               </thead>
               <tbody>
-                ${result.heirs.filter(h => h.aulApplied).map(h => `
-                  <tr class="border-b dark:border-gray-700">
-                    <td class="p-2 font-semibold">${h.name}</td>
-                    <td class="p-2 text-center">${fractionToString(h.originalShare)}</td>
-                    <td class="p-2 text-center text-purple-600 dark:text-purple-400 font-bold">× ${h.aulFactor.toFixed(4)}</td>
-                    <td class="p-2 text-center">${fractionToString(h.share)}</td>
-                    <td class="p-2 text-right text-red-600 dark:text-red-400 line-through">${formatRupiah(Math.round(h.originalShare * result.hartaBersih.bersih))}</td>
-                    <td class="p-2 text-right text-green-600 dark:text-green-400 font-bold">${formatRupiah(Math.round(h.total))}</td>
-                  </tr>
-                `).join('')}
+    `;
+    
+    // PART 3B: Isi Tabel - Per Ahli Waris
+    heirsAfterAul.forEach(h => {
+      aulHTML += `
+                <tr class="border-b dark:border-gray-700">
+                  <td class="p-2 font-semibold">${h.name}</td>
+                  <td class="p-2 text-center">${fractionToString(h.originalShare)}</td>
+                  <td class="p-2 text-center text-purple-600 dark:text-purple-400 font-bold">
+                    × ${h.aulFactor.toFixed(4)}
+                  </td>
+                  <td class="p-2 text-center">${fractionToString(h.share)}</td>
+                  <td class="p-2 text-right text-red-600 dark:text-red-400 line-through">
+                    ${formatRupiah(Math.round(h.originalShare * result.hartaBersih.bersih))}
+                  </td>
+                  <td class="p-2 text-right text-green-600 dark:text-green-400 font-bold">
+                    ${formatRupiah(Math.round(h.total))}
+                  </td>
+                </tr>
+      `;
+    });
+    
+    // PART 3C: Tutup Tabel
+    aulHTML += `
               </tbody>
             </table>
           </div>
         </div>
-        
-        <!-- DALIL 'AUL -->
+    `;
+    
+    // PART 3D: Dalil 'Aul
+    aulHTML += `
         <div class="bg-purple-100 dark:bg-purple-800 p-4 rounded-lg">
-          <h5 class="font-bold mb-3">${currentLang === 'id' ? '📖 Dalil Hukum \'Aul:' : '📖 Evidence for \'Aul:'}</h5>
+          <h5 class="font-bold mb-3">
+            ${currentLang === 'id' ? '📖 Dalil Hukum \'Aul:' : '📖 Evidence for \'Aul:'}
+          </h5>
           ${renderDalil(getDalil('aul'))}
+          
           <div class="mt-3 p-3 bg-white dark:bg-gray-700 rounded text-sm">
-            <p class="font-semibold mb-2">${currentLang === 'id' ? '💡 Penjelasan Tambahan:' : '💡 Additional Explanation:'}</p>
-            <p>${currentLang === 'id' 
-              ? 'Hukum \'Aul pertama kali diterapkan oleh Khalifah Umar bin Khattab RA dan menjadi Ijma\' (konsensus) para Sahabat. Ketika total bagian fardh melebihi 100%, semua ahli waris fardh mendapat pengurangan proporsional yang sama agar total tepat 100%. Ini adalah solusi yang adil karena tidak ada yang didahulukan atau diakhirkan.'
-              : 'The law of \'Aul was first applied by Caliph Umar bin Khattab RA and became Ijma\' (consensus) of the Companions. When total fardh shares exceed 100%, all fardh heirs receive the same proportional reduction to make the total exactly 100%. This is a fair solution as no one is given precedence or delayed.'
-            }</p>
+            <p class="font-semibold mb-2">
+              ${currentLang === 'id' ? '💡 Penjelasan Tambahan:' : '💡 Additional Explanation:'}
+            </p>
+            <p>
+              ${currentLang === 'id' 
+                ? 'Hukum \'Aul pertama kali diterapkan oleh Khalifah Umar bin Khattab RA dan menjadi Ijma\' (konsensus) para Sahabat. Ketika total bagian fardh melebihi 100%, semua ahli waris fardh mendapat pengurangan proporsional yang sama agar total tepat 100%. Ini adalah solusi yang adil karena tidak ada yang didahulukan atau diakhirkan.'
+                : 'The law of \'Aul was first applied by Caliph Umar bin Khattab RA and became Ijma\' (consensus) of the Companions. When total fardh shares exceed 100%, all fardh heirs receive the same proportional reduction to make the total exactly 100%. This is a fair solution as no one is given precedence or delayed.'}
+            </p>
           </div>
         </div>
       </div>
     `;
     
-    document.getElementById('resultSummary').insertAdjacentHTML('beforeend', aulDetailHTML);
+    // PART 3E: Render 'Aul HTML ke DOM
+    document.getElementById('resultSummary').insertAdjacentHTML('beforeend', aulHTML);
   }
+
+  // ===== PART 4A: DISPLAY HEIRS (AHLI WARIS) =====
   
-  // 2. DISPLAY HEIRS (Ahli Waris)
-  let heirsHTML = `
+  heirsHTML = `
     <h3 class="text-2xl font-bold text-blue-900 dark:text-blue-300 mt-8 mb-4">
       ${currentLang === 'id' ? '👥 Ahli Waris yang Berhak' : '👥 Eligible Heirs'}
     </h3>
@@ -1797,9 +1954,10 @@ function displayResult(result) {
   
   document.getElementById('resultHeirs').innerHTML = heirsHTML;
   
-  // 3. DISPLAY BLOCKED HEIRS (Ahli Waris Terhalang)
+  // ===== PART 4B: DISPLAY BLOCKED HEIRS (AHLI WARIS TERHALANG) =====
+  
   if (result.blocked.length > 0) {
-    let blockedHTML = `
+    blockedHTML = `
       <h3 class="text-2xl font-bold text-red-900 dark:text-red-300 mt-8 mb-4">
         ${currentLang === 'id' ? '⛔ Ahli Waris yang Terhalang (Mahjub)' : '⛔ Blocked Heirs (Mahjub)'}
       </h3>
@@ -1814,16 +1972,18 @@ function displayResult(result) {
     document.getElementById('resultBlocked').innerHTML = '';
   }
   
-  // 4. DISPLAY VERIFICATION (Verifikasi Total Pembagian)
+  // ===== PART 4C: DISPLAY VERIFICATION (VERIFIKASI TOTAL) =====
+  
+  // Hitung total dibagikan
   let totalDibagikan = 0;
   result.heirs.forEach(h => {
     totalDibagikan += h.total;
   });
   
   const selisih = Math.abs(result.hartaBersih.bersih - totalDibagikan);
-  const isMatch = selisih < 1000; // Toleransi Rp 1000 untuk pembulatan
+  const isMatch = selisih < 1000; // Toleransi Rp 1000
   
-  let verificationHTML = `
+  verificationHTML = `
     <div class="verification-card mt-8">
       <h3 class="text-2xl font-bold mb-4" style="color: ${isMatch ? '#10b981' : '#f59e0b'};">
         ${currentLang === 'id' ? '📊 Verifikasi Total Pembagian' : '📊 Distribution Verification'}
@@ -1842,18 +2002,25 @@ function displayResult(result) {
         
         <div class="verification-row">
           <span class="font-semibold">${currentLang === 'id' ? 'Selisih:' : 'Difference:'}</span>
-          <span class="font-bold ${isMatch ? 'verification-match' : 'verification-mismatch'}">${formatRupiah(Math.round(selisih))}</span>
+          <span class="font-bold ${isMatch ? 'verification-match' : 'verification-mismatch'}">
+            ${formatRupiah(Math.round(selisih))}
+          </span>
         </div>
         
         <div class="verification-row" style="background: ${isMatch ? '#d1fae5' : '#fef3c7'}; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem;">
           <span class="font-bold text-lg">${currentLang === 'id' ? 'Status:' : 'Status:'}</span>
           <span class="font-bold text-lg ${isMatch ? 'verification-match' : 'verification-mismatch'}">
-            ${isMatch ? (currentLang === 'id' ? '✅ Sesuai' : '✅ Match') : (currentLang === 'id' ? '⚠️ Ada Selisih' : '⚠️ Mismatch')}
+            ${isMatch 
+              ? (currentLang === 'id' ? '✅ Sesuai' : '✅ Match') 
+              : (currentLang === 'id' ? '⚠️ Ada Selisih' : '⚠️ Mismatch')}
           </span>
         </div>
       </div>
-      
-      ${!isMatch && result.aul && result.aul.occurred ? `
+  `;
+  
+  // PART 4D: Catatan jika ada selisih
+  if (!isMatch && result.aul && result.aul.occurred) {
+    verificationHTML += `
       <div class="mt-4 p-4 bg-purple-100 dark:bg-purple-900 rounded-lg">
         <p class="text-sm text-purple-800 dark:text-purple-200">
           ${currentLang === 'id' 
@@ -1861,7 +2028,9 @@ function displayResult(result) {
             : '💡 Note: This difference occurs due to the application of \'Aul law. See the \'Aul calculation details above for complete explanation.'}
         </p>
       </div>
-      ` : !isMatch ? `
+    `;
+  } else if (!isMatch) {
+    verificationHTML += `
       <div class="mt-4 p-4 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
         <p class="text-sm text-yellow-800 dark:text-yellow-200">
           ${currentLang === 'id' 
@@ -1869,20 +2038,35 @@ function displayResult(result) {
             : '💡 Note: Small differences may occur due to rounding in calculations.'}
         </p>
       </div>
-      ` : ''}
-      
+    `;
+  }
+  
+  // PART 4E: Rincian per ahli waris
+  verificationHTML += `
       <div class="mt-6">
-        <h4 class="font-bold mb-3">${currentLang === 'id' ? '📋 Rincian Per Ahli Waris:' : '📋 Breakdown Per Heir:'}</h4>
+        <h4 class="font-bold mb-3">
+          ${currentLang === 'id' ? '📋 Rincian Per Ahli Waris:' : '📋 Breakdown Per Heir:'}
+        </h4>
         <div class="space-y-2">
-          ${result.heirs.map(h => `
-            <div class="flex justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-              <span class="font-semibold">${h.name}</span>
-              <span class="font-bold text-green-600 dark:text-green-400">${formatRupiah(Math.round(h.total))}</span>
-            </div>
-          `).join('')}
+  `;
+  
+  result.heirs.forEach(h => {
+    verificationHTML += `
+          <div class="flex justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <span class="font-semibold">${h.name}</span>
+            <span class="font-bold text-green-600 dark:text-green-400">
+              ${formatRupiah(Math.round(h.total))}
+            </span>
+          </div>
+    `;
+  });
+  
+  verificationHTML += `
           <div class="flex justify-between p-4 bg-blue-100 dark:bg-blue-900 rounded-lg font-bold text-lg">
             <span>${currentLang === 'id' ? 'TOTAL:' : 'TOTAL:'}</span>
-            <span class="text-blue-900 dark:text-blue-300">${formatRupiah(Math.round(totalDibagikan))}</span>
+            <span class="text-blue-900 dark:text-blue-300">
+              ${formatRupiah(Math.round(totalDibagikan))}
+            </span>
           </div>
         </div>
       </div>
@@ -1891,30 +2075,39 @@ function displayResult(result) {
   
   document.getElementById('resultVerification').innerHTML = verificationHTML;
   
-  // 5. DISPLAY RADD NOTIFICATION (jika terjadi)
+  // ===== PART 4F: DISPLAY RADD (JIKA TERJADI) =====
+  
   if (result.radd && result.radd.occurred) {
     const raddHTML = `
       <div class="bg-teal-50 dark:bg-teal-900 p-6 rounded-xl border-l-4 border-teal-500 mt-6">
         <h4 class="font-bold text-lg mb-3 text-teal-900 dark:text-teal-300">
           🔄 ${currentLang === 'id' ? 'Kasus Radd Terdeteksi' : 'Radd Case Detected'}
         </h4>
-        <p class="mb-4">${currentLang === 'id' ? result.radd.explanation.id : result.radd.explanation.en}</p>
+        <p class="mb-4">
+          ${currentLang === 'id' ? result.radd.explanation.id : result.radd.explanation.en}
+        </p>
         <div class="dalil-section">
           ${renderDalil(getDalil('radd'))}
         </div>
         <div class="mt-4 p-4 bg-teal-100 dark:bg-teal-800 rounded-lg">
-          <p class="font-semibold mb-2">${currentLang === 'id' ? '📊 Detail Pengembalian:' : '📊 Return Details:'}</p>
+          <p class="font-semibold mb-2">
+            ${currentLang === 'id' ? '📊 Detail Pengembalian:' : '📊 Return Details:'}
+          </p>
           <p class="text-sm">
-            ${currentLang === 'id' ? 'Sisa harta yang dikembalikan:' : 'Remainder returned:'} <strong>${formatRupiah(Math.round(result.radd.sisaHarta))}</strong><br>
-            ${currentLang === 'id' ? 'Dikembalikan kepada ahli waris fardh (kecuali suami/istri)' : 'Returned to fardh heirs (except spouse)'}
+            ${currentLang === 'id' ? 'Sisa harta yang dikembalikan:' : 'Remainder returned:'} 
+            <strong>${formatRupiah(Math.round(result.radd.sisaHarta))}</strong><br>
+            ${currentLang === 'id' 
+              ? 'Dikembalikan kepada ahli waris fardh (kecuali suami/istri)' 
+              : 'Returned to fardh heirs (except spouse)'}
           </p>
         </div>
       </div>
     `;
     document.getElementById('resultSummary').insertAdjacentHTML('beforeend', raddHTML);
   }
-}
-                
+  
+} // PENUTUP FUNGSI displayResult()
+
 // ===== EDUCATIONAL CONTENT =====
 
 const educationalContent = {
