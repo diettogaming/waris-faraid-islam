@@ -750,9 +750,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== PART 2: CALCULATION ENGINE =====
 
-// ===== FUNGSI DETEKSI MAHJUB (PENGHALANGAN) =====
+// ===== FUNGSI DETEKSI MAHJUB (PENGHALANGAN) - FIXED =====
 
-function detectMahjub(data, heirs, blocked) {
+function detectMahjub(data) {
+  const blocked = [];
   const hasAnakOrCucu = hasAnak(data);
   const hasAyah = data.ayah;
   const hasIbu = data.ibu;
@@ -789,10 +790,10 @@ function detectMahjub(data, heirs, blocked) {
     data.nenek = false;
   }
   
-  // Saudara kandung/seayah terhalang oleh ayah, anak laki, ATAU anak perempuan + cucu
-  if ((hasAyah || hasAnakLaki || (data.anakPerempuan > 0 && hasCucu(data))) && 
+  // Saudara kandung/seayah terhalang oleh ayah atau anak laki
+  if ((hasAyah || hasAnakLaki) && 
       (data.saudaraLakiKandung > 0 || data.saudaraPerempuanKandung > 0 || 
-     data.saudaraLakiSeayah > 0 || data.saudaraPerempuanSeayah > 0)) {
+       data.saudaraLakiSeayah > 0 || data.saudaraPerempuanSeayah > 0)) {
     blocked.push({
       type: 'saudara_kandung_seayah',
       count: data.saudaraLakiKandung + data.saudaraPerempuanKandung + 
@@ -971,36 +972,22 @@ if (data.ayah) {
     }
   }
   
-// CUCU (jika tidak terhalang)
+// CUCU PEREMPUAN (jika tidak terhalang)
 if (data.cucuPerempuan > 0 && data.cucuLaki === 0 && data.anakLaki === 0) {
   // Cek apakah ada 2+ anak perempuan
   if (data.anakPerempuan >= 2) {
     // Cucu perempuan TERHALANG oleh 2+ anak perempuan
-    // Tidak ditambahkan ke heirs, tapi ke blocked
-    blocked.push({
-      type: 'cucu_perempuan',
-      count: data.cucuPerempuan,
-      reason: {
-        penjelasan_id: 'Cucu perempuan terhalang (mahjub) karena sudah ada 2 atau lebih anak perempuan yang memenuhi kuota 2/3.',
-        penjelasan_en: 'Granddaughters are blocked (mahjub) because there are already 2 or more daughters fulfilling the 2/3 quota.',
-        dalil: 'الأقرب يحجب الأبعد',
-        sumber: 'Ijma\' Ulama 4 Mazhab'
-      }
-    });
+    // Akan ditambahkan ke blocked di performCalculation()
+    // Tidak perlu push ke blocked di sini
   } else if (data.anakPerempuan === 1) {
     // Jika hanya 1 anak perempuan, cucu perempuan dapat 1/6 (pelengkap)
-    const dalil = {
-      bagian: 1/6,
-      penjelasan_id: 'Cucu perempuan mendapat 1/6 sebagai pelengkap bersama 1 anak perempuan',
-      penjelasan_en: 'Granddaughters get 1/6 as complement with 1 daughter'
-    };
-    
+    const dalil = getDalil('anak_perempuan.satu');
     addHeir(heirs, {
       name: currentLang === 'id' ? `Cucu Perempuan (${data.cucuPerempuan} orang)` : `Granddaughter (${data.cucuPerempuan})`,
-      share: dalil.bagian,
+      share: 1/6,
       count: data.cucuPerempuan,
-      explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
-      dalil: getDalil('anak_perempuan.satu')
+      explanation: currentLang === 'id' ? 'Cucu perempuan mendapat 1/6 sebagai pelengkap bersama 1 anak perempuan' : 'Granddaughters get 1/6 as complement with 1 daughter',
+      dalil: dalil
     });
   } else {
     // Tidak ada anak perempuan, cucu menggantikan
@@ -1251,7 +1238,7 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
   });
 }
 
-// ===== FUNGSI PERHITUNGAN UTAMA (PERBAIKAN) =====
+// ===== FUNGSI PERHITUNGAN UTAMA (FIXED) =====
 
 function performCalculation(data) {
   // 1. Hitung harta bersih
@@ -1262,19 +1249,29 @@ function performCalculation(data) {
   const wasiatFinal = Math.min(data.wasiat, maxWasiat);
   hartaBersih -= wasiatFinal;
   
-  // 2. Inisialisasi array ahli waris dan terhalang
-  let heirs = [];
-  let blocked = [];
-  
-  // 3. Deteksi dan hapus ahli waris yang terhalang (mahjub)
-  const mahjubResult = detectMahjub(data, heirs, blocked);
+  // 2. Deteksi dan hapus ahli waris yang terhalang (mahjub)
+  const mahjubResult = detectMahjub(data);
   data = mahjubResult.data;
-  blocked = mahjubResult.blocked;
+  let blocked = mahjubResult.blocked;
   
-  // 4. Hitung ahli waris fardh
-  heirs = calculateFardhHeirs(data, heirs);
+  // 3. Hitung ahli waris fardh
+  const heirs = calculateFardhHeirs(data);
   
-  // 5. Hitung total bagian fardh SEBELUM 'Aul
+  // 4. Tambahkan cucu perempuan ke blocked jika terhalang oleh 2+ anak perempuan
+  if (data.cucuPerempuan > 0 && data.anakPerempuan >= 2 && data.cucuLaki === 0 && data.anakLaki === 0) {
+    blocked.push({
+      type: 'cucu_perempuan',
+      count: data.cucuPerempuan,
+      reason: {
+        penjelasan_id: 'Cucu perempuan terhalang (mahjub) karena sudah ada 2 atau lebih anak perempuan yang memenuhi kuota 2/3.',
+        penjelasan_en: 'Granddaughters are blocked (mahjub) because there are already 2 or more daughters fulfilling the 2/3 quota.',
+        dalil: 'الأقرب يحجب الأبعد',
+        sumber: 'Ijma\' Ulama 4 Mazhab'
+      }
+    });
+  }
+  
+  // 5. Hitung total bagian fardh
   let totalFardh = 0;
   heirs.forEach(h => {
     if (!h.isAshabah) {
@@ -1286,25 +1283,19 @@ function performCalculation(data) {
   const aulResult = applyAul(heirs, hartaBersih);
   
   // 7. Hitung sisa harta untuk ashabah
-  let actualTotalFardh = totalFardh;
-  if (aulResult.occurred) {
-    actualTotalFardh = 1; // Setelah 'Aul, fardh = 100%
-  }
-  
+  const actualTotalFardh = aulResult.occurred ? 1 : totalFardh;
   const sisaHarta = hartaBersih * (1 - actualTotalFardh);
   
   // 8. Distribusikan sisa harta ke ashabah
   distributeAshabah(heirs, sisaHarta, hartaBersih);
   
-  // 9. Hitung total untuk ahli waris fardh yang belum dapat nilai (jika tidak ada 'Aul)
-  if (!aulResult.occurred) {
-    heirs.forEach(h => {
-      if (!h.isAshabah && h.total === 0) {
-        h.total = h.share * hartaBersih;
-        h.perPerson = h.total / h.count;
-      }
-    });
-  }
+  // 9. Hitung total untuk ahli waris fardh yang belum dapat nilai
+  heirs.forEach(h => {
+    if (!h.isAshabah && h.total === 0) {
+      h.total = h.share * hartaBersih;
+      h.perPerson = h.total / h.count;
+    }
+  });
   
   // 10. Terapkan hukum Radd jika ada sisa dan tidak ada ashabah
   const raddResult = applyRadd(heirs, sisaHarta, hartaBersih);
@@ -1322,8 +1313,7 @@ function performCalculation(data) {
     heirs: heirs,
     blocked: blocked,
     aul: aulResult.occurred ? aulResult : null,
-    radd: raddResult.occurred ? raddResult : null,
-    totalFardhBeforeAul: totalFardh
+    radd: raddResult.occurred ? raddResult : null
   };
 }
 
