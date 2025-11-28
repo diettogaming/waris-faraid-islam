@@ -1297,7 +1297,16 @@ function applyAul(heirs, hartaBersih) {
 function distributeAshabah(heirs, sisaHarta, hartaBersih) {
   const ashabahHeirs = heirs.filter(h => h.isAshabah);
   
-  if (ashabahHeirs.length === 0) {
+  if (ashabahHeirs.length === 0 || sisaHarta <= 0) {
+    ashabahHeirs.forEach(h => {
+      if (h.share > 0) {
+        h.total = h.share * hartaBersih;
+        h.perPerson = h.total / h.count;
+      } else {
+        h.total = 0;
+        h.perPerson = 0;
+      }
+    });
     return;
   }
   
@@ -1417,54 +1426,6 @@ function performCalculation(data) {
   };
 }
 
-// ===== FUNGSI DISTRIBUSI ASHABAH (SISA HARTA) - FIXED 100% =====
-
-function distributeAshabah(heirs, sisaHarta, hartaBersih) {
-  const ashabahHeirs = heirs.filter(h => h.isAshabah);
-  
-  if (ashabahHeirs.length === 0 || sisaHarta <= 0) {
-    // Jika tidak ada sisa, ashabah tidak dapat apa-apa
-    ashabahHeirs.forEach(h => {
-      if (h.share > 0) {
-        // Jika sudah dapat fardh, hitung totalnya
-        h.total = h.share * hartaBersih;
-        h.perPerson = h.total / h.count;
-      } else {
-        h.total = 0;
-        h.perPerson = 0;
-      }
-    });
-    return;
-  }
-  
-  // Cek apakah ada anak/cucu yang juga ashabah
-  const anakAshabah = ashabahHeirs.filter(h => h.ashabahRatio && h.ashabahTotal);
-  const orangTuaAshabah = ashabahHeirs.filter(h => !h.ashabahRatio && !h.ashabahTotal);
-  
-  if (anakAshabah.length > 0) {
-    // Ada anak/cucu, distribusi sisa ke anak dengan ratio 2:1
-    anakAshabah.forEach(h => {
-      const sharePerUnit = sisaHarta / h.ashabahTotal;
-      const fardh = h.share > 0 ? hartaBersih * h.share : 0;
-      h.total = fardh + (sharePerUnit * h.ashabahRatio * h.count);
-      h.perPerson = h.total / h.count;
-    });
-    
-    // Orang tua (ayah/kakek) hanya dapat fardh, tidak dapat sisa
-    orangTuaAshabah.forEach(h => {
-      h.total = h.share > 0 ? hartaBersih * h.share : 0;
-      h.perPerson = h.total;
-    });
-  } else {
-    // Tidak ada anak, orang tua dapat fardh + semua sisa
-    orangTuaAshabah.forEach(h => {
-      const fardh = h.share > 0 ? hartaBersih * h.share : 0;
-      h.total = fardh + sisaHarta;
-      h.perPerson = h.total;
-    });
-  }
-}
-
 // ===== FUNGSI TERAPKAN HUKUM RADD (PENGEMBALIAN SISA) - FIXED 100% =====
 
 function applyRadd(heirs, sisaHarta, hartaBersih) {
@@ -1523,75 +1484,6 @@ function applyRadd(heirs, sisaHarta, hartaBersih) {
   }
   
   return { occurred: false };
-}
-
-// ===== FUNGSI PERHITUNGAN UTAMA (OPTIMIZED) =====
-
-function performCalculation(data) {
-  // 1. Hitung harta bersih
-  let hartaBersih = data.totalHarta - data.biayaJenazah - data.hutang;
-  if (data.asuransi === 'syariah') hartaBersih += data.nilaiAsuransi;
-  
-  const maxWasiat = hartaBersih / 3;
-  const wasiatFinal = Math.min(data.wasiat, maxWasiat);
-  hartaBersih -= wasiatFinal;
-  
-  // 2. Inisialisasi array ahli waris dan terhalang
-  let heirs = [];
-  let blocked = [];
-  
-  // 3. Deteksi dan hapus ahli waris yang terhalang (mahjub)
-  const mahjubResult = detectMahjub(data, heirs, blocked);
-  data = mahjubResult.data;
-  blocked = mahjubResult.blocked;
-  
-  // 4. Hitung ahli waris fardh
-  heirs = calculateFardhHeirs(data, heirs);
-  
-  // 5. Hitung total bagian fardh
-  let totalFardh = 0;
-  heirs.forEach(h => {
-    if (!h.isAshabah) {
-      totalFardh += h.share;
-    }
-  });
-  
-  // 6. Terapkan hukum 'Aul jika totalFardh > 1
-  const aulResult = applyAul(heirs, hartaBersih);
-  
-  // 7. Hitung sisa harta untuk ashabah
-  const actualTotalFardh = aulResult.occurred ? 1 : totalFardh;
-  const sisaHarta = hartaBersih * (1 - actualTotalFardh);
-  
-  // 8. Distribusikan sisa harta ke ashabah
-  distributeAshabah(heirs, sisaHarta, hartaBersih);
-  
-  // 9. Hitung total untuk ahli waris fardh yang belum dapat nilai
-  heirs.forEach(h => {
-    if (!h.isAshabah && h.total === 0) {
-      h.total = h.share * hartaBersih;
-      h.perPerson = h.total / h.count;
-    }
-  });
-  
-  // 10. Terapkan hukum Radd jika ada sisa dan tidak ada ashabah
-  const raddResult = applyRadd(heirs, sisaHarta, hartaBersih);
-  
-  // 11. Return hasil perhitungan
-  return {
-    hartaBersih: {
-      awal: data.totalHarta,
-      biayaJenazah: data.biayaJenazah,
-      hutang: data.hutang,
-      asuransi: data.asuransi === 'syariah' ? data.nilaiAsuransi : 0,
-      wasiat: wasiatFinal,
-      bersih: hartaBersih
-    },
-    heirs: heirs,
-    blocked: blocked,
-    aul: aulResult.occurred ? aulResult : null,
-    radd: raddResult.occurred ? raddResult : null
-  };
 }
 
 // ===== FUNGSI VALIDASI DATA =====
