@@ -791,38 +791,25 @@ function detectMahjub(data) {
     data.nenek = false;
   }
   
-  // ✅ PERBAIKAN: Saudara kandung/seayah terhalang oleh:
-  // 1. Anak laki-laki (dengan atau tanpa ayah)
-  // 2. Anak perempuan + Ayah (keduanya harus ada)
-  // Saudara TIDAK terhalang oleh ayah saja jika tidak ada anak!
-
-  const saudaraKandungSeayahCount = data.saudaraLakiKandung + data.saudaraPerempuanKandung + 
-                                   data.saudaraLakiSeayah + data.saudaraPerempuanSeayah;
-
-  if (saudaraKandungSeayahCount > 0) {
-    let terhalang = false;
-  
-  // Terhalang oleh anak laki-laki
-  if (hasAnakLaki) {
-    terhalang = true;
-  }
-  
-  // Terhalang oleh anak perempuan + ayah (keduanya harus ada)
-  if (hasAnakPerempuan && hasAyah) {
-    terhalang = true;
-  }
-  
-  if (terhalang) {
+  // Saudara kandung/seayah terhalang oleh ayah, anak laki, ATAU anak perempuan + cucu
+  if ((hasAyah || hasAnakLaki || hasAnakOrCucu) && 
+      (data.saudaraLakiKandung > 0 || data.saudaraPerempuanKandung > 0 || 
+       data.saudaraLakiSeayah > 0 || data.saudaraPerempuanSeayah > 0)) {
     blocked.push({
       type: 'saudara_kandung_seayah',
-      count: saudaraKandungSeayahCount,
-      reason: getDalil('mahjub.saudara_oleh_ayah')
-    });
-    data.saudaraLakiKandung = 0;
-    data.saudaraPerempuanKandung = 0;
-    data.saudaraLakiSeayah = 0;
-    data.saudaraPerempuanSeayah = 0;
-  }
+      count: data.saudaraLakiKandung + data.saudaraPerempuanKandung + 
+             data.saudaraLakiSeayah + data.saudaraPerempuanSeayah,
+      reason: {
+        penjelasan_id: 'Saudara kandung dan saudara seayah terhalang (mahjub) oleh keberadaan ayah, anak laki-laki, atau anak perempuan.',
+        penjelasan_en: 'Full siblings and paternal siblings are blocked (mahjub) by the presence of father, son, or daughter.',
+        dalil: 'الأب يحجب الإخوة',
+        sumber: 'Ijma\' Ulama 4 Mazhab'
+    }
+  });
+  data.saudaraLakiKandung = 0;
+  data.saudaraPerempuanKandung = 0;
+  data.saudaraLakiSeayah = 0;
+  data.saudaraPerempuanSeayah = 0;
 }
   
   // Saudara seibu terhalang oleh anak, cucu, ayah, atau kakek
@@ -871,10 +858,13 @@ function calculateFardhHeirs(data, heirs) {
   
   // AYAH
 if (data.ayah) {
+  const hasAnakOrCucu = hasAnak(data);
+  const hasSaudara = data.saudaraLakiKandung > 0 || data.saudaraPerempuanKandung > 0 ||
+                     data.saudaraLakiSeayah > 0 || data.saudaraPerempuanSeayah > 0;
+  
   if (hasAnakOrCucu) {
+    // Ada anak/cucu
     const dalil = getDalil('ayah.dengan_anak');
-    
-    // Cek apakah ada anak laki-laki
     const hasAnakLaki = data.anakLaki > 0;
     
     addHeir(heirs, {
@@ -883,9 +873,24 @@ if (data.ayah) {
       count: 1,
       explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
       dalil: dalil,
-      isAshabah: !hasAnakLaki
+      isAshabah: !hasAnakLaki // Hanya ashabah jika tidak ada anak laki
+    });
+  } else if (hasSaudara) {
+    // ✅ PERBAIKAN: Tidak ada anak, tapi ada saudara
+    // Ayah tetap dapat 1/6 fardh (tidak ashabah)
+    const dalil = getDalil('ayah.dengan_anak');
+    addHeir(heirs, {
+      name: currentLang === 'id' ? 'Ayah' : 'Father',
+      share: 1/6, // Fardh 1/6
+      count: 1,
+      explanation: currentLang === 'id' ? 
+        'Ayah mendapat 1/6 karena ada saudara (tidak ada anak)' : 
+        'Father gets 1/6 because there are siblings (no children)',
+      dalil: dalil,
+      isAshabah: false // TIDAK ashabah
     });
   } else {
+    // Tidak ada anak dan tidak ada saudara
     const dalil = getDalil('ayah.tanpa_anak');
     addHeir(heirs, {
       name: currentLang === 'id' ? 'Ayah' : 'Father',
@@ -893,7 +898,7 @@ if (data.ayah) {
       count: 1,
       explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
       dalil: dalil,
-      isAshabah: true
+      isAshabah: true // Ashabah (dapat semua sisa)
     });
   }
 }
@@ -1096,8 +1101,14 @@ if (data.cucuLaki > 0 && data.anakLaki === 0) {
   }
 }
   
-  // SAUDARA KANDUNG
-  if (data.saudaraPerempuanKandung > 0 && data.saudaraLakiKandung === 0) {
+// SAUDARA KANDUNG (hanya jika tidak ada anak/cucu)
+if (data.saudaraPerempuanKandung > 0 && data.saudaraLakiKandung === 0) {
+  // Cek apakah ada anak atau cucu
+  const hasAnakOrCucu = data.anakLaki > 0 || data.anakPerempuan > 0 || 
+                        data.cucuLaki > 0 || data.cucuPerempuan > 0;
+  
+  if (!hasAnakOrCucu) {
+    // Hanya dapat fardh jika tidak ada anak/cucu
     const bagian = data.saudaraPerempuanKandung === 1 ? 0.5 : 2/3;
     const fraction = data.saudaraPerempuanKandung === 1 ? '1/2' : '2/3';
     
@@ -1115,8 +1126,16 @@ if (data.cucuLaki > 0 && data.anakLaki === 0) {
       }
     });
   }
+  // Jika ada anak/cucu, saudara perempuan akan terhalang di detectMahjub()
+}
+
+if (data.saudaraLakiKandung > 0) {
+  // Cek apakah ada anak atau cucu
+  const hasAnakOrCucu = data.anakLaki > 0 || data.anakPerempuan > 0 || 
+                        data.cucuLaki > 0 || data.cucuPerempuan > 0;
   
-  if (data.saudaraLakiKandung > 0) {
+  if (!hasAnakOrCucu) {
+    // Hanya dapat ashabah jika tidak ada anak/cucu
     const totalSaudara = data.saudaraLakiKandung * 2 + data.saudaraPerempuanKandung;
     
     addHeir(heirs, {
@@ -1155,6 +1174,8 @@ if (data.cucuLaki > 0 && data.anakLaki === 0) {
       });
     }
   }
+  // Jika ada anak/cucu, saudara akan terhalang di detectMahjub()
+ }
   
   // SAUDARA SEIBU
   if (data.saudaraLakiSeibu > 0 || data.saudaraPerempuanSeibu > 0) {
@@ -1394,14 +1415,55 @@ function performCalculation(data) {
   };
 }
 
-// ===== FUNGSI DISTRIBUSI ASHABAH (SISA HARTA) =====
+// ===== FUNGSI DISTRIBUSI ASHABAH (SISA HARTA) - FIXED =====
 
 function distributeAshabah(heirs, sisaHarta, hartaBersih) {
   const ashabahHeirs = heirs.filter(h => h.isAshabah);
   
-  if (ashabahHeirs.length === 0 || sisaHarta <= 0) return;
+  if (ashabahHeirs.length === 0 || sisaHarta <= 0) {
+    // Jika tidak ada sisa, ashabah tidak dapat apa-apa
+    ashabahHeirs.forEach(h => {
+      if (h.share > 0) {
+        // Jika sudah dapat fardh, hitung totalnya
+        h.total = h.share * hartaBersih;
+        h.perPerson = h.total / h.count;
+      } else {
+        h.total = 0;
+        h.perPerson = 0;
+      }
+    });
+    return;
+  }
   
-  ashabahHeirs.forEach(h => {
+  // Hitung berapa ashabah yang benar-benar dapat sisa
+  // Ayah/Kakek yang sudah dapat fardh TIDAK dapat sisa lagi jika ada anak laki
+  const ashabahYangDapatSisa = ashabahHeirs.filter(h => {
+    // Jika Ayah/Kakek dan sudah dapat fardh (1/6), cek apakah ada anak laki
+    if ((h.name.includes('Ayah') || h.name.includes('Father') || 
+         h.name.includes('Kakek') || h.name.includes('Grandfather')) && 
+        h.share > 0) {
+      // Ayah/Kakek sudah dapat 1/6, tidak dapat sisa lagi
+      return false;
+    }
+    return true;
+  });
+  
+  if (ashabahYangDapatSisa.length === 0) {
+    // Semua ashabah sudah dapat fardh, tidak ada yang dapat sisa
+    ashabahHeirs.forEach(h => {
+      if (h.share > 0) {
+        h.total = h.share * hartaBersih;
+        h.perPerson = h.total / h.count;
+      } else {
+        h.total = 0;
+        h.perPerson = 0;
+      }
+    });
+    return;
+  }
+  
+  // Distribusikan sisa ke ashabah yang berhak
+  ashabahYangDapatSisa.forEach(h => {
     if (h.ashabahRatio && h.ashabahTotal) {
       // Anak/Cucu/Saudara dengan ratio 2:1
       const sharePerUnit = sisaHarta / h.ashabahTotal;
@@ -1409,10 +1471,18 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
       h.total = fardh + (sharePerUnit * h.ashabahRatio * h.count);
       h.perPerson = h.total / h.count;
     } else {
-      // Ayah atau Kakek
+      // Ayah atau Kakek (tanpa anak laki, jadi dapat seluruh sisa)
       const fardh = h.share > 0 ? hartaBersih * h.share : 0;
       h.total = fardh + sisaHarta;
       h.perPerson = h.total;
+    }
+  });
+  
+  // Untuk Ayah/Kakek yang tidak dapat sisa, hitung fardh saja
+  ashabahHeirs.forEach(h => {
+    if (!ashabahYangDapatSisa.includes(h) && h.share > 0) {
+      h.total = h.share * hartaBersih;
+      h.perPerson = h.total / h.count;
     }
   });
 }
