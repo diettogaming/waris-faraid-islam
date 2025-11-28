@@ -971,8 +971,39 @@ if (data.ayah) {
     }
   }
   
-  // CUCU (jika tidak terhalang)
-  if (data.cucuPerempuan > 0 && data.cucuLaki === 0 && data.anakLaki === 0) {
+// CUCU (jika tidak terhalang)
+if (data.cucuPerempuan > 0 && data.cucuLaki === 0 && data.anakLaki === 0) {
+  // Cek apakah ada 2+ anak perempuan
+  if (data.anakPerempuan >= 2) {
+    // Cucu perempuan TERHALANG oleh 2+ anak perempuan
+    // Tidak ditambahkan ke heirs, tapi ke blocked
+    blocked.push({
+      type: 'cucu_perempuan',
+      count: data.cucuPerempuan,
+      reason: {
+        penjelasan_id: 'Cucu perempuan terhalang (mahjub) karena sudah ada 2 atau lebih anak perempuan yang memenuhi kuota 2/3.',
+        penjelasan_en: 'Granddaughters are blocked (mahjub) because there are already 2 or more daughters fulfilling the 2/3 quota.',
+        dalil: 'الأقرب يحجب الأبعد',
+        sumber: 'Ijma\' Ulama 4 Mazhab'
+      }
+    });
+  } else if (data.anakPerempuan === 1) {
+    // Jika hanya 1 anak perempuan, cucu perempuan dapat 1/6 (pelengkap)
+    const dalil = {
+      bagian: 1/6,
+      penjelasan_id: 'Cucu perempuan mendapat 1/6 sebagai pelengkap bersama 1 anak perempuan',
+      penjelasan_en: 'Granddaughters get 1/6 as complement with 1 daughter'
+    };
+    
+    addHeir(heirs, {
+      name: currentLang === 'id' ? `Cucu Perempuan (${data.cucuPerempuan} orang)` : `Granddaughter (${data.cucuPerempuan})`,
+      share: dalil.bagian,
+      count: data.cucuPerempuan,
+      explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
+      dalil: getDalil('anak_perempuan.satu')
+    });
+  } else {
+    // Tidak ada anak perempuan, cucu menggantikan
     const dalil = data.cucuPerempuan === 1 ? 
       getDalil('anak_perempuan.satu') : 
       getDalil('anak_perempuan.dua_atau_lebih');
@@ -985,6 +1016,7 @@ if (data.ayah) {
       dalil: dalil
     });
   }
+}
   
   if (data.cucuLaki > 0 && data.anakLaki === 0) {
     const totalCucu = data.cucuLaki * 2 + data.cucuPerempuan;
@@ -2158,6 +2190,58 @@ if (result.aul && result.aul.occurred) {
     `;
   }
   
+  // ===== TAMBAHKAN KODE INI DI SINI ===== ↓↓↓
+  
+  // PART 4D-2: NOTIFIKASI KHUSUS UNTUK KASUS BAITUL MAL
+  if (selisih > 1000 && result.heirs.length === 1) {
+    const onlyHeir = result.heirs[0];
+    const isSpouse = onlyHeir.name.includes('Istri') || onlyHeir.name.includes('Wife') || 
+                     onlyHeir.name.includes('Suami') || onlyHeir.name.includes('Husband');
+    
+    if (isSpouse) {
+      verificationHTML += `
+        <div class="mt-4 p-4 bg-blue-100 dark:bg-blue-900 rounded-lg border-l-4 border-blue-500">
+          <p class="text-sm text-blue-900 dark:text-blue-200">
+            <strong>💡 ${currentLang === 'id' ? 'Catatan Penting - Sisa Harta:' : 'Important Note - Remaining Estate:'}</strong><br><br>
+            ${currentLang === 'id' 
+              ? `Sisa harta sebesar <strong>${formatRupiah(Math.round(selisih))}</strong> tidak memiliki ahli waris yang berhak menerimanya.<br><br>
+                 Menurut hukum Islam, sisa harta ini diserahkan ke:<br>
+                 1️⃣ <strong>Baitul Mal</strong> (kas negara/lembaga zakat), atau<br>
+                 2️⃣ <strong>Kerabat Jauh (Dzawil Arham)</strong> jika ada, seperti:<br>
+                 &nbsp;&nbsp;&nbsp;• Anak dari saudara perempuan<br>
+                 &nbsp;&nbsp;&nbsp;• Cucu dari anak perempuan<br>
+                 &nbsp;&nbsp;&nbsp;• Paman dari pihak ibu<br>
+                 &nbsp;&nbsp;&nbsp;• Dan kerabat lain yang tidak termasuk ashabah<br><br>
+                 <strong>⚠️ Rekomendasi:</strong> Silakan konsultasikan dengan ulama atau pengadilan agama untuk penentuan penerima sisa harta ini.`
+              : `The remaining estate of <strong>${formatRupiah(Math.round(selisih))}</strong> has no eligible heirs to receive it.<br><br>
+                 According to Islamic law, this remainder goes to:<br>
+                 1️⃣ <strong>Baitul Mal</strong> (state treasury/zakat institution), or<br>
+                 2️⃣ <strong>Distant Relatives (Dzawil Arham)</strong> if any, such as:<br>
+                 &nbsp;&nbsp;&nbsp;• Children of sisters<br>
+                 &nbsp;&nbsp;&nbsp;• Grandchildren from daughters<br>
+                 &nbsp;&nbsp;&nbsp;• Maternal uncles<br>
+                 &nbsp;&nbsp;&nbsp;• And other relatives not included in ashabah<br><br>
+                 <strong>⚠️ Recommendation:</strong> Please consult with scholars or religious courts to determine the recipient of this remaining estate.`}
+          </p>
+          
+          <div class="mt-3 p-3 bg-white dark:bg-gray-700 rounded text-xs">
+            <p class="font-semibold mb-1">
+              ${currentLang === 'id' ? '📖 Dalil:' : '📖 Evidence:'}
+            </p>
+            <p class="italic mb-1">
+              ${currentLang === 'id' 
+                ? '"Jika tidak ada ahli waris ashabah dan dzawil furudh, maka harta diserahkan ke Baitul Mal."'
+                : '"If there are no ashabah heirs and dzawil furudh, then the estate goes to Baitul Mal."'}
+            </p>
+            <p class="font-bold">
+              ${currentLang === 'id' ? 'Pendapat Jumhur Ulama' : 'Opinion of Jumhur Scholars'}
+            </p>
+          </div>
+        </div>
+      `;
+    }
+  }
+
   // PART 4E: Rincian per ahli waris
   verificationHTML += `
       <div class="mt-6">
