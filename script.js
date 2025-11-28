@@ -240,11 +240,11 @@ const dalilDatabase = {
       sumber: 'Ijma\' Ulama 4 Mazhab'
     },
     saudara_oleh_ayah: {
-      penjelasan_id: 'Saudara kandung dan saudara seayah terhalang (mahjub) oleh keberadaan ayah atau anak laki-laki.',
-      penjelasan_en: 'Full siblings and paternal siblings are blocked (mahjub) by the presence of father or son.',
+      penjelasan_id: 'Saudara kandung dan saudara seayah terhalang (mahjub) oleh keberadaan ayah, anak laki-laki, atau anak perempuan.',
+      penjelasan_en: 'Full siblings and paternal siblings are blocked (mahjub) by the presence of father, son, or daughter.',
       dalil: 'الأب يحجب الإخوة',
       sumber: 'Ijma\' Ulama 4 Mazhab'
-    },
+  },
     saudara_seibu_oleh_anak: {
       penjelasan_id: 'Saudara seibu terhalang (mahjub) oleh keberadaan anak, cucu, ayah, atau kakek.',
       penjelasan_en: 'Maternal siblings are blocked (mahjub) by the presence of children, grandchildren, father, or grandfather.',
@@ -758,6 +758,7 @@ function detectMahjub(data) {
   const hasAyah = data.ayah;
   const hasIbu = data.ibu;
   const hasAnakLaki = data.anakLaki > 0;
+  const hasAnakPerempuan = data.anakPerempuan > 0; // ✅ TAMBAHKAN INI
   
   // Cucu terhalang oleh anak laki-laki
   if (hasAnakLaki && hasCucu(data)) {
@@ -790,8 +791,8 @@ function detectMahjub(data) {
     data.nenek = false;
   }
   
-  // Saudara kandung/seayah terhalang oleh ayah atau anak laki
-  if ((hasAyah || hasAnakLaki) && 
+  // ✅ PERBAIKAN: Saudara kandung/seayah terhalang oleh ayah, anak laki, ATAU anak perempuan
+  if ((hasAyah || hasAnakLaki || hasAnakPerempuan) && 
       (data.saudaraLakiKandung > 0 || data.saudaraPerempuanKandung > 0 || 
        data.saudaraLakiSeayah > 0 || data.saudaraPerempuanSeayah > 0)) {
     blocked.push({
@@ -1208,7 +1209,7 @@ function applyAul(heirs, hartaBersih) {
   return { occurred: false };
 }
 
-// ===== FUNGSI DISTRIBUSI ASHABAH (PERBAIKAN) =====
+// ===== FUNGSI DISTRIBUSI ASHABAH (SISA HARTA) - FIXED =====
 
 function distributeAshabah(heirs, sisaHarta, hartaBersih) {
   const ashabahHeirs = heirs.filter(h => h.isAshabah);
@@ -1222,6 +1223,15 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
     return;
   }
   
+  // ✅ PERBAIKAN: Hitung total fardh yang sudah diterima oleh ashabah
+  let totalFardhAshabah = 0;
+  ashabahHeirs.forEach(h => {
+    if (h.share > 0) {
+      totalFardhAshabah += h.share * hartaBersih;
+    }
+  });
+  
+  // ✅ Distribusi sisa harta
   ashabahHeirs.forEach(h => {
     if (h.ashabahRatio && h.ashabahTotal) {
       // Anak/Cucu/Saudara dengan ratio 2:1
@@ -1232,8 +1242,19 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
     } else {
       // Ayah atau Kakek
       const fardh = h.share > 0 ? hartaBersih * h.share : 0;
-      h.total = fardh + sisaHarta;
-      h.perPerson = h.total;
+      
+      // ✅ PERBAIKAN: Jika ada ashabah lain (anak), ayah hanya dapat fardh + bagian proporsional
+      const otherAshabah = ashabahHeirs.filter(a => a.ashabahRatio && a.ashabahTotal);
+      
+      if (otherAshabah.length > 0) {
+        // Ada anak/cucu, ayah hanya dapat fardh (tidak dapat sisa)
+        h.total = fardh;
+        h.perPerson = h.total;
+      } else {
+        // Tidak ada anak/cucu, ayah dapat fardh + semua sisa
+        h.total = fardh + sisaHarta;
+        h.perPerson = h.total;
+      }
     }
   });
 }
