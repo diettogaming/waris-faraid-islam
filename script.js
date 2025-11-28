@@ -480,10 +480,8 @@ function toggleIstriCount() {
   
   if (checkbox.checked) {
     countDiv.classList.remove('hidden');
-    countInput.removeAttribute('disabled');
   } else {
     countDiv.classList.add('hidden');
-    countInput.setAttribute('disabled', 'disabled');
   }
 }
 
@@ -1752,34 +1750,116 @@ function displayResult(result) {
     </div>
   `;
   
-  // PART 1H: Dalil Hutang
+  // PART 1H & 1I: Dalil Hutang dan Urutan (Side by Side, Lebih Kecil)
   summaryHTML += `
-    <div class="dalil-section mt-6">
-      <h4 class="font-bold text-lg mb-3">
-        ${currentLang === 'id' ? '📜 Dalil Hadits Tentang Hutang' : '📜 Hadith About Debt'}
-      </h4>
-      ${renderDalil(getDalil('hutang'))}
-    </div>
-  `;
-  
-  // PART 1I: Dalil Urutan Pembagian
-  summaryHTML += `
-    <div class="dalil-section mt-4">
-      <h4 class="font-bold text-lg mb-3">
-        ${currentLang === 'id' ? '📜 Dalil Urutan Pembagian Harta' : '📜 Evidence for Order of Distribution'}
-      </h4>
-      ${renderDalil(getDalil('urutan'))}
-      <p class="mt-2 text-sm">
-        ${currentLang === 'id' 
-          ? 'Ayat ini menunjukkan urutan pembagian harta: 1) Biaya jenazah, 2) Hutang, 3) Wasiat (maksimal 1/3), 4) Waris' 
-          : 'This verse shows the order: 1) Funeral expenses, 2) Debts, 3) Will (max 1/3), 4) Inheritance'}
-      </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+      <div class="dalil-section">
+        <h4 class="font-bold text-base mb-2">
+          ${currentLang === 'id' ? '📜 Dalil Hutang' : '📜 Debt Evidence'}
+        </h4>
+        <div class="text-xs">
+          ${renderDalil(getDalil('hutang'))}
+        </div>
+      </div>
+      
+      <div class="dalil-section">
+        <h4 class="font-bold text-base mb-2">
+          ${currentLang === 'id' ? '📜 Dalil Urutan' : '📜 Order Evidence'}
+        </h4>
+        <div class="text-xs">
+          ${renderDalil(getDalil('urutan'))}
+          <p class="mt-2">
+            ${currentLang === 'id' 
+              ? 'Urutan: 1) Jenazah, 2) Hutang, 3) Wasiat (maks 1/3), 4) Waris' 
+              : 'Order: 1) Funeral, 2) Debts, 3) Will (max 1/3), 4) Inheritance'}
+          </p>
+        </div>
+      </div>
     </div>
   `;
   
   // PART 1J: Render Summary ke DOM
   document.getElementById('resultSummary').innerHTML = summaryHTML;
+  function generateSummary(data) {
+  const mazhab = data.mazhab === 'jumhur' ? 'Jumhur (Mayoritas Ulama)' : 'Mazhab Tertentu';
+  const gender = data.gender === 'male' ? (currentLang === 'id' ? 'Laki-laki' : 'Male') : (currentLang === 'id' ? 'Perempuan' : 'Female');
   
+  let pasangan = currentLang === 'id' ? 'Tidak ada pasangan' : 'No spouse';
+  if (data.suami) pasangan = currentLang === 'id' ? 'Memiliki Suami' : 'Has Husband';
+  if (data.istri) pasangan = currentLang === 'id' ? `Memiliki ${data.istriCount} Istri` : `Has ${data.istriCount} Wife/Wives`;
+  
+  let orangTua = [];
+  if (data.ayah) orangTua.push(currentLang === 'id' ? 'Ayah' : 'Father');
+  if (data.ibu) orangTua.push(currentLang === 'id' ? 'Ibu' : 'Mother');
+  if (data.kakek) orangTua.push(currentLang === 'id' ? 'Kakek' : 'Grandfather');
+  if (data.nenek) orangTua.push(currentLang === 'id' ? 'Nenek' : 'Grandmother');
+  const orangTuaText = orangTua.length > 0 ? orangTua.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
+  
+  let anak = [];
+  if (data.anakLaki > 0) anak.push(`${data.anakLaki} ${currentLang === 'id' ? 'Anak Laki-laki' : 'Son(s)'}`);
+  if (data.anakPerempuan > 0) anak.push(`${data.anakPerempuan} ${currentLang === 'id' ? 'Anak Perempuan' : 'Daughter(s)'}`);
+  const anakText = anak.length > 0 ? anak.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
+  
+  let cucu = [];
+  if (data.cucuLaki > 0) cucu.push(`${data.cucuLaki} ${currentLang === 'id' ? 'Cucu Laki-laki' : 'Grandson(s)'}`);
+  if (data.cucuPerempuan > 0) cucu.push(`${data.cucuPerempuan} ${currentLang === 'id' ? 'Cucu Perempuan' : 'Granddaughter(s)'}`);
+  const cucuText = cucu.length > 0 ? cucu.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
+  
+  let saudara = [];
+  if (data.saudaraLakiKandung > 0) saudara.push(`${data.saudaraLakiKandung} ${currentLang === 'id' ? 'Saudara Laki Kandung' : 'Full Brother(s)'}`);
+  if (data.saudaraPerempuanKandung > 0) saudara.push(`${data.saudaraPerempuanKandung} ${currentLang === 'id' ? 'Saudara Perempuan Kandung' : 'Full Sister(s)'}`);
+  if (data.saudaraLakiSeayah > 0) saudara.push(`${data.saudaraLakiSeayah} ${currentLang === 'id' ? 'Saudara Laki Seayah' : 'Paternal Brother(s)'}`);
+  if (data.saudaraPerempuanSeayah > 0) saudara.push(`${data.saudaraPerempuanSeayah} ${currentLang === 'id' ? 'Saudara Perempuan Seayah' : 'Paternal Sister(s)'}`);
+  if (data.saudaraLakiSeibu > 0) saudara.push(`${data.saudaraLakiSeibu} ${currentLang === 'id' ? 'Saudara Laki Seibu' : 'Maternal Brother(s)'}`);
+  if (data.saudaraPerempuanSeibu > 0) saudara.push(`${data.saudaraPerempuanSeibu} ${currentLang === 'id' ? 'Saudara Perempuan Seibu' : 'Maternal Sister(s)'}`);
+  const saudaraText = saudara.length > 0 ? saudara.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
+  
+  return `
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 p-6 rounded-xl border-2 border-blue-200 dark:border-blue-700 mb-6">
+      <h3 class="text-xl font-bold text-blue-900 dark:text-blue-300 mb-4 flex items-center">
+        <span class="text-2xl mr-2">📋</span>
+        ${currentLang === 'id' ? 'Ringkasan Data Pewaris' : 'Summary of Deceased Data'}
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '⚖️ Mazhab:' : '⚖️ Madhab:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${mazhab}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👤 Jenis Kelamin Pewaris:' : '👤 Gender of Deceased:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${gender}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '💑 Status Pasangan:' : '💑 Spouse Status:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${pasangan}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👴👵 Orang Tua/Kakek Nenek:' : '👴👵 Parents/Grandparents:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${orangTuaText}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👶 Anak:' : '👶 Children:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${anakText}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👦👧 Cucu:' : '👦👧 Grandchildren:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${cucuText}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg md:col-span-2">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👥 Saudara:' : '👥 Siblings:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${saudaraText}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
   // ===== PART 2: DISPLAY DETAIL 'AUL (JIKA TERJADI) =====
   
   if (result.aul && result.aul.occurred) {
@@ -2158,6 +2238,7 @@ const educationalContent = {
         </div>
       `
     },
+    
     ashabah: {
       title: '📖 Apa itu Ashabah?',
       content: `
@@ -2194,6 +2275,7 @@ const educationalContent = {
         </div>
       `
     },
+    
     mahjub: {
       title: '📖 Apa itu Mahjub (Penghalangan)?',
       content: `
@@ -2222,6 +2304,7 @@ const educationalContent = {
         </div>
       `
     },
+    
     aul: {
       title: '📖 Apa itu \'Aul?',
       content: `
@@ -2254,6 +2337,7 @@ const educationalContent = {
         </div>
       `
     },
+    
     radd: {
       title: '📖 Apa itu Radd?',
       content: `
@@ -2285,6 +2369,7 @@ const educationalContent = {
         </div>
       `
     },
+    
     mazhab: {
       title: '📖 Perbedaan 4 Mazhab dalam Waris',
       content: `
@@ -2335,213 +2420,8 @@ const educationalContent = {
           </div>
         </div>
       `
-    }
-  },
-  en: {
-    fardh: {
-      title: '📖 What is Fardh (Ashhabul Furudh)?',
-      content: `
-        <div class="space-y-4">
-          <p><strong>Fardh</strong> are fixed shares determined in the Quran and Hadith.</p>
-          
-          <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-            <h4 class="font-bold mb-2">Fardh Shares:</h4>
-            <ul class="list-disc list-inside space-y-1">
-              <li><strong>1/2 (Half)</strong>: Husband (no children), Single daughter, Single full sister</li>
-              <li><strong>1/4 (Quarter)</strong>: Husband (with children), Wife (no children)</li>
-              <li><strong>1/8 (Eighth)</strong>: Wife (with children)</li>
-              <li><strong>2/3 (Two thirds)</strong>: Two or more daughters, Two or more sisters</li>
-              <li><strong>1/3 (Third)</strong>: Mother (no children & siblings), Two or more maternal siblings</li>
-              <li><strong>1/6 (Sixth)</strong>: Father/Mother (with children), Grandfather, Grandmother, One maternal sibling</li>
-            </ul>
-          </div>
-          
-          <div class="dalil-section">
-            <p class="dalil-arabic">يُوصِيكُمُ اللَّهُ فِي أَوْلَادِكُمْ</p>
-            <p class="dalil-translation">"Allah instructs you concerning your children..."</p>
-            <p class="dalil-source">QS. An-Nisa: 11</p>
-          </div>
-        </div>
-      `
     },
-    ashabah: {
-      title: '📖 What is Ashabah?',
-      content: `
-        <div class="space-y-4">
-          <p><strong>Ashabah</strong> are heirs who receive the remainder after fardh shares are distributed.</p>
-          
-          <div class="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-            <h4 class="font-bold mb-2">Types of Ashabah:</h4>
-            <ul class="list-disc list-inside space-y-2">
-              <li><strong>Ashabah Bi Nafsihi</strong> (Ashabah by himself):
-                <ul class="list-circle list-inside ml-4 mt-1">
-                  <li>Son</li>
-                  <li>Grandson (through son)</li>
-                  <li>Father (if no children)</li>
-                  <li>Grandfather (if no father)</li>
-                  <li>Brothers (full/paternal)</li>
-                </ul>
-              </li>
-              <li><strong>Ashabah Bi Ghairihi</strong> (Ashabah with others):
-                <ul class="list-circle list-inside ml-4 mt-1">
-                  <li>Daughter with son (ratio 2:1)</li>
-                  <li>Granddaughter with grandson (ratio 2:1)</li>
-                  <li>Sister with brother (ratio 2:1)</li>
-                </ul>
-              </li>
-            </ul>
-          </div>
-          
-          <div class="dalil-section">
-            <p class="dalil-arabic">أَلْحِقُوا الْفَرَائِضَ بِأَهْلِهَا فَمَا بَقِيَ فَهُوَ لِأَوْلَى رَجُلٍ ذَكَرٍ</p>
-            <p class="dalil-translation">"Give the shares to those entitled to them, and whatever remains goes to the nearest male relative."</p>
-            <p class="dalil-source">HR. Bukhari & Muslim from Ibn Abbas RA</p>
-          </div>
-        </div>
-      `
-    },
-    mahjub: {
-      title: '📖 What is Mahjub (Blocking)?',
-      content: `
-        <div class="space-y-4">
-          <p><strong>Mahjub</strong> is when an heir is blocked from inheritance because there is another heir with a closer relationship to the deceased.</p>
-          
-          <div class="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
-            <h4 class="font-bold mb-2">Blocking Principle:</h4>
-            <p class="mb-3"><strong>"Al-Aqrab Yahjubu Al-Ab'ad"</strong><br>الأقرب يحجب الأبعد<br><em>"The closer blocks the farther"</em></p>
-            
-            <h4 class="font-bold mb-2 mt-4">Blocking Examples:</h4>
-            <ul class="list-disc list-inside space-y-2">
-              <li><strong>Grandchildren</strong> blocked by <strong>Son</strong></li>
-              <li><strong>Grandfather</strong> blocked by <strong>Father</strong></li>
-              <li><strong>Grandmother</strong> blocked by <strong>Mother</strong></li>
-              <li><strong>Siblings</strong> blocked by <strong>Father or Son</strong></li>
-              <li><strong>Maternal siblings</strong> blocked by <strong>Children, Grandchildren, Father, or Grandfather</strong></li>
-            </ul>
-          </div>
-          
-          <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg mt-4">
-            <h4 class="font-bold mb-2">⚠️ Important Exception:</h4>
-            <p><strong>Grandfather and Grandmother are NOT blocked by the presence of children.</strong> They still receive their fardh share (1/6) along with the children of the deceased.</p>
-            <p class="text-sm mt-2 italic">Reference: Bidayatul Mujtahid (Ibn Rushd), Al-Mughni (Ibn Qudamah)</p>
-          </div>
-        </div>
-      `
-    },
-    aul: {
-      title: '📖 What is \'Aul?',
-      content: `
-        <div class="space-y-4">
-          <p><strong>'Aul</strong> (العول) occurs when total fardh shares exceed 100%. In this case, all fardh shares are reduced proportionally.</p>
-          
-          <div class="bg-purple-50 dark:bg-purple-900 p-4 rounded-lg">
-            <h4 class="font-bold mb-2">'Aul Case Example:</h4>
-            <p class="mb-2">Deceased leaves:</p>
-            <ul class="list-disc list-inside space-y-1 mb-3">
-              <li>Husband: 1/2 (50%)</li>
-              <li>Mother: 1/3 (33.33%)</li>
-              <li>2 Full sisters: 2/3 (66.67%)</li>
-            </ul>
-            <p class="font-bold">Total: 150% (exceeds 100%)</p>
-            <p class="mt-2">Solution: All shares reduced proportionally to:</p>
-            <ul class="list-disc list-inside space-y-1 mt-2">
-              <li>Husband: 1/2 × (100/150) = 33.33%</li>
-              <li>Mother: 1/3 × (100/150) = 22.22%</li>
-              <li>2 Sisters: 2/3 × (100/150) = 44.44%</li>
-            </ul>
-            <p class="font-bold mt-2">Total: 100% ✅</p>
-          </div>
-          
-          <div class="dalil-section">
-            <p class="dalil-arabic">قَالَ عُمَرُ رَضِيَ اللَّهُ عَنْهُ: وَاللَّهِ مَا أَدْرِي أَيُّكُمْ قَدَّمَ اللَّهُ وَأَيُّكُمْ أَخَّرَ، فَأَعُولُ الْفَرِيضَةَ</p>
-            <p class="dalil-translation">"Umar RA said: 'By Allah, I do not know which of you Allah has given precedence and which He has delayed, so I will distribute the inheritance by 'aul.'"</p>
-            <p class="dalil-source">Athar of Umar bin Khattab RA - Ijma' of Companions</p>
-          </div>
-        </div>
-      `
-    },
-    radd: {
-      title: '📖 What is Radd?',
-      content: `
-        <div class="space-y-4">
-          <p><strong>Radd</strong> (الرد) is the return of remaining estate to fardh heirs (except spouse) when there is no ashabah heir.</p>
-          
-          <div class="bg-teal-50 dark:bg-teal-900 p-4 rounded-lg">
-            <h4 class="font-bold mb-2">Radd Case Example:</h4>
-            <p class="mb-2">Deceased leaves:</p>
-            <ul class="list-disc list-inside space-y-1 mb-3">
-              <li>Mother: 1/3 (33.33%)</li>
-              <li>2 Daughters: 2/3 (66.67%)</li>
-            </ul>
-            <p class="font-bold">Total: 100%</p>
-            <p class="mt-2">No ashabah, no remainder? <strong>WRONG!</strong></p>
-            <p class="mt-2">If total fardh is less than 100% and there is no ashabah, the remainder is returned (radd) to fardh heirs proportionally.</p>
-          </div>
-          
-          <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg mt-4">
-            <h4 class="font-bold mb-2">⚠️ Important Note:</h4>
-            <p><strong>Husband and Wife do NOT receive Radd.</strong> Remainder is only returned to fardh heirs other than spouse.</p>
-          </div>
-          
-          <div class="dalil-section">
-            <p class="dalil-arabic">قَالَ عَلِيٌّ رَضِيَ اللَّهُ عَنْهُ: إِذَا لَمْ يَكُنْ عَصَبَةٌ رُدَّ عَلَى ذَوِي الْفُرُوضِ بِقَدْرِ فُرُوضِهِمْ</p>
-            <p class="dalil-translation">"Ali RA said: 'If there is no ashabah, then the remainder is returned to the fardh heirs according to their shares.'"</p>
-            <p class="dalil-source">Opinion of Ali bin Abi Talib RA - Jumhur Madhab</p>
-          </div>
-        </div>
-      `
-    },
-    mazhab: {
-      title: '📖 Differences Among 4 Madhabs in Inheritance',
-      content: `
-        <div class="space-y-4">
-          <p>The four madhabs (Hanafi, Maliki, Shafi'i, Hanbali) have some differences in inheritance law:</p>
-          
-          <div class="space-y-4">
-            <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-              <h4 class="font-bold mb-2">🔹 Hanafi Madhab</h4>
-              <ul class="list-disc list-inside space-y-1">
-                <li>Grandfather blocks all siblings in all conditions</li>
-                <li>Stricter in blocking matters</li>
-              </ul>
-            </div>
-            
-            <div class="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-              <h4 class="font-bold mb-2">🔹 Maliki Madhab</h4>
-              <ul class="list-disc list-inside space-y-1">
-                <li>Granddaughters can receive ta'shib from sisters</li>
-                <li>More flexible in certain cases</li>
-              </ul>
-            </div>
-            
-            <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg">
-              <h4 class="font-bold mb-2">🔹 Shafi'i Madhab</h4>
-              <ul class="list-disc list-inside space-y-1">
-                <li>Follows jumhur opinion in most cases</li>
-                <li>Grandfather does not block siblings if there are children</li>
-              </ul>
-            </div>
-            
-            <div class="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
-              <h4 class="font-bold mb-2">🔹 Hanbali Madhab</h4>
-              <ul class="list-disc list-inside space-y-1">
-                <li>Similar to Shafi'i Madhab</li>
-                <li>Follows jumhur opinion</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mt-4">
-            <h4 class="font-bold mb-2">📚 References:</h4>
-            <ul class="list-disc list-inside space-y-1 text-sm">
-              <li>Bidayatul Mujtahid - Ibn Rushd</li>
-              <li>Al-Mughni - Ibn Qudamah</li>
-              <li>Al-Fiqh 'ala Madhahib al-Arba'ah</li>
-            </ul>
-          </div>
-        </div>
-      `
-    },
+    
     rukun: {
       title: '📖 Rukun Waris dalam Islam',
       content: `
@@ -2634,7 +2514,215 @@ const educationalContent = {
   },
   
   en: {
-    // ... konten yang sudah ada ...
+    fardh: {
+      title: '📖 What is Fardh (Ashhabul Furudh)?',
+      content: `
+        <div class="space-y-4">
+          <p><strong>Fardh</strong> are fixed shares determined in the Quran and Hadith.</p>
+          
+          <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Fardh Shares:</h4>
+            <ul class="list-disc list-inside space-y-1">
+              <li><strong>1/2 (Half)</strong>: Husband (no children), Single daughter, Single full sister</li>
+              <li><strong>1/4 (Quarter)</strong>: Husband (with children), Wife (no children)</li>
+              <li><strong>1/8 (Eighth)</strong>: Wife (with children)</li>
+              <li><strong>2/3 (Two thirds)</strong>: Two or more daughters, Two or more sisters</li>
+              <li><strong>1/3 (Third)</strong>: Mother (no children & siblings), Two or more maternal siblings</li>
+              <li><strong>1/6 (Sixth)</strong>: Father/Mother (with children), Grandfather, Grandmother, One maternal sibling</li>
+            </ul>
+          </div>
+          
+          <div class="dalil-section">
+            <p class="dalil-arabic">يُوصِيكُمُ اللَّهُ فِي أَوْلَادِكُمْ</p>
+            <p class="dalil-translation">"Allah instructs you concerning your children..."</p>
+            <p class="dalil-source">QS. An-Nisa: 11</p>
+          </div>
+        </div>
+      `
+    },
+    
+    ashabah: {
+      title: '📖 What is Ashabah?',
+      content: `
+        <div class="space-y-4">
+          <p><strong>Ashabah</strong> are heirs who receive the remainder after fardh shares are distributed.</p>
+          
+          <div class="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Types of Ashabah:</h4>
+            <ul class="list-disc list-inside space-y-2">
+              <li><strong>Ashabah Bi Nafsihi</strong> (Ashabah by himself):
+                <ul class="list-circle list-inside ml-4 mt-1">
+                  <li>Son</li>
+                  <li>Grandson (through son)</li>
+                  <li>Father (if no children)</li>
+                  <li>Grandfather (if no father)</li>
+                  <li>Brothers (full/paternal)</li>
+                </ul>
+              </li>
+              <li><strong>Ashabah Bi Ghairihi</strong> (Ashabah with others):
+                <ul class="list-circle list-inside ml-4 mt-1">
+                  <li>Daughter with son (ratio 2:1)</li>
+                  <li>Granddaughter with grandson (ratio 2:1)</li>
+                  <li>Sister with brother (ratio 2:1)</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          
+          <div class="dalil-section">
+            <p class="dalil-arabic">أَلْحِقُوا الْفَرَائِضَ بِأَهْلِهَا فَمَا بَقِيَ فَهُوَ لِأَوْلَى رَجُلٍ ذَكَرٍ</p>
+            <p class="dalil-translation">"Give the shares to those entitled to them, and whatever remains goes to the nearest male relative."</p>
+            <p class="dalil-source">HR. Bukhari & Muslim from Ibn Abbas RA</p>
+          </div>
+        </div>
+      `
+    },
+    
+    mahjub: {
+      title: '📖 What is Mahjub (Blocking)?',
+      content: `
+        <div class="space-y-4">
+          <p><strong>Mahjub</strong> is when an heir is blocked from inheritance because there is another heir with a closer relationship to the deceased.</p>
+          
+          <div class="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Blocking Principle:</h4>
+            <p class="mb-3"><strong>"Al-Aqrab Yahjubu Al-Ab'ad"</strong><br>الأقرب يحجب الأبعد<br><em>"The closer blocks the farther"</em></p>
+            
+            <h4 class="font-bold mb-2 mt-4">Blocking Examples:</h4>
+            <ul class="list-disc list-inside space-y-2">
+              <li><strong>Grandchildren</strong> blocked by <strong>Son</strong></li>
+              <li><strong>Grandfather</strong> blocked by <strong>Father</strong></li>
+              <li><strong>Grandmother</strong> blocked by <strong>Mother</strong></li>
+              <li><strong>Siblings</strong> blocked by <strong>Father or Son</strong></li>
+              <li><strong>Maternal siblings</strong> blocked by <strong>Children, Grandchildren, Father, or Grandfather</strong></li>
+            </ul>
+          </div>
+          
+          <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg mt-4">
+            <h4 class="font-bold mb-2">⚠️ Important Exception:</h4>
+            <p><strong>Grandfather and Grandmother are NOT blocked by the presence of children.</strong> They still receive their fardh share (1/6) along with the children of the deceased.</p>
+            <p class="text-sm mt-2 italic">Reference: Bidayatul Mujtahid (Ibn Rushd), Al-Mughni (Ibn Qudamah)</p>
+          </div>
+        </div>
+      `
+    },
+    
+    aul: {
+      title: '📖 What is \'Aul?',
+      content: `
+        <div class="space-y-4">
+          <p><strong>'Aul</strong> (العول) occurs when total fardh shares exceed 100%. In this case, all fardh shares are reduced proportionally.</p>
+          
+          <div class="bg-purple-50 dark:bg-purple-900 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">'Aul Case Example:</h4>
+            <p class="mb-2">Deceased leaves:</p>
+            <ul class="list-disc list-inside space-y-1 mb-3">
+              <li>Husband: 1/2 (50%)</li>
+              <li>Mother: 1/3 (33.33%)</li>
+              <li>2 Full sisters: 2/3 (66.67%)</li>
+            </ul>
+            <p class="font-bold">Total: 150% (exceeds 100%)</p>
+            <p class="mt-2">Solution: All shares reduced proportionally to:</p>
+            <ul class="list-disc list-inside space-y-1 mt-2">
+              <li>Husband: 1/2 × (100/150) = 33.33%</li>
+              <li>Mother: 1/3 × (100/150) = 22.22%</li>
+              <li>2 Sisters: 2/3 × (100/150) = 44.44%</li>
+            </ul>
+            <p class="font-bold mt-2">Total: 100% ✅</p>
+          </div>
+          
+          <div class="dalil-section">
+            <p class="dalil-arabic">قَالَ عُمَرُ رَضِيَ اللَّهُ عَنْهُ: وَاللَّهِ مَا أَدْرِي أَيُّكُمْ قَدَّمَ اللَّهُ وَأَيُّكُمْ أَخَّرَ، فَأَعُولُ الْفَرِيضَةَ</p>
+            <p class="dalil-translation">"Umar RA said: 'By Allah, I do not know which of you Allah has given precedence and which He has delayed, so I will distribute the inheritance by 'aul.'"</p>
+            <p class="dalil-source">Athar of Umar bin Khattab RA - Ijma' of Companions</p>
+          </div>
+        </div>
+      `
+    },
+    
+    radd: {
+      title: '📖 What is Radd?',
+      content: `
+        <div class="space-y-4">
+          <p><strong>Radd</strong> (الرد) is the return of remaining estate to fardh heirs (except spouse) when there is no ashabah heir.</p>
+          
+          <div class="bg-teal-50 dark:bg-teal-900 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Radd Case Example:</h4>
+            <p class="mb-2">Deceased leaves:</p>
+            <ul class="list-disc list-inside space-y-1 mb-3">
+              <li>Mother: 1/3 (33.33%)</li>
+              <li>2 Daughters: 2/3 (66.67%)</li>
+            </ul>
+            <p class="font-bold">Total: 100%</p>
+            <p class="mt-2">No ashabah, no remainder? <strong>WRONG!</strong></p>
+            <p class="mt-2">If total fardh is less than 100% and there is no ashabah, the remainder is returned (radd) to fardh heirs proportionally.</p>
+          </div>
+          
+          <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg mt-4">
+            <h4 class="font-bold mb-2">⚠️ Important Note:</h4>
+            <p><strong>Husband and Wife do NOT receive Radd.</strong> Remainder is only returned to fardh heirs other than spouse.</p>
+          </div>
+          
+          <div class="dalil-section">
+            <p class="dalil-arabic">قَالَ عَلِيٌّ رَضِيَ اللَّهُ عَنْهُ: إِذَا لَمْ يَكُنْ عَصَبَةٌ رُدَّ عَلَى ذَوِي الْفُرُوضِ بِقَدْرِ فُرُوضِهِمْ</p>
+            <p class="dalil-translation">"Ali RA said: 'If there is no ashabah, then the remainder is returned to the fardh heirs according to their shares.'"</p>
+            <p class="dalil-source">Opinion of Ali bin Abi Talib RA - Jumhur Madhab</p>
+          </div>
+        </div>
+      `
+    },
+    
+    mazhab: {
+      title: '📖 Differences Among 4 Madhabs in Inheritance',
+      content: `
+        <div class="space-y-4">
+          <p>The four madhabs (Hanafi, Maliki, Shafi'i, Hanbali) have some differences in inheritance law:</p>
+          
+          <div class="space-y-4">
+            <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+              <h4 class="font-bold mb-2">🔹 Hanafi Madhab</h4>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Grandfather blocks all siblings in all conditions</li>
+                <li>Stricter in blocking matters</li>
+              </ul>
+            </div>
+            
+            <div class="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
+              <h4 class="font-bold mb-2">🔹 Maliki Madhab</h4>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Granddaughters can receive ta'shib from sisters</li>
+                <li>More flexible in certain cases</li>
+              </ul>
+            </div>
+            
+            <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg">
+              <h4 class="font-bold mb-2">🔹 Shafi'i Madhab</h4>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Follows jumhur opinion in most cases</li>
+                <li>Grandfather does not block siblings if there are children</li>
+              </ul>
+            </div>
+            
+            <div class="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
+              <h4 class="font-bold mb-2">🔹 Hanbali Madhab</h4>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Similar to Shafi'i Madhab</li>
+                <li>Follows jumhur opinion</li>
+              </ul>
+            </div>
+          </div>
+          
+          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mt-4">
+            <h4 class="font-bold mb-2">📚 References:</h4>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>Bidayatul Mujtahid - Ibn Rushd</li>
+              <li>Al-Mughni - Ibn Qudamah</li>
+              <li>Al-Fiqh 'ala Madhahib al-Arba'ah</li>
+            </ul>
+          </div>
+        </div>
+      `
+    },
     
     rukun: {
       title: '📖 Pillars of Islamic Inheritance',
