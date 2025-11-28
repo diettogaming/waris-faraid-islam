@@ -1292,12 +1292,18 @@ function applyAul(heirs, hartaBersih) {
   return { occurred: false };
 }
 
-// ===== FUNGSI DISTRIBUSI ASHABAH (SISA HARTA) - FIXED =====
+// ===== FUNGSI DISTRIBUSI ASHABAH (SISA HARTA) - FIXED 100% =====
 
 function distributeAshabah(heirs, sisaHarta, hartaBersih) {
   const ashabahHeirs = heirs.filter(h => h.isAshabah);
   
-  if (ashabahHeirs.length === 0 || sisaHarta <= 0) {
+  // ✅ Jika tidak ada ashabah, return
+  if (ashabahHeirs.length === 0) {
+    return;
+  }
+  
+  // ✅ Jika sisa harta <= 0, ashabah hanya dapat fardh (jika ada)
+  if (sisaHarta <= 0) {
     ashabahHeirs.forEach(h => {
       if (h.share > 0) {
         h.total = h.share * hartaBersih;
@@ -1306,15 +1312,6 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
         h.total = 0;
         h.perPerson = 0;
       }
-    });
-    return;
-  }
-  
-  // ✅ Jika sisa harta <= 0, ashabah tidak dapat apa-apa
-  if (sisaHarta <= 0) {
-    ashabahHeirs.forEach(h => {
-      h.total = h.share > 0 ? hartaBersih * h.share : 0;
-      h.perPerson = h.total / h.count;
     });
     return;
   }
@@ -1338,13 +1335,73 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
       h.perPerson = h.total;
     });
   } else {
-    // Tidak ada anak, orang tua dapat fardh + semua sisa
+    // ✅ Tidak ada anak, orang tua dapat fardh + semua sisa
     orangTuaAshabah.forEach(h => {
       const fardh = h.share > 0 ? hartaBersih * h.share : 0;
-      h.total = fardh + sisaHarta;
+      h.total = fardh + sisaHarta; // ✅ INI YANG BENAR!
       h.perPerson = h.total;
     });
   }
+}
+
+// ===== FUNGSI TERAPKAN HUKUM RADD (PENGEMBALIAN SISA) - FIXED 100% =====
+
+function applyRadd(heirs, sisaHarta, hartaBersih) {
+  // Radd hanya terjadi jika:
+  // 1. Tidak ada ashabah (atau ashabah dapat 0)
+  // 2. Ada sisa harta
+  
+  const ashabahHeirs = heirs.filter(h => h.isAshabah);
+  
+  // Cek apakah ada ashabah yang benar-benar dapat bagian
+  let hasActiveAshabah = false;
+  ashabahHeirs.forEach(h => {
+    if (h.total > 0) {
+      hasActiveAshabah = true;
+    }
+  });
+  
+  // Radd terjadi jika tidak ada ashabah aktif dan ada sisa harta
+  if (!hasActiveAshabah && sisaHarta > 0) {
+    // Ahli waris yang eligible untuk Radd (kecuali suami/istri)
+    const eligibleHeirs = heirs.filter(h => 
+      !h.isAshabah &&
+      !h.name.toLowerCase().includes('suami') && 
+      !h.name.toLowerCase().includes('istri') && 
+      !h.name.toLowerCase().includes('husband') && 
+      !h.name.toLowerCase().includes('wife')
+    );
+    
+    if (eligibleHeirs.length > 0) {
+      // Hitung total share eligible heirs
+      let totalEligibleShares = 0;
+      eligibleHeirs.forEach(h => {
+        totalEligibleShares += h.share;
+      });
+      
+      // Distribusi sisa proporsional
+      eligibleHeirs.forEach(h => {
+        const additionalShare = (h.share / totalEligibleShares) * sisaHarta;
+        h.total += additionalShare;
+        h.perPerson = h.total / h.count;
+        h.fraction += ' (Radd)';
+        h.explanation += currentLang === 'id'
+          ? ` 🔄 Terjadi Radd (pengembalian sisa harta ${formatRupiah(Math.round(sisaHarta))} kepada ahli waris fardh karena tidak ada ashabah). Sisa dikembalikan secara proporsional.`
+          : ` 🔄 Radd occurred (return of remainder ${formatRupiah(Math.round(sisaHarta))} to fardh heirs because there is no ashabah). Remainder is returned proportionally.`;
+      });
+      
+      return {
+        occurred: true,
+        sisaHarta: sisaHarta,
+        explanation: {
+          id: `Kasus Radd terjadi ketika tidak ada ahli waris ashabah dan masih ada sisa harta ${formatRupiah(Math.round(sisaHarta))} setelah dibagikan kepada ahli waris fardh. Sisa harta dikembalikan kepada ahli waris fardh (kecuali suami/istri) secara proporsional.`,
+          en: `Radd case occurs when there is no ashabah heir and there is remaining estate ${formatRupiah(Math.round(sisaHarta))} after distribution to fardh heirs. Remainder is returned to fardh heirs (except spouse) proportionally.`
+        }
+      };
+    }
+  }
+  
+  return { occurred: false };
 }
 
 // ===== FUNGSI PERHITUNGAN UTAMA - FIXED 100% =====
@@ -1424,66 +1481,6 @@ function performCalculation(data) {
     aul: aulResult.occurred ? aulResult : null,
     radd: raddResult.occurred ? raddResult : null
   };
-}
-
-// ===== FUNGSI TERAPKAN HUKUM RADD (PENGEMBALIAN SISA) - FIXED 100% =====
-
-function applyRadd(heirs, sisaHarta, hartaBersih) {
-  // Radd hanya terjadi jika:
-  // 1. Tidak ada ashabah (atau ashabah dapat 0)
-  // 2. Ada sisa harta
-  
-  const ashabahHeirs = heirs.filter(h => h.isAshabah);
-  
-  // Cek apakah ada ashabah yang benar-benar dapat bagian
-  let hasActiveAshabah = false;
-  ashabahHeirs.forEach(h => {
-    if (h.total > 0) {
-      hasActiveAshabah = true;
-    }
-  });
-  
-  // Radd terjadi jika tidak ada ashabah aktif dan ada sisa harta
-  if (!hasActiveAshabah && sisaHarta > 0) {
-    // Ahli waris yang eligible untuk Radd (kecuali suami/istri)
-    const eligibleHeirs = heirs.filter(h => 
-      !h.isAshabah &&
-      !h.name.toLowerCase().includes('suami') && 
-      !h.name.toLowerCase().includes('istri') && 
-      !h.name.toLowerCase().includes('husband') && 
-      !h.name.toLowerCase().includes('wife')
-    );
-    
-    if (eligibleHeirs.length > 0) {
-      // Hitung total share eligible heirs
-      let totalEligibleShares = 0;
-      eligibleHeirs.forEach(h => {
-        totalEligibleShares += h.share;
-      });
-      
-      // Distribusi sisa proporsional
-      eligibleHeirs.forEach(h => {
-        const additionalShare = (h.share / totalEligibleShares) * sisaHarta;
-        h.total += additionalShare;
-        h.perPerson = h.total / h.count;
-        h.fraction += ' (Radd)';
-        h.explanation += currentLang === 'id'
-          ? ` 🔄 Terjadi Radd (pengembalian sisa harta ${formatRupiah(Math.round(sisaHarta))} kepada ahli waris fardh karena tidak ada ashabah). Sisa dikembalikan secara proporsional.`
-          : ` 🔄 Radd occurred (return of remainder ${formatRupiah(Math.round(sisaHarta))} to fardh heirs because there is no ashabah). Remainder is returned proportionally.`;
-      });
-      
-      return {
-        occurred: true,
-        sisaHarta: sisaHarta,
-        explanation: {
-          id: `Kasus Radd terjadi ketika tidak ada ahli waris ashabah dan masih ada sisa harta ${formatRupiah(Math.round(sisaHarta))} setelah dibagikan kepada ahli waris fardh. Sisa harta dikembalikan kepada ahli waris fardh (kecuali suami/istri) secara proporsional.`,
-          en: `Radd case occurs when there is no ashabah heir and there is remaining estate ${formatRupiah(Math.round(sisaHarta))} after distribution to fardh heirs. Remainder is returned to fardh heirs (except spouse) proportionally.`
-        }
-      };
-    }
-  }
-  
-  return { occurred: false };
 }
 
 // ===== FUNGSI VALIDASI DATA =====
