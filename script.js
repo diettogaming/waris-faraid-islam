@@ -850,29 +850,33 @@ function calculateFardhHeirs(data, heirs) {
   }
   
   // AYAH
-  if (data.ayah) {
-    if (hasAnakOrCucu) {
-      const dalil = getDalil('ayah.dengan_anak');
-      addHeir(heirs, {
-        name: currentLang === 'id' ? 'Ayah' : 'Father',
-        share: dalil.bagian,
-        count: 1,
-        explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
-        dalil: dalil,
-        isAshabah: true
-      });
-    } else {
-      const dalil = getDalil('ayah.tanpa_anak');
-      addHeir(heirs, {
-        name: currentLang === 'id' ? 'Ayah' : 'Father',
-        share: 0,
-        count: 1,
-        explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
-        dalil: dalil,
-        isAshabah: true
-      });
-    }
+if (data.ayah) {
+  if (hasAnakOrCucu) {
+    const dalil = getDalil('ayah.dengan_anak');
+    
+    // Cek apakah ada anak laki-laki
+    const hasAnakLaki = data.anakLaki > 0;
+    
+    addHeir(heirs, {
+      name: currentLang === 'id' ? 'Ayah' : 'Father',
+      share: dalil.bagian, // 1/6
+      count: 1,
+      explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
+      dalil: dalil,
+      isAshabah: !hasAnakLaki
+    });
+  } else {
+    const dalil = getDalil('ayah.tanpa_anak');
+    addHeir(heirs, {
+      name: currentLang === 'id' ? 'Ayah' : 'Father',
+      share: 0,
+      count: 1,
+      explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
+      dalil: dalil,
+      isAshabah: true
+    });
   }
+}
   
   // IBU
   if (data.ibu) {
