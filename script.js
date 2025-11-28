@@ -2106,7 +2106,7 @@ function displayResult(result) {
     document.getElementById('resultSummary').insertAdjacentHTML('beforeend', raddHTML);
   }
   
-} // PENUTUP FUNGSI displayResult()
+// PENUTUP FUNGSI displayResult()
 
 // ===== EDUCATIONAL CONTENT =====
 
