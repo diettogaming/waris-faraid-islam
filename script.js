@@ -1757,8 +1757,6 @@ function displayResult(result) {
   // PART 1J: Render Summary ke DOM
   document.getElementById('resultSummary').innerHTML = summaryHTML;
   
-  // Lanjut ke PART 2...
-}
   // ===== PART 2: DISPLAY DETAIL 'AUL (JIKA TERJADI) =====
   
   if (result.aul && result.aul.occurred) {
