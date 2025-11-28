@@ -827,9 +827,10 @@ function detectMahjub(data) {
   return { data, blocked };
 }
 
-// ===== FUNGSI HITUNG AHLI WARIS FARDH =====
+// ===== FUNGSI HITUNG AHLI WARIS FARDH - FIXED 100% =====
 
-function calculateFardhHeirs(data, heirs) {
+function calculateFardhHeirs(data) {
+  const heirs = []; // ✅ Inisialisasi di dalam fungsi
   const hasAnakOrCucu = hasAnak(data);
   
   // SUAMI
@@ -857,51 +858,49 @@ function calculateFardhHeirs(data, heirs) {
   }
   
   // AYAH
-if (data.ayah) {
-  const hasAnakOrCucu = hasAnak(data);
-  const hasSaudara = data.saudaraLakiKandung > 0 || data.saudaraPerempuanKandung > 0 ||
-                     data.saudaraLakiSeayah > 0 || data.saudaraPerempuanSeayah > 0;
-  
-  if (hasAnakOrCucu) {
-    // Ada anak/cucu
-    const dalil = getDalil('ayah.dengan_anak');
-    const hasAnakLaki = data.anakLaki > 0;
+  if (data.ayah) {
+    const hasSaudara = data.saudaraLakiKandung > 0 || data.saudaraPerempuanKandung > 0 ||
+                       data.saudaraLakiSeayah > 0 || data.saudaraPerempuanSeayah > 0;
     
-    addHeir(heirs, {
-      name: currentLang === 'id' ? 'Ayah' : 'Father',
-      share: dalil.bagian, // 1/6
-      count: 1,
-      explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
-      dalil: dalil,
-      isAshabah: !hasAnakLaki // Hanya ashabah jika tidak ada anak laki
-    });
-  } else if (hasSaudara) {
-    // ✅ PERBAIKAN: Tidak ada anak, tapi ada saudara
-    // Ayah tetap dapat 1/6 fardh (tidak ashabah)
-    const dalil = getDalil('ayah.dengan_anak');
-    addHeir(heirs, {
-      name: currentLang === 'id' ? 'Ayah' : 'Father',
-      share: 1/6, // Fardh 1/6
-      count: 1,
-      explanation: currentLang === 'id' ? 
-        'Ayah mendapat 1/6 karena ada saudara (tidak ada anak)' : 
-        'Father gets 1/6 because there are siblings (no children)',
-      dalil: dalil,
-      isAshabah: false // TIDAK ashabah
-    });
-  } else {
-    // Tidak ada anak dan tidak ada saudara
-    const dalil = getDalil('ayah.tanpa_anak');
-    addHeir(heirs, {
-      name: currentLang === 'id' ? 'Ayah' : 'Father',
-      share: 0,
-      count: 1,
-      explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
-      dalil: dalil,
-      isAshabah: true // Ashabah (dapat semua sisa)
-    });
+    if (hasAnakOrCucu) {
+      // Ada anak/cucu: Ayah dapat 1/6 fardh + sisa (jika tidak ada anak laki)
+      const dalil = getDalil('ayah.dengan_anak');
+      const hasAnakLaki = data.anakLaki > 0 || data.cucuLaki > 0;
+      
+      addHeir(heirs, {
+        name: currentLang === 'id' ? 'Ayah' : 'Father',
+        share: dalil.bagian, // 1/6
+        count: 1,
+        explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
+        dalil: dalil,
+        isAshabah: !hasAnakLaki // Hanya ashabah jika tidak ada anak laki
+      });
+    } else if (hasSaudara) {
+      // Tidak ada anak, tapi ada saudara: Ayah dapat 1/6 fardh (Kasus Gharrawain)
+      const dalil = getDalil('ayah.dengan_anak');
+      addHeir(heirs, {
+        name: currentLang === 'id' ? 'Ayah' : 'Father',
+        share: 1/6, // Fardh 1/6
+        count: 1,
+        explanation: currentLang === 'id' ? 
+          'Ayah mendapat 1/6 karena ada saudara (kasus Gharrawain)' : 
+          'Father gets 1/6 because there are siblings (Gharrawain case)',
+        dalil: dalil,
+        isAshabah: false // TIDAK ashabah
+      });
+    } else {
+      // Tidak ada anak dan tidak ada saudara: Ayah dapat semua sisa
+      const dalil = getDalil('ayah.tanpa_anak');
+      addHeir(heirs, {
+        name: currentLang === 'id' ? 'Ayah' : 'Father',
+        share: 0,
+        count: 1,
+        explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
+        dalil: dalil,
+        isAshabah: true // Ashabah (dapat semua sisa)
+      });
+    }
   }
-}
   
   // IBU
   if (data.ibu) {
@@ -1006,161 +1005,136 @@ if (data.ayah) {
     }
   }
   
-// CUCU PEREMPUAN (jika tidak terhalang)
-if (data.cucuPerempuan > 0 && data.cucuLaki === 0 && data.anakLaki === 0) {
-  // Cek apakah ada 2+ anak perempuan
-  if (data.anakPerempuan >= 2) {
-    // Cucu perempuan TERHALANG oleh 2+ anak perempuan
-    // Akan ditambahkan ke blocked di performCalculation()
-  } else if (data.anakPerempuan === 1) {
-    // ✅ PERBAIKAN: Jika hanya 1 anak perempuan, cucu perempuan dapat 1/6 (pelengkap)
-    const dalil = getDalil('anak_perempuan.satu');
-    addHeir(heirs, {
-      name: currentLang === 'id' ? `Cucu Perempuan (${data.cucuPerempuan} orang)` : `Granddaughter (${data.cucuPerempuan})`,
-      share: 1/6,
-      count: data.cucuPerempuan,
-      explanation: currentLang === 'id' ? 'Cucu perempuan mendapat 1/6 sebagai pelengkap bersama 1 anak perempuan (total 2/3)' : 'Granddaughters get 1/6 as complement with 1 daughter (total 2/3)',
-      dalil: dalil
-    });
-  } else {
-    // Tidak ada anak perempuan, cucu menggantikan
-    const dalil = data.cucuPerempuan === 1 ? 
-      getDalil('anak_perempuan.satu') : 
-      getDalil('anak_perempuan.dua_atau_lebih');
-    
-    addHeir(heirs, {
-      name: currentLang === 'id' ? `Cucu Perempuan (${data.cucuPerempuan} orang)` : `Granddaughter (${data.cucuPerempuan})`,
-      share: dalil.bagian,
-      count: data.cucuPerempuan,
-      explanation: currentLang === 'id' ? 'Cucu perempuan menggantikan posisi anak perempuan' : 'Granddaughters replace daughters',
-      dalil: dalil
-    });
-  }
-}
-
-// ✅ CUCU LAKI-LAKI dengan 1 Anak Perempuan
-if (data.cucuLaki > 0 && data.anakLaki === 0) {
-  // Jika ada 1 anak perempuan + cucu laki
-  if (data.anakPerempuan === 1 && data.cucuPerempuan > 0) {
-    // Cucu laki + cucu perempuan dapat sisa sebagai ashabah (ratio 2:1)
-    const totalCucu = data.cucuLaki * 2 + data.cucuPerempuan;
-    const dalil = getDalil('anak_laki');
-    
-    addHeir(heirs, {
-      name: currentLang === 'id' ? `Cucu Laki-laki (${data.cucuLaki} orang)` : `Grandson (${data.cucuLaki})`,
-      share: 0,
-      count: data.cucuLaki,
-      explanation: currentLang === 'id' ? 'Cucu laki-laki bersama cucu perempuan mendapat sisa sebagai ashabah (ratio 2:1)' : 'Grandsons with granddaughters get remainder as ashabah (ratio 2:1)',
-      dalil: dalil,
-      isAshabah: true,
-      ashabahRatio: 2,
-      ashabahTotal: totalCucu
-    });
-    
-    // Cucu perempuan sudah ditambahkan di atas dengan 1/6 fardh
-    // Sekarang update menjadi ashabah
-    const cucuPerempuanHeir = heirs.find(h => h.name.includes('Cucu Perempuan'));
-    if (cucuPerempuanHeir) {
-      cucuPerempuanHeir.share = 0;
-      cucuPerempuanHeir.isAshabah = true;
-      cucuPerempuanHeir.ashabahRatio = 1;
-      cucuPerempuanHeir.ashabahTotal = totalCucu;
-      cucuPerempuanHeir.explanation = currentLang === 'id' ? 
-        'Cucu perempuan bersama cucu laki-laki mendapat sisa sebagai ashabah (ratio 2:1)' : 
-        'Granddaughters with grandsons get remainder as ashabah (ratio 2:1)';
-    }
-  } else if (data.anakPerempuan === 0) {
-    // Tidak ada anak perempuan, cucu laki menggantikan
-    const totalCucu = data.cucuLaki * 2 + data.cucuPerempuan;
-    const dalil = getDalil('anak_laki');
-    
-    addHeir(heirs, {
-      name: currentLang === 'id' ? `Cucu Laki-laki (${data.cucuLaki} orang)` : `Grandson (${data.cucuLaki})`,
-      share: 0,
-      count: data.cucuLaki,
-      explanation: currentLang === 'id' ? 'Cucu laki-laki menggantikan posisi anak laki-laki' : 'Grandsons replace sons',
-      dalil: dalil,
-      isAshabah: true,
-      ashabahRatio: 2,
-      ashabahTotal: totalCucu
-    });
-    
-    if (data.cucuPerempuan > 0) {
-      const dalilPerempuan = getDalil('anak_perempuan.dengan_laki');
+  // CUCU PEREMPUAN (jika tidak terhalang)
+  if (data.cucuPerempuan > 0 && data.cucuLaki === 0 && data.anakLaki === 0) {
+    if (data.anakPerempuan >= 2) {
+      // Cucu perempuan TERHALANG oleh 2+ anak perempuan
+      // Akan ditambahkan ke blocked di performCalculation()
+    } else if (data.anakPerempuan === 1) {
+      // Jika hanya 1 anak perempuan, cucu perempuan dapat 1/6 (pelengkap)
+      const dalil = getDalil('anak_perempuan.satu');
       addHeir(heirs, {
         name: currentLang === 'id' ? `Cucu Perempuan (${data.cucuPerempuan} orang)` : `Granddaughter (${data.cucuPerempuan})`,
-        share: 0,
+        share: 1/6,
         count: data.cucuPerempuan,
-        explanation: currentLang === 'id' ? 'Cucu perempuan bersama cucu laki-laki mendapat ashabah' : 'Granddaughters with grandsons get ashabah',
-        dalil: dalilPerempuan,
-        isAshabah: true,
-        ashabahRatio: 1,
-        ashabahTotal: totalCucu
+        explanation: currentLang === 'id' ? 'Cucu perempuan mendapat 1/6 sebagai pelengkap bersama 1 anak perempuan (total 2/3)' : 'Granddaughters get 1/6 as complement with 1 daughter (total 2/3)',
+        dalil: dalil
+      });
+    } else {
+      // Tidak ada anak perempuan, cucu menggantikan
+      const dalil = data.cucuPerempuan === 1 ? 
+        getDalil('anak_perempuan.satu') : 
+        getDalil('anak_perempuan.dua_atau_lebih');
+      
+      addHeir(heirs, {
+        name: currentLang === 'id' ? `Cucu Perempuan (${data.cucuPerempuan} orang)` : `Granddaughter (${data.cucuPerempuan})`,
+        share: dalil.bagian,
+        count: data.cucuPerempuan,
+        explanation: currentLang === 'id' ? 'Cucu perempuan menggantikan posisi anak perempuan' : 'Granddaughters replace daughters',
+        dalil: dalil
       });
     }
   }
-}
   
-// SAUDARA KANDUNG (hanya jika tidak ada anak/cucu)
-if (data.saudaraPerempuanKandung > 0 && data.saudaraLakiKandung === 0) {
-  // Cek apakah ada anak atau cucu
-  const hasAnakOrCucu = data.anakLaki > 0 || data.anakPerempuan > 0 || 
-                        data.cucuLaki > 0 || data.cucuPerempuan > 0;
-  
-  if (!hasAnakOrCucu) {
-    // Hanya dapat fardh jika tidak ada anak/cucu
-    const bagian = data.saudaraPerempuanKandung === 1 ? 0.5 : 2/3;
-    const fraction = data.saudaraPerempuanKandung === 1 ? '1/2' : '2/3';
-    
-    addHeir(heirs, {
-      name: currentLang === 'id' ? `Saudara Perempuan Kandung (${data.saudaraPerempuanKandung} orang)` : `Full Sister (${data.saudaraPerempuanKandung})`,
-      share: bagian,
-      count: data.saudaraPerempuanKandung,
-      explanation: currentLang === 'id' ? `Saudara perempuan kandung mendapat ${fraction}` : `Full sisters get ${fraction}`,
-      dalil: {
-        arab: 'يَسْتَفْتُونَكَ قُلِ اللَّهُ يُفْتِيكُمْ فِي الْكَلَالَةِ',
-        terjemah_id: 'Mereka meminta fatwa kepadamu. Katakanlah: "Allah memberi fatwa kepadamu tentang kalalah."',
-        terjemah_en: 'They request from you a [legal] ruling. Say, "Allah gives you a ruling concerning kalalah."',
-        surah: 'An-Nisa',
-        ayat: 176
+  // CUCU LAKI-LAKI (jika tidak terhalang)
+  if (data.cucuLaki > 0 && data.anakLaki === 0) {
+    // ✅ PERBAIKAN: Jika ada 1 anak perempuan + cucu laki + cucu perempuan
+    if (data.anakPerempuan === 1 && data.cucuPerempuan > 0) {
+      // Cucu laki + cucu perempuan dapat sisa sebagai ashabah (ratio 2:1)
+      const totalCucu = data.cucuLaki * 2 + data.cucuPerempuan;
+      const dalil = getDalil('anak_laki');
+      
+      addHeir(heirs, {
+        name: currentLang === 'id' ? `Cucu Laki-laki (${data.cucuLaki} orang)` : `Grandson (${data.cucuLaki})`,
+        share: 0,
+        count: data.cucuLaki,
+        explanation: currentLang === 'id' ? 'Cucu laki-laki bersama cucu perempuan mendapat sisa sebagai ashabah (ratio 2:1)' : 'Grandsons with granddaughters get remainder as ashabah (ratio 2:1)',
+        dalil: dalil,
+        isAshabah: true,
+        ashabahRatio: 2,
+        ashabahTotal: totalCucu
+      });
+      
+      // Update cucu perempuan yang sudah ditambahkan sebelumnya (1/6 fardh) menjadi ashabah
+      const cucuPerempuanIndex = heirs.findIndex(h => h.name.includes('Cucu Perempuan'));
+      if (cucuPerempuanIndex !== -1) {
+        heirs[cucuPerempuanIndex].share = 0;
+        heirs[cucuPerempuanIndex].isAshabah = true;
+        heirs[cucuPerempuanIndex].ashabahRatio = 1;
+        heirs[cucuPerempuanIndex].ashabahTotal = totalCucu;
+        heirs[cucuPerempuanIndex].explanation = currentLang === 'id' ? 
+          'Cucu perempuan bersama cucu laki-laki mendapat sisa sebagai ashabah (ratio 2:1)' : 
+          'Granddaughters with grandsons get remainder as ashabah (ratio 2:1)';
       }
-    });
+    } else if (data.anakPerempuan === 0) {
+      // Tidak ada anak perempuan, cucu laki menggantikan
+      const totalCucu = data.cucuLaki * 2 + data.cucuPerempuan;
+      const dalil = getDalil('anak_laki');
+      
+      addHeir(heirs, {
+        name: currentLang === 'id' ? `Cucu Laki-laki (${data.cucuLaki} orang)` : `Grandson (${data.cucuLaki})`,
+        share: 0,
+        count: data.cucuLaki,
+        explanation: currentLang === 'id' ? 'Cucu laki-laki menggantikan posisi anak laki-laki' : 'Grandsons replace sons',
+        dalil: dalil,
+        isAshabah: true,
+        ashabahRatio: 2,
+        ashabahTotal: totalCucu
+      });
+      
+      if (data.cucuPerempuan > 0) {
+        const dalilPerempuan = getDalil('anak_perempuan.dengan_laki');
+        addHeir(heirs, {
+          name: currentLang === 'id' ? `Cucu Perempuan (${data.cucuPerempuan} orang)` : `Granddaughter (${data.cucuPerempuan})`,
+          share: 0,
+          count: data.cucuPerempuan,
+          explanation: currentLang === 'id' ? 'Cucu perempuan bersama cucu laki-laki mendapat ashabah' : 'Granddaughters with grandsons get ashabah',
+          dalil: dalilPerempuan,
+          isAshabah: true,
+          ashabahRatio: 1,
+          ashabahTotal: totalCucu
+        });
+      }
+    }
   }
-  // Jika ada anak/cucu, saudara perempuan akan terhalang di detectMahjub()
-}
-
-if (data.saudaraLakiKandung > 0) {
-  // Cek apakah ada anak atau cucu
-  const hasAnakOrCucu = data.anakLaki > 0 || data.anakPerempuan > 0 || 
-                        data.cucuLaki > 0 || data.cucuPerempuan > 0;
   
-  if (!hasAnakOrCucu) {
-    // Hanya dapat ashabah jika tidak ada anak/cucu
-    const totalSaudara = data.saudaraLakiKandung * 2 + data.saudaraPerempuanKandung;
+  // SAUDARA KANDUNG (hanya jika tidak ada anak/cucu)
+  if (data.saudaraPerempuanKandung > 0 && data.saudaraLakiKandung === 0) {
+    const hasAnakOrCucu = data.anakLaki > 0 || data.anakPerempuan > 0 || 
+                          data.cucuLaki > 0 || data.cucuPerempuan > 0;
     
-    addHeir(heirs, {
-      name: currentLang === 'id' ? `Saudara Laki-laki Kandung (${data.saudaraLakiKandung} orang)` : `Full Brother (${data.saudaraLakiKandung})`,
-      share: 0,
-      count: data.saudaraLakiKandung,
-      explanation: currentLang === 'id' ? 'Saudara laki-laki kandung mendapat sisa sebagai ashabah' : 'Full brothers get remainder as ashabah',
-      dalil: {
-        arab: 'وَإِن كَانُوا إِخْوَةً رِّجَالًا وَنِسَاءً فَلِلذَّكَرِ مِثْلُ حَظِّ الْأُنثَيَيْنِ',
-        terjemah_id: 'Dan jika mereka (ahli waris itu terdiri dari) saudara laki-laki dan perempuan, maka bagian seorang saudara laki-laki sama dengan bagian dua orang saudara perempuan.',
-        terjemah_en: 'But if there are both brothers and sisters, the male will have the share of two females.',
-        surah: 'An-Nisa',
-        ayat: 176
-      },
-      isAshabah: true,
-      ashabahRatio: 2,
-      ashabahTotal: totalSaudara
-    });
-    
-    if (data.saudaraPerempuanKandung > 0) {
+    if (!hasAnakOrCucu) {
+      const bagian = data.saudaraPerempuanKandung === 1 ? 0.5 : 2/3;
+      const fraction = data.saudaraPerempuanKandung === 1 ? '1/2' : '2/3';
+      
       addHeir(heirs, {
         name: currentLang === 'id' ? `Saudara Perempuan Kandung (${data.saudaraPerempuanKandung} orang)` : `Full Sister (${data.saudaraPerempuanKandung})`,
-        share: 0,
+        share: bagian,
         count: data.saudaraPerempuanKandung,
-        explanation: currentLang === 'id' ? 'Saudara perempuan kandung bersama saudara laki-laki mendapat ashabah' : 'Full sisters with brothers get ashabah',
+        explanation: currentLang === 'id' ? `Saudara perempuan kandung mendapat ${fraction}` : `Full sisters get ${fraction}`,
+        dalil: {
+          arab: 'يَسْتَفْتُونَكَ قُلِ اللَّهُ يُفْتِيكُمْ فِي الْكَلَالَةِ',
+          terjemah_id: 'Mereka meminta fatwa kepadamu. Katakanlah: "Allah memberi fatwa kepadamu tentang kalalah."',
+          terjemah_en: 'They request from you a [legal] ruling. Say, "Allah gives you a ruling concerning kalalah."',
+          surah: 'An-Nisa',
+          ayat: 176
+        }
+      });
+    }
+  }
+  
+  if (data.saudaraLakiKandung > 0) {
+    const hasAnakOrCucu = data.anakLaki > 0 || data.anakPerempuan > 0 || 
+                          data.cucuLaki > 0 || data.cucuPerempuan > 0;
+    
+    if (!hasAnakOrCucu) {
+      const totalSaudara = data.saudaraLakiKandung * 2 + data.saudaraPerempuanKandung;
+      
+      addHeir(heirs, {
+        name: currentLang === 'id' ? `Saudara Laki-laki Kandung (${data.saudaraLakiKandung} orang)` : `Full Brother (${data.saudaraLakiKandung})`,
+        share: 0,
+        count: data.saudaraLakiKandung,
+        explanation: currentLang === 'id' ? 'Saudara laki-laki kandung mendapat sisa sebagai ashabah' : 'Full brothers get remainder as ashabah',
         dalil: {
           arab: 'وَإِن كَانُوا إِخْوَةً رِّجَالًا وَنِسَاءً فَلِلذَّكَرِ مِثْلُ حَظِّ الْأُنثَيَيْنِ',
           terjemah_id: 'Dan jika mereka (ahli waris itu terdiri dari) saudara laki-laki dan perempuan, maka bagian seorang saudara laki-laki sama dengan bagian dua orang saudara perempuan.',
@@ -1169,13 +1143,30 @@ if (data.saudaraLakiKandung > 0) {
           ayat: 176
         },
         isAshabah: true,
-        ashabahRatio: 1,
+        ashabahRatio: 2,
         ashabahTotal: totalSaudara
       });
+      
+      if (data.saudaraPerempuanKandung > 0) {
+        addHeir(heirs, {
+          name: currentLang === 'id' ? `Saudara Perempuan Kandung (${data.saudaraPerempuanKandung} orang)` : `Full Sister (${data.saudaraPerempuanKandung})`,
+          share: 0,
+          count: data.saudaraPerempuanKandung,
+          explanation: currentLang === 'id' ? 'Saudara perempuan kandung bersama saudara laki-laki mendapat ashabah' : 'Full sisters with brothers get ashabah',
+          dalil: {
+            arab: 'وَإِن كَانُوا إِخْوَةً رِّجَالًا وَنِسَاءً فَلِلذَّكَرِ مِثْلُ حَظِّ الْأُنثَيَيْنِ',
+            terjemah_id: 'Dan jika mereka (ahli waris itu terdiri dari) saudara laki-laki dan perempuan, maka bagian seorang saudara laki-laki sama dengan bagian dua orang saudara perempuan.',
+            terjemah_en: 'But if there are both brothers and sisters, the male will have the share of two females.',
+            surah: 'An-Nisa',
+            ayat: 176
+          },
+          isAshabah: true,
+          ashabahRatio: 1,
+          ashabahTotal: totalSaudara
+        });
+      }
     }
   }
-  // Jika ada anak/cucu, saudara akan terhalang di detectMahjub()
- }
   
   // SAUDARA SEIBU
   if (data.saudaraLakiSeibu > 0 || data.saudaraPerempuanSeibu > 0) {
@@ -1218,7 +1209,7 @@ if (data.saudaraLakiKandung > 0) {
     }
   }
   
-  return heirs;
+  return heirs; // ✅ Return array heirs
 }
 
 // ===== FUNGSI TERAPKAN HUKUM 'AUL (PERBAIKAN LENGKAP) =====
@@ -1336,7 +1327,7 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
   }
 }
 
-// ===== FUNGSI PERHITUNGAN UTAMA (FIXED) =====
+// ===== FUNGSI PERHITUNGAN UTAMA - FIXED 100% =====
 
 function performCalculation(data) {
   // 1. Hitung harta bersih
@@ -1348,12 +1339,12 @@ function performCalculation(data) {
   hartaBersih -= wasiatFinal;
   
   // 2. Deteksi dan hapus ahli waris yang terhalang (mahjub)
-  const mahjubResult = detectMahjub(data);
+  const mahjubResult = detectMahjub(data); // ✅ HANYA 1 parameter
   data = mahjubResult.data;
   let blocked = mahjubResult.blocked;
   
   // 3. Hitung ahli waris fardh
-  const heirs = calculateFardhHeirs(data);
+  const heirs = calculateFardhHeirs(data); // ✅ Tidak perlu parameter heirs
   
   // 4. Tambahkan cucu perempuan ke blocked jika terhalang oleh 2+ anak perempuan
   if (data.cucuPerempuan > 0 && data.anakPerempuan >= 2 && data.cucuLaki === 0 && data.anakLaki === 0) {
@@ -1415,7 +1406,7 @@ function performCalculation(data) {
   };
 }
 
-// ===== FUNGSI DISTRIBUSI ASHABAH (SISA HARTA) - FIXED =====
+// ===== FUNGSI DISTRIBUSI ASHABAH (SISA HARTA) - FIXED 100% =====
 
 function distributeAshabah(heirs, sisaHarta, hartaBersih) {
   const ashabahHeirs = heirs.filter(h => h.isAshabah);
@@ -1435,62 +1426,38 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
     return;
   }
   
-  // Hitung berapa ashabah yang benar-benar dapat sisa
-  // Ayah/Kakek yang sudah dapat fardh TIDAK dapat sisa lagi jika ada anak laki
-  const ashabahYangDapatSisa = ashabahHeirs.filter(h => {
-    // Jika Ayah/Kakek dan sudah dapat fardh (1/6), cek apakah ada anak laki
-    if ((h.name.includes('Ayah') || h.name.includes('Father') || 
-         h.name.includes('Kakek') || h.name.includes('Grandfather')) && 
-        h.share > 0) {
-      // Ayah/Kakek sudah dapat 1/6, tidak dapat sisa lagi
-      return false;
-    }
-    return true;
-  });
+  // Cek apakah ada anak/cucu yang juga ashabah
+  const anakAshabah = ashabahHeirs.filter(h => h.ashabahRatio && h.ashabahTotal);
+  const orangTuaAshabah = ashabahHeirs.filter(h => !h.ashabahRatio && !h.ashabahTotal);
   
-  if (ashabahYangDapatSisa.length === 0) {
-    // Semua ashabah sudah dapat fardh, tidak ada yang dapat sisa
-    ashabahHeirs.forEach(h => {
-      if (h.share > 0) {
-        h.total = h.share * hartaBersih;
-        h.perPerson = h.total / h.count;
-      } else {
-        h.total = 0;
-        h.perPerson = 0;
-      }
-    });
-    return;
-  }
-  
-  // Distribusikan sisa ke ashabah yang berhak
-  ashabahYangDapatSisa.forEach(h => {
-    if (h.ashabahRatio && h.ashabahTotal) {
-      // Anak/Cucu/Saudara dengan ratio 2:1
+  if (anakAshabah.length > 0) {
+    // Ada anak/cucu, distribusi sisa ke anak dengan ratio 2:1
+    anakAshabah.forEach(h => {
       const sharePerUnit = sisaHarta / h.ashabahTotal;
       const fardh = h.share > 0 ? hartaBersih * h.share : 0;
       h.total = fardh + (sharePerUnit * h.ashabahRatio * h.count);
       h.perPerson = h.total / h.count;
-    } else {
-      // Ayah atau Kakek (tanpa anak laki, jadi dapat seluruh sisa)
+    });
+    
+    // Orang tua (ayah/kakek) hanya dapat fardh, tidak dapat sisa
+    orangTuaAshabah.forEach(h => {
+      h.total = h.share > 0 ? hartaBersih * h.share : 0;
+      h.perPerson = h.total;
+    });
+  } else {
+    // Tidak ada anak, orang tua dapat fardh + semua sisa
+    orangTuaAshabah.forEach(h => {
       const fardh = h.share > 0 ? hartaBersih * h.share : 0;
       h.total = fardh + sisaHarta;
       h.perPerson = h.total;
-    }
-  });
-  
-  // Untuk Ayah/Kakek yang tidak dapat sisa, hitung fardh saja
-  ashabahHeirs.forEach(h => {
-    if (!ashabahYangDapatSisa.includes(h) && h.share > 0) {
-      h.total = h.share * hartaBersih;
-      h.perPerson = h.total / h.count;
-    }
-  });
+    });
+  }
 }
 
-// ===== FUNGSI TERAPKAN HUKUM RADD (PENGEMBALIAN SISA) - FIXED =====
+// ===== FUNGSI TERAPKAN HUKUM RADD (PENGEMBALIAN SISA) - FIXED 100% =====
 
 function applyRadd(heirs, sisaHarta, hartaBersih) {
-  // ✅ Radd hanya terjadi jika:
+  // Radd hanya terjadi jika:
   // 1. Tidak ada ashabah (atau ashabah dapat 0)
   // 2. Ada sisa harta
   
