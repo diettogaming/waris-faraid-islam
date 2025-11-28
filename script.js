@@ -480,8 +480,10 @@ function toggleIstriCount() {
   
   if (checkbox.checked) {
     countDiv.classList.remove('hidden');
+    countInput.removeAttribute('disabled');
   } else {
     countDiv.classList.add('hidden');
+    countInput.setAttribute('disabled', 'disabled');
   }
 }
 
@@ -687,24 +689,45 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-en').addEventListener('click', () => changeLang('en'));
   
   document.getElementById('btnReset').addEventListener('click', () => {
-    if (confirm(currentLang === 'id' ? 'Apakah Anda yakin ingin menghitung ulang?' : 'Are you sure you want to calculate again?')) {
-      formData = {};
-      document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
-        input.value = '0';
-      });
-      document.querySelectorAll('input[type="checkbox"]').forEach(input => {
+  if (confirm(currentLang === 'id' ? 'Apakah Anda yakin ingin menghitung ulang?' : 'Are you sure you want to calculate again?')) {
+    // RESET LENGKAP
+    formData = {};
+    currentStep = 0;
+    
+    // Reset semua input text dan number
+    document.querySelectorAll('input[type="text"], input[type="number"]').forEach(input => {
+      input.value = '0';
+    });
+    
+    // Reset semua checkbox
+    document.querySelectorAll('input[type="checkbox"]').forEach(input => {
+      input.checked = false;
+    });
+    
+    // Reset radio ke default
+    document.querySelectorAll('input[type="radio"]').forEach(input => {
+      if (input.value === 'jumhur' || input.value === 'male' || input.value === 'none' || input.value === 'keduanya') {
+        input.checked = true;
+      } else {
         input.checked = false;
-      });
-      document.querySelectorAll('input[type="radio"]').forEach(input => {
-        if (input.value === 'jumhur' || input.value === 'male' || input.value === 'none') {
-          input.checked = true;
-        } else {
-          input.checked = false;
-        }
-      });
-      showStep(0);
-    }
-  });
+      }
+    });
+    
+    // Reset visibility
+    document.getElementById('istriCountDiv').classList.add('hidden');
+    document.getElementById('pasanganOptions').classList.remove('hidden');
+    document.getElementById('sectionOrangTua').classList.add('hidden');
+    document.getElementById('sectionKakekNenek').classList.add('hidden');
+    document.getElementById('asuransiInput').classList.add('hidden');
+    document.getElementById('biayaJenazahInput').style.display = 'block';
+    
+    // Reset warning
+    document.getElementById('wasiatWarning').classList.add('hidden');
+    
+    // Refresh halaman (cara terbaik untuk reset penuh)
+    location.reload();
+  }
+});
   
   document.getElementById('btnExportPDF').addEventListener('click', () => {
     alert(currentLang === 'id' 
@@ -2518,6 +2541,189 @@ const educationalContent = {
           </div>
         </div>
       `
+    },
+    rukun: {
+      title: '📖 Rukun Waris dalam Islam',
+      content: `
+        <div class="space-y-4">
+          <p><strong>Rukun Waris</strong> adalah syarat-syarat yang harus terpenuhi agar pembagian waris dapat dilaksanakan.</p>
+          
+          <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">3 Rukun Waris:</h4>
+            <ol class="list-decimal list-inside space-y-2">
+              <li><strong>Al-Muwarrits (المورث)</strong> - Orang yang meninggal dan meninggalkan harta</li>
+              <li><strong>Al-Warits (الوارث)</strong> - Ahli waris yang berhak menerima harta</li>
+              <li><strong>Al-Mauruts (الموروث)</strong> - Harta yang ditinggalkan</li>
+            </ol>
+          </div>
+          
+          <div class="bg-green-50 dark:bg-green-900 p-4 rounded-lg mt-4">
+            <h4 class="font-bold mb-2">Syarat Waris:</h4>
+            <ul class="list-disc list-inside space-y-1">
+              <li>Pewaris benar-benar telah meninggal dunia (secara hakiki atau hukmi)</li>
+              <li>Ahli waris masih hidup saat pewaris meninggal</li>
+              <li>Diketahui sebab-sebab mewarisi (hubungan kekerabatan, pernikahan, atau wala')</li>
+              <li>Tidak ada penghalang waris</li>
+            </ul>
+          </div>
+        </div>
+      `
+    },
+    
+    penghalang: {
+      title: '📖 Penghalang Waris (Mawani\' al-Irts)',
+      content: `
+        <div class="space-y-4">
+          <p><strong>Penghalang Waris</strong> adalah hal-hal yang menyebabkan seseorang tidak berhak menerima warisan meskipun memiliki hubungan kekerabatan dengan pewaris.</p>
+          
+          <div class="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">3 Penghalang Utama:</h4>
+            
+            <div class="space-y-4 mt-3">
+              <div class="bg-white dark:bg-gray-700 p-3 rounded">
+                <h5 class="font-bold text-red-800 dark:text-red-300 mb-2">1️⃣ Pembunuhan (القتل)</h5>
+                <p class="text-sm mb-2">Ahli waris yang membunuh pewaris tidak berhak mendapat warisan.</p>
+                <div class="dalil-section mt-2">
+                  <p class="dalil-arabic text-sm">لَيْسَ لِلْقَاتِلِ مِيرَاثٌ</p>
+                  <p class="dalil-translation text-xs">"Tidak ada warisan bagi pembunuh."</p>
+                  <p class="dalil-source text-xs">HR. Nasa'i, Ibnu Majah, Daruquthni</p>
+                </div>
+                <p class="text-xs mt-2 italic">Catatan: Pembunuhan yang dimaksud adalah pembunuhan yang disengaja (qatl al-'amd). Ada perbedaan pendapat ulama tentang pembunuhan tidak sengaja.</p>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-3 rounded">
+                <h5 class="font-bold text-red-800 dark:text-red-300 mb-2">2️⃣ Perbedaan Agama (اختلاف الدين)</h5>
+                <p class="text-sm mb-2">Muslim tidak mewarisi dari non-Muslim, dan sebaliknya.</p>
+                <div class="dalil-section mt-2">
+                  <p class="dalil-arabic text-sm">لَا يَرِثُ الْمُسْلِمُ الْكَافِرَ وَلَا الْكَافِرُ الْمُسْلِمَ</p>
+                  <p class="dalil-translation text-xs">"Orang Muslim tidak mewarisi orang kafir, dan orang kafir tidak mewarisi orang Muslim."</p>
+                  <p class="dalil-source text-xs">HR. Bukhari & Muslim dari Usamah bin Zaid RA</p>
+                </div>
+                <p class="text-xs mt-2 italic">Catatan: Ini berlaku untuk orang yang murtad (keluar dari Islam). Namun ada perbedaan pendapat ulama tentang detail kasusnya.</p>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-3 rounded">
+                <h5 class="font-bold text-red-800 dark:text-red-300 mb-2">3️⃣ Perbudakan (الرق)</h5>
+                <p class="text-sm mb-2">Budak tidak berhak mewarisi karena tidak memiliki hak kepemilikan.</p>
+                <p class="text-xs mt-2 italic">Catatan: Hukum ini sudah tidak relevan di zaman modern karena perbudakan telah dihapuskan.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg mt-4">
+            <h4 class="font-bold mb-2">⚠️ Catatan Penting:</h4>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>Kalkulator ini <strong>tidak memperhitungkan</strong> penghalang waris dalam perhitungan otomatis</li>
+              <li>Jika ada kasus pembunuhan atau murtad, konsultasikan dengan ulama atau pengadilan agama</li>
+              <li>Penghalang waris harus dibuktikan secara hukum</li>
+              <li>Dalam kasus kompleks, sebaiknya menggunakan jasa konsultan waris syariah</li>
+            </ul>
+          </div>
+          
+          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mt-4">
+            <h4 class="font-bold mb-2">📚 Referensi:</h4>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>Al-Fiqh al-Islami wa Adillatuhu - Wahbah Zuhaili</li>
+              <li>Fiqh al-Mawaris - Muhammad Ali ash-Shabuni</li>
+              <li>Kompilasi Hukum Islam (KHI) Pasal 173</li>
+            </ul>
+          </div>
+        </div>
+      `
+    }
+  },
+  
+  en: {
+    // ... konten yang sudah ada ...
+    
+    rukun: {
+      title: '📖 Pillars of Islamic Inheritance',
+      content: `
+        <div class="space-y-4">
+          <p><strong>Pillars of Inheritance</strong> are the requirements that must be fulfilled for inheritance distribution to be valid.</p>
+          
+          <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">3 Pillars of Inheritance:</h4>
+            <ol class="list-decimal list-inside space-y-2">
+              <li><strong>Al-Muwarrits (المورث)</strong> - The deceased who leaves property</li>
+              <li><strong>Al-Warits (الوارث)</strong> - The heir entitled to receive property</li>
+              <li><strong>Al-Mauruts (الموروث)</strong> - The property left behind</li>
+            </ol>
+          </div>
+          
+          <div class="bg-green-50 dark:bg-green-900 p-4 rounded-lg mt-4">
+            <h4 class="font-bold mb-2">Conditions for Inheritance:</h4>
+            <ul class="list-disc list-inside space-y-1">
+              <li>The deceased has truly passed away (actually or legally)</li>
+              <li>The heir is alive when the deceased passes away</li>
+              <li>The cause of inheritance is known (kinship, marriage, or wala')</li>
+              <li>There are no impediments to inheritance</li>
+            </ul>
+          </div>
+        </div>
+      `
+    },
+    
+    penghalang: {
+      title: '📖 Impediments to Inheritance (Mawani\' al-Irts)',
+      content: `
+        <div class="space-y-4">
+          <p><strong>Impediments to Inheritance</strong> are factors that prevent someone from receiving inheritance despite having kinship with the deceased.</p>
+          
+          <div class="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">3 Main Impediments:</h4>
+            
+            <div class="space-y-4 mt-3">
+              <div class="bg-white dark:bg-gray-700 p-3 rounded">
+                <h5 class="font-bold text-red-800 dark:text-red-300 mb-2">1️⃣ Murder (القتل)</h5>
+                <p class="text-sm mb-2">An heir who murders the deceased is not entitled to inheritance.</p>
+                <div class="dalil-section mt-2">
+                  <p class="dalil-arabic text-sm">لَيْسَ لِلْقَاتِلِ مِيرَاثٌ</p>
+                  <p class="dalil-translation text-xs">"There is no inheritance for the murderer."</p>
+                  <p class="dalil-source text-xs">HR. Nasa'i, Ibn Majah, Daruquthni</p>
+                </div>
+                <p class="text-xs mt-2 italic">Note: This refers to intentional murder (qatl al-'amd). There are differences of opinion among scholars regarding unintentional killing.</p>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-3 rounded">
+                <h5 class="font-bold text-red-800 dark:text-red-300 mb-2">2️⃣ Difference in Religion (اختلاف الدين)</h5>
+                <p class="text-sm mb-2">A Muslim does not inherit from a non-Muslim, and vice versa.</p>
+                <div class="dalil-section mt-2">
+                  <p class="dalil-arabic text-sm">لَا يَرِثُ الْمُسْلِمُ الْكَافِرَ وَلَا الْكَافِرُ الْمُسْلِمَ</p>
+                  <p class="dalil-translation text-xs">"A Muslim does not inherit from a disbeliever, nor does a disbeliever inherit from a Muslim."</p>
+                  <p class="dalil-source text-xs">HR. Bukhari & Muslim from Usamah bin Zaid RA</p>
+                </div>
+                <p class="text-xs mt-2 italic">Note: This applies to apostates (those who leave Islam). However, there are differences of opinion among scholars on specific cases.</p>
+              </div>
+              
+              <div class="bg-white dark:bg-gray-700 p-3 rounded">
+                <h5 class="font-bold text-red-800 dark:text-red-300 mb-2">3️⃣ Slavery (الرق)</h5>
+                <p class="text-sm mb-2">A slave is not entitled to inherit because they have no ownership rights.</p>
+                <p class="text-xs mt-2 italic">Note: This law is no longer relevant in modern times as slavery has been abolished.</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-lg mt-4">
+            <h4 class="font-bold mb-2">⚠️ Important Notes:</h4>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>This calculator <strong>does not account for</strong> impediments to inheritance in automatic calculations</li>
+              <li>If there are cases of murder or apostasy, consult with scholars or religious courts</li>
+              <li>Impediments to inheritance must be legally proven</li>
+              <li>In complex cases, it's advisable to use Islamic inheritance consultant services</li>
+            </ul>
+          </div>
+          
+          <div class="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg mt-4">
+            <h4 class="font-bold mb-2">📚 References:</h4>
+            <ul class="list-disc list-inside space-y-1 text-sm">
+              <li>Al-Fiqh al-Islami wa Adillatuhu - Wahbah Zuhaili</li>
+              <li>Fiqh al-Mawaris - Muhammad Ali ash-Shabuni</li>
+              <li>Islamic Law Compilation (KHI) Article 173</li>
+            </ul>
+          </div>
+        </div>
+      `
     }
   }
 };
@@ -2567,6 +2773,18 @@ function addEducationalButtons() {
         <button onclick="showEducationalContent('mazhab')" class="p-4 bg-yellow-100 dark:bg-yellow-900 rounded-xl hover:bg-yellow-200 dark:hover:bg-yellow-800 transition text-left">
           <div class="font-bold text-yellow-900 dark:text-yellow-300">📖 4 Mazhab</div>
           <div class="text-sm text-yellow-700 dark:text-yellow-400">${currentLang === 'id' ? 'Perbedaan mazhab' : 'Madhab differences'}</div>
+        </button>
+        
+        <!-- TOMBOL BARU: RUKUN WARIS -->
+        <button onclick="showEducationalContent('rukun')" class="p-4 bg-indigo-100 dark:bg-indigo-900 rounded-xl hover:bg-indigo-200 dark:hover:bg-indigo-800 transition text-left">
+          <div class="font-bold text-indigo-900 dark:text-indigo-300">📖 Rukun Waris</div>
+          <div class="text-sm text-indigo-700 dark:text-indigo-400">${currentLang === 'id' ? 'Syarat waris' : 'Inheritance pillars'}</div>
+        </button>
+        
+        <!-- TOMBOL BARU: PENGHALANG WARIS -->
+        <button onclick="showEducationalContent('penghalang')" class="p-4 bg-rose-100 dark:bg-rose-900 rounded-xl hover:bg-rose-200 dark:hover:bg-rose-800 transition text-left">
+          <div class="font-bold text-rose-900 dark:text-rose-300">📖 Penghalang Waris</div>
+          <div class="text-sm text-rose-700 dark:text-rose-400">${currentLang === 'id' ? 'Pembunuh & Murtad' : 'Murder & Apostasy'}</div>
         </button>
       </div>
     `;
