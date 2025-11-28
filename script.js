@@ -768,10 +768,10 @@ function detectMahjub(data, heirs, blocked) {
     data.nenek = false;
   }
   
-  // Saudara kandung/seayah terhalang oleh ayah atau anak laki
-  if ((hasAyah || hasAnakLaki) && 
+  // Saudara kandung/seayah terhalang oleh ayah, anak laki, ATAU anak perempuan + cucu
+  if ((hasAyah || hasAnakLaki || (data.anakPerempuan > 0 && hasCucu(data))) && 
       (data.saudaraLakiKandung > 0 || data.saudaraPerempuanKandung > 0 || 
-       data.saudaraLakiSeayah > 0 || data.saudaraPerempuanSeayah > 0)) {
+     data.saudaraLakiSeayah > 0 || data.saudaraPerempuanSeayah > 0)) {
     blocked.push({
       type: 'saudara_kandung_seayah',
       count: data.saudaraLakiKandung + data.saudaraPerempuanKandung + 
