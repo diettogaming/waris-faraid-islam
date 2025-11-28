@@ -906,36 +906,28 @@ function calculateFardhHeirs(data) {
     }
   }
   
-  // ===== IBU - FIXED UNTUK GHARRAWAIN =====
+  // ===== IBU - FIXED UNTUK GHARRAWAIN (VERSI FINAL) =====
   if (data.ibu) {
-    // Hitung total saudara YANG TIDAK TERHALANG
-    let totalSaudaraAktif = 0;
+    // Untuk Gharrawain: Saudara kandung/seayah yang terhalang TETAP mempengaruhi bagian ibu
+    const totalSaudaraKandungSeayah = data.saudaraLakiKandung + data.saudaraPerempuanKandung +
+                                       data.saudaraLakiSeayah + data.saudaraPerempuanSeayah;
     
-    // Saudara kandung/seayah terhalang oleh ayah atau anak
-    const saudaraKandungSeayahTerhalang = data.ayah || hasAnakOrCucu;
-    
-    if (!saudaraKandungSeayahTerhalang) {
-      totalSaudaraAktif += data.saudaraLakiKandung + data.saudaraPerempuanKandung +
-                           data.saudaraLakiSeayah + data.saudaraPerempuanSeayah;
-    }
-    
-    // Saudara seibu terhalang oleh ayah, kakek, atau anak
+    // Saudara seibu terhalang oleh ayah/kakek/anak
     const saudaraSeibuTerhalang = data.ayah || data.kakek || hasAnakOrCucu;
+    const totalSaudaraSeibu = saudaraSeibuTerhalang ? 0 : (data.saudaraLakiSeibu + data.saudaraPerempuanSeibu);
     
-    if (!saudaraSeibuTerhalang) {
-      totalSaudaraAktif += data.saudaraLakiSeibu + data.saudaraPerempuanSeibu;
-    }
+    // Total saudara yang mempengaruhi bagian ibu (termasuk yang terhalang oleh ayah!)
+    const totalSaudaraYangMempengaruhiIbu = totalSaudaraKandungSeayah + totalSaudaraSeibu;
     
-    // ✅ PERBAIKAN: Ibu dapat 1/6 jika ada anak ATAU ada 2+ saudara AKTIF
-    const ibuGet1_6 = hasAnakOrCucu || totalSaudaraAktif >= 2;
+    // ✅ Ibu dapat 1/6 jika: ada anak ATAU ada 2+ saudara (termasuk yang terhalang!)
+    const ibuGet1_6 = hasAnakOrCucu || totalSaudaraYangMempengaruhiIbu >= 2;
     
     const dalil = ibuGet1_6 ? getDalil('ibu.dengan_anak') : getDalil('ibu.tanpa_anak');
     
     let explanation = currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en;
     
-    // ✅ Tambahkan penjelasan khusus untuk Gharrawain
-    if (data.ayah && !hasAnakOrCucu && (data.saudaraLakiKandung + data.saudaraPerempuanKandung + 
-        data.saudaraLakiSeayah + data.saudaraPerempuanSeayah) >= 2) {
+    // Penjelasan khusus untuk Gharrawain
+    if (data.ayah && !hasAnakOrCucu && totalSaudaraKandungSeayah >= 2) {
       explanation = currentLang === 'id' ? 
         'Ibu mendapat 1/6 karena ada 2+ saudara (meskipun terhalang oleh ayah) - Kasus Gharrawain' : 
         'Mother gets 1/6 because there are 2+ siblings (even though blocked by father) - Gharrawain case';
