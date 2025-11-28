@@ -1637,6 +1637,89 @@ function renderHeir(heir) {
   `;
 }
 
+// ===== FUNGSI GENERATE SUMMARY DATA INPUT =====
+
+function generateSummary(data) {
+  const mazhab = data.mazhab === 'jumhur' ? 'Jumhur (Mayoritas Ulama)' : 'Mazhab Tertentu';
+  const gender = data.gender === 'male' ? (currentLang === 'id' ? 'Laki-laki' : 'Male') : (currentLang === 'id' ? 'Perempuan' : 'Female');
+  
+  let pasangan = currentLang === 'id' ? 'Tidak ada pasangan' : 'No spouse';
+  if (data.suami) pasangan = currentLang === 'id' ? 'Memiliki Suami' : 'Has Husband';
+  if (data.istri) pasangan = currentLang === 'id' ? `Memiliki ${data.istriCount} Istri` : `Has ${data.istriCount} Wife/Wives`;
+  
+  let orangTua = [];
+  if (data.ayah) orangTua.push(currentLang === 'id' ? 'Ayah' : 'Father');
+  if (data.ibu) orangTua.push(currentLang === 'id' ? 'Ibu' : 'Mother');
+  if (data.kakek) orangTua.push(currentLang === 'id' ? 'Kakek' : 'Grandfather');
+  if (data.nenek) orangTua.push(currentLang === 'id' ? 'Nenek' : 'Grandmother');
+  const orangTuaText = orangTua.length > 0 ? orangTua.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
+  
+  let anak = [];
+  if (data.anakLaki > 0) anak.push(`${data.anakLaki} ${currentLang === 'id' ? 'Anak Laki-laki' : 'Son(s)'}`);
+  if (data.anakPerempuan > 0) anak.push(`${data.anakPerempuan} ${currentLang === 'id' ? 'Anak Perempuan' : 'Daughter(s)'}`);
+  const anakText = anak.length > 0 ? anak.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
+  
+  let cucu = [];
+  if (data.cucuLaki > 0) cucu.push(`${data.cucuLaki} ${currentLang === 'id' ? 'Cucu Laki-laki' : 'Grandson(s)'}`);
+  if (data.cucuPerempuan > 0) cucu.push(`${data.cucuPerempuan} ${currentLang === 'id' ? 'Cucu Perempuan' : 'Granddaughter(s)'}`);
+  const cucuText = cucu.length > 0 ? cucu.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
+  
+  let saudara = [];
+  if (data.saudaraLakiKandung > 0) saudara.push(`${data.saudaraLakiKandung} ${currentLang === 'id' ? 'Saudara Laki Kandung' : 'Full Brother(s)'}`);
+  if (data.saudaraPerempuanKandung > 0) saudara.push(`${data.saudaraPerempuanKandung} ${currentLang === 'id' ? 'Saudara Perempuan Kandung' : 'Full Sister(s)'}`);
+  if (data.saudaraLakiSeayah > 0) saudara.push(`${data.saudaraLakiSeayah} ${currentLang === 'id' ? 'Saudara Laki Seayah' : 'Paternal Brother(s)'}`);
+  if (data.saudaraPerempuanSeayah > 0) saudara.push(`${data.saudaraPerempuanSeayah} ${currentLang === 'id' ? 'Saudara Perempuan Seayah' : 'Paternal Sister(s)'}`);
+  if (data.saudaraLakiSeibu > 0) saudara.push(`${data.saudaraLakiSeibu} ${currentLang === 'id' ? 'Saudara Laki Seibu' : 'Maternal Brother(s)'}`);
+  if (data.saudaraPerempuanSeibu > 0) saudara.push(`${data.saudaraPerempuanSeibu} ${currentLang === 'id' ? 'Saudara Perempuan Seibu' : 'Maternal Sister(s)'}`);
+  const saudaraText = saudara.length > 0 ? saudara.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
+  
+  return `
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 p-6 rounded-xl border-2 border-blue-200 dark:border-blue-700 mb-6">
+      <h3 class="text-xl font-bold text-blue-900 dark:text-blue-300 mb-4 flex items-center">
+        <span class="text-2xl mr-2">📋</span>
+        ${currentLang === 'id' ? 'Ringkasan Data Pewaris' : 'Summary of Deceased Data'}
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '⚖️ Mazhab:' : '⚖️ Madhab:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${mazhab}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👤 Jenis Kelamin Pewaris:' : '👤 Gender of Deceased:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${gender}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '💑 Status Pasangan:' : '💑 Spouse Status:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${pasangan}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👴👵 Orang Tua/Kakek Nenek:' : '👴👵 Parents/Grandparents:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${orangTuaText}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👶 Anak:' : '👶 Children:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${anakText}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👦👧 Cucu:' : '👦👧 Grandchildren:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${cucuText}</span>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg md:col-span-2">
+          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👥 Saudara:' : '👥 Siblings:'}</span>
+          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${saudaraText}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 // ===== FUNGSI RENDER AHLI WARIS TERHALANG =====
 
 function renderBlockedHeir(blocked) {
@@ -1780,89 +1863,12 @@ function displayResult(result) {
   
   // PART 1J: Render Summary ke DOM
   document.getElementById('resultSummary').innerHTML = summaryHTML;
-  function generateSummary(data) {
-  const mazhab = data.mazhab === 'jumhur' ? 'Jumhur (Mayoritas Ulama)' : 'Mazhab Tertentu';
-  const gender = data.gender === 'male' ? (currentLang === 'id' ? 'Laki-laki' : 'Male') : (currentLang === 'id' ? 'Perempuan' : 'Female');
+  const dataSummary = generateSummary(formData);
+  document.getElementById('resultSummary').insertAdjacentHTML('afterbegin', dataSummary);
   
-  let pasangan = currentLang === 'id' ? 'Tidak ada pasangan' : 'No spouse';
-  if (data.suami) pasangan = currentLang === 'id' ? 'Memiliki Suami' : 'Has Husband';
-  if (data.istri) pasangan = currentLang === 'id' ? `Memiliki ${data.istriCount} Istri` : `Has ${data.istriCount} Wife/Wives`;
+// ===== PART 2: DISPLAY DETAIL 'AUL (JIKA TERJADI) =====
   
-  let orangTua = [];
-  if (data.ayah) orangTua.push(currentLang === 'id' ? 'Ayah' : 'Father');
-  if (data.ibu) orangTua.push(currentLang === 'id' ? 'Ibu' : 'Mother');
-  if (data.kakek) orangTua.push(currentLang === 'id' ? 'Kakek' : 'Grandfather');
-  if (data.nenek) orangTua.push(currentLang === 'id' ? 'Nenek' : 'Grandmother');
-  const orangTuaText = orangTua.length > 0 ? orangTua.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
-  
-  let anak = [];
-  if (data.anakLaki > 0) anak.push(`${data.anakLaki} ${currentLang === 'id' ? 'Anak Laki-laki' : 'Son(s)'}`);
-  if (data.anakPerempuan > 0) anak.push(`${data.anakPerempuan} ${currentLang === 'id' ? 'Anak Perempuan' : 'Daughter(s)'}`);
-  const anakText = anak.length > 0 ? anak.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
-  
-  let cucu = [];
-  if (data.cucuLaki > 0) cucu.push(`${data.cucuLaki} ${currentLang === 'id' ? 'Cucu Laki-laki' : 'Grandson(s)'}`);
-  if (data.cucuPerempuan > 0) cucu.push(`${data.cucuPerempuan} ${currentLang === 'id' ? 'Cucu Perempuan' : 'Granddaughter(s)'}`);
-  const cucuText = cucu.length > 0 ? cucu.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
-  
-  let saudara = [];
-  if (data.saudaraLakiKandung > 0) saudara.push(`${data.saudaraLakiKandung} ${currentLang === 'id' ? 'Saudara Laki Kandung' : 'Full Brother(s)'}`);
-  if (data.saudaraPerempuanKandung > 0) saudara.push(`${data.saudaraPerempuanKandung} ${currentLang === 'id' ? 'Saudara Perempuan Kandung' : 'Full Sister(s)'}`);
-  if (data.saudaraLakiSeayah > 0) saudara.push(`${data.saudaraLakiSeayah} ${currentLang === 'id' ? 'Saudara Laki Seayah' : 'Paternal Brother(s)'}`);
-  if (data.saudaraPerempuanSeayah > 0) saudara.push(`${data.saudaraPerempuanSeayah} ${currentLang === 'id' ? 'Saudara Perempuan Seayah' : 'Paternal Sister(s)'}`);
-  if (data.saudaraLakiSeibu > 0) saudara.push(`${data.saudaraLakiSeibu} ${currentLang === 'id' ? 'Saudara Laki Seibu' : 'Maternal Brother(s)'}`);
-  if (data.saudaraPerempuanSeibu > 0) saudara.push(`${data.saudaraPerempuanSeibu} ${currentLang === 'id' ? 'Saudara Perempuan Seibu' : 'Maternal Sister(s)'}`);
-  const saudaraText = saudara.length > 0 ? saudara.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
-  
-  return `
-    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 p-6 rounded-xl border-2 border-blue-200 dark:border-blue-700 mb-6">
-      <h3 class="text-xl font-bold text-blue-900 dark:text-blue-300 mb-4 flex items-center">
-        <span class="text-2xl mr-2">📋</span>
-        ${currentLang === 'id' ? 'Ringkasan Data Pewaris' : 'Summary of Deceased Data'}
-      </h3>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
-          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '⚖️ Mazhab:' : '⚖️ Madhab:'}</span>
-          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${mazhab}</span>
-        </div>
-        
-        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
-          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👤 Jenis Kelamin Pewaris:' : '👤 Gender of Deceased:'}</span>
-          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${gender}</span>
-        </div>
-        
-        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
-          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '💑 Status Pasangan:' : '💑 Spouse Status:'}</span>
-          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${pasangan}</span>
-        </div>
-        
-        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
-          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👴👵 Orang Tua/Kakek Nenek:' : '👴👵 Parents/Grandparents:'}</span>
-          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${orangTuaText}</span>
-        </div>
-        
-        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
-          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👶 Anak:' : '👶 Children:'}</span>
-          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${anakText}</span>
-        </div>
-        
-        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg">
-          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👦👧 Cucu:' : '👦👧 Grandchildren:'}</span>
-          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${cucuText}</span>
-        </div>
-        
-        <div class="bg-white dark:bg-gray-800 p-3 rounded-lg md:col-span-2">
-          <span class="font-semibold text-gray-600 dark:text-gray-400">${currentLang === 'id' ? '👥 Saudara:' : '👥 Siblings:'}</span>
-          <span class="ml-2 font-bold text-blue-900 dark:text-blue-300">${saudaraText}</span>
-        </div>
-      </div>
-    </div>
-  `;
-}
-  // ===== PART 2: DISPLAY DETAIL 'AUL (JIKA TERJADI) =====
-  
-  if (result.aul && result.aul.occurred) {
+if (result.aul && result.aul.occurred) {
     // PART 2A: Header 'Aul
     let aulHTML = `
       <div class="bg-purple-50 dark:bg-purple-900 p-6 rounded-xl border-l-4 border-purple-500 mt-6">
