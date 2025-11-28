@@ -1526,6 +1526,9 @@ function calculate() {
   
   setTimeout(() => {
     try {
+      // TAMBAHKAN INI - Simpan data asli sebelum perhitungan
+      window.originalFormData = JSON.parse(JSON.stringify(formData));
+      
       // Lakukan perhitungan
       const result = performCalculation(formData);
       
@@ -1640,37 +1643,40 @@ function renderHeir(heir) {
 // ===== FUNGSI GENERATE SUMMARY DATA INPUT =====
 
 function generateSummary(data) {
-  const mazhab = data.mazhab === 'jumhur' ? 'Jumhur (Mayoritas Ulama)' : 'Mazhab Tertentu';
-  const gender = data.gender === 'male' ? (currentLang === 'id' ? 'Laki-laki' : 'Male') : (currentLang === 'id' ? 'Perempuan' : 'Female');
+  // Gunakan data asli jika ada, jika tidak gunakan data yang dikirim
+  const originalData = window.originalFormData || data;
+  
+  const mazhab = originalData.mazhab === 'jumhur' ? 'Jumhur (Mayoritas Ulama)' : 'Mazhab Tertentu';
+  const gender = originalData.gender === 'male' ? (currentLang === 'id' ? 'Laki-laki' : 'Male') : (currentLang === 'id' ? 'Perempuan' : 'Female');
   
   let pasangan = currentLang === 'id' ? 'Tidak ada pasangan' : 'No spouse';
-  if (data.suami) pasangan = currentLang === 'id' ? 'Memiliki Suami' : 'Has Husband';
-  if (data.istri) pasangan = currentLang === 'id' ? `Memiliki ${data.istriCount} Istri` : `Has ${data.istriCount} Wife/Wives`;
+  if (originalData.suami) pasangan = currentLang === 'id' ? 'Memiliki Suami' : 'Has Husband';
+  if (originalData.istri) pasangan = currentLang === 'id' ? `Memiliki ${originalData.istriCount} Istri` : `Has ${originalData.istriCount} Wife/Wives`;
   
   let orangTua = [];
-  if (data.ayah) orangTua.push(currentLang === 'id' ? 'Ayah' : 'Father');
-  if (data.ibu) orangTua.push(currentLang === 'id' ? 'Ibu' : 'Mother');
-  if (data.kakek) orangTua.push(currentLang === 'id' ? 'Kakek' : 'Grandfather');
-  if (data.nenek) orangTua.push(currentLang === 'id' ? 'Nenek' : 'Grandmother');
+  if (originalData.ayah) orangTua.push(currentLang === 'id' ? 'Ayah' : 'Father');
+  if (originalData.ibu) orangTua.push(currentLang === 'id' ? 'Ibu' : 'Mother');
+  if (originalData.kakek) orangTua.push(currentLang === 'id' ? 'Kakek' : 'Grandfather');
+  if (originalData.nenek) orangTua.push(currentLang === 'id' ? 'Nenek' : 'Grandmother');
   const orangTuaText = orangTua.length > 0 ? orangTua.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
   
   let anak = [];
-  if (data.anakLaki > 0) anak.push(`${data.anakLaki} ${currentLang === 'id' ? 'Anak Laki-laki' : 'Son(s)'}`);
-  if (data.anakPerempuan > 0) anak.push(`${data.anakPerempuan} ${currentLang === 'id' ? 'Anak Perempuan' : 'Daughter(s)'}`);
+  if (originalData.anakLaki > 0) anak.push(`${originalData.anakLaki} ${currentLang === 'id' ? 'Anak Laki-laki' : 'Son(s)'}`);
+  if (originalData.anakPerempuan > 0) anak.push(`${originalData.anakPerempuan} ${currentLang === 'id' ? 'Anak Perempuan' : 'Daughter(s)'}`);
   const anakText = anak.length > 0 ? anak.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
   
   let cucu = [];
-  if (data.cucuLaki > 0) cucu.push(`${data.cucuLaki} ${currentLang === 'id' ? 'Cucu Laki-laki' : 'Grandson(s)'}`);
-  if (data.cucuPerempuan > 0) cucu.push(`${data.cucuPerempuan} ${currentLang === 'id' ? 'Cucu Perempuan' : 'Granddaughter(s)'}`);
+  if (originalData.cucuLaki > 0) cucu.push(`${originalData.cucuLaki} ${currentLang === 'id' ? 'Cucu Laki-laki' : 'Grandson(s)'}`);
+  if (originalData.cucuPerempuan > 0) cucu.push(`${originalData.cucuPerempuan} ${currentLang === 'id' ? 'Cucu Perempuan' : 'Granddaughter(s)'}`);
   const cucuText = cucu.length > 0 ? cucu.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
   
   let saudara = [];
-  if (data.saudaraLakiKandung > 0) saudara.push(`${data.saudaraLakiKandung} ${currentLang === 'id' ? 'Saudara Laki Kandung' : 'Full Brother(s)'}`);
-  if (data.saudaraPerempuanKandung > 0) saudara.push(`${data.saudaraPerempuanKandung} ${currentLang === 'id' ? 'Saudara Perempuan Kandung' : 'Full Sister(s)'}`);
-  if (data.saudaraLakiSeayah > 0) saudara.push(`${data.saudaraLakiSeayah} ${currentLang === 'id' ? 'Saudara Laki Seayah' : 'Paternal Brother(s)'}`);
-  if (data.saudaraPerempuanSeayah > 0) saudara.push(`${data.saudaraPerempuanSeayah} ${currentLang === 'id' ? 'Saudara Perempuan Seayah' : 'Paternal Sister(s)'}`);
-  if (data.saudaraLakiSeibu > 0) saudara.push(`${data.saudaraLakiSeibu} ${currentLang === 'id' ? 'Saudara Laki Seibu' : 'Maternal Brother(s)'}`);
-  if (data.saudaraPerempuanSeibu > 0) saudara.push(`${data.saudaraPerempuanSeibu} ${currentLang === 'id' ? 'Saudara Perempuan Seibu' : 'Maternal Sister(s)'}`);
+  if (originalData.saudaraLakiKandung > 0) saudara.push(`${originalData.saudaraLakiKandung} ${currentLang === 'id' ? 'Saudara Laki Kandung' : 'Full Brother(s)'}`);
+  if (originalData.saudaraPerempuanKandung > 0) saudara.push(`${originalData.saudaraPerempuanKandung} ${currentLang === 'id' ? 'Saudara Perempuan Kandung' : 'Full Sister(s)'}`);
+  if (originalData.saudaraLakiSeayah > 0) saudara.push(`${originalData.saudaraLakiSeayah} ${currentLang === 'id' ? 'Saudara Laki Seayah' : 'Paternal Brother(s)'}`);
+  if (originalData.saudaraPerempuanSeayah > 0) saudara.push(`${originalData.saudaraPerempuanSeayah} ${currentLang === 'id' ? 'Saudara Perempuan Seayah' : 'Paternal Sister(s)'}`);
+  if (originalData.saudaraLakiSeibu > 0) saudara.push(`${originalData.saudaraLakiSeibu} ${currentLang === 'id' ? 'Saudara Laki Seibu' : 'Maternal Brother(s)'}`);
+  if (originalData.saudaraPerempuanSeibu > 0) saudara.push(`${originalData.saudaraPerempuanSeibu} ${currentLang === 'id' ? 'Saudara Perempuan Seibu' : 'Maternal Sister(s)'}`);
   const saudaraText = saudara.length > 0 ? saudara.join(', ') : (currentLang === 'id' ? 'Tidak ada' : 'None');
   
   return `
