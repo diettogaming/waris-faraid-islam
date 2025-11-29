@@ -106,7 +106,7 @@
       <button 
         type="button" 
         id="btnStart" 
-        onclick="startCalculation()" 
+        onclick="handleCalculateButton()" 
         class="w-full py-5 rounded-2xl font-bold text-xl text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300" 
         data-i18n="start">
         Mulai Perhitungan →
@@ -180,7 +180,7 @@
         </div>
 
         <div class="flex gap-4">
-          <button type="button" onclick="showLanding()" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
+          <button type="button" id="backStep1" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
             ← Kembali
           </button>
           <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
@@ -238,11 +238,11 @@
             <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
             <input type="text" id="wasiat" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="0" oninput="formatCurrency(this)">
           </div>
-          <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="wasiat_hint">Maksimal 1/3 harta setelah hutang</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="wasiat_hint">Wasiat maksimal 1/3 harta, untuk non-ahli waris</p>
         </div>
 
         <div class="flex gap-4">
-          <button type="button" onclick="showStep(1)" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
+          <button type="button" id="backStep2" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
             ← Kembali
           </button>
           <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
@@ -256,7 +256,7 @@
     <div id="step3" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
       <div class="text-center mb-8">
         <div class="text-5xl mb-4">👴👵</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step3_title">Ahli Waris - Orang Tua & Kakek Nenek</h2>
+        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step3_title">Orang Tua & Kakek Nenek</h2>
         <p class="text-gray-600 dark:text-gray-400 mt-2" data-i18n="step3_subtitle">Langkah 3 dari 6</p>
       </div>
 
@@ -264,33 +264,59 @@
         <div class="grid grid-cols-2 gap-6">
           <div class="space-y-3">
             <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="ayah">👨‍🦳 Ayah</label>
-            <input type="number" id="ayah" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
+            <input type="number" id="ayah" min="0" max="1" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
           </div>
           <div class="space-y-3">
             <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="ibu">👩‍🦳 Ibu</label>
-            <input type="number" id="ibu" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
+            <input type="number" id="ibu" min="0" max="1" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-6">
           <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="kakek">👴 Kakek</label>
-            <input type="number" id="kakek" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
+            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="kakek">👨‍🦳 Kakek (Ayah dari Ayah)</label>
+            <input type="number" id="kakek" min="0" max="1" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
           </div>
           <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="nenek">👵 Nenek</label>
-            <input type="number" id="nenek" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
+            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="nenek">👩‍🦳 Nenek (Ibu dari Ibu)</label>
+            <input type="number" id="nenek" min="0" max="1" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
           </div>
         </div>
 
         <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-xl border-l-4 border-yellow-500">
-          <p class="text-sm text-yellow-800 dark:text-yellow-200" data-i18n="kakek_nenek_note">
-            ⚠️ Kakek & Nenek mendapat 1/6 tetap, tidak terhalang anak (Hanbali). Sesuaikan mazhab untuk variasi.
-          </p>
+          <h4 class="font-bold mb-3 text-yellow-900 dark:text-yellow-300">📖 Dalil & Kaidah Hukum Waris</h4>
+          
+          <div class="space-y-4 text-sm text-yellow-800 dark:text-yellow-200">
+            <div>
+              <div class="font-semibold mb-2">🔹 Prinsip Hijab (Penghalangan):</div>
+              <p class="mb-2">"Ahli waris yang lebih dekat derajatnya menghalangi ahli waris yang lebih jauh dari garis keturunan yang sama."</p>
+              <p class="text-xs italic">📚 Hadits Bukhari & Muslim dari Ibnu Abbas RA</p>
+            </div>
+            
+            <div>
+              <div class="font-semibold mb-2">🔹 Bagian Kakek & Nenek (jika berhak):</div>
+              <p>• Kakek mendapat 1/6 (jika ada anak kandung)</p>
+              <p>• Nenek mendapat 1/6</p>
+              <p class="text-xs mt-2 italic">📚 Hadits Riwayat Abu Daud, Tirmidzi, Ibnu Majah (Hasan)</p>
+              <p class="text-xs italic">Dari Qabishah bin Zu'aib: "Nenek datang kepada Abu Bakar RA menanyakan bagian warisnya... lalu Abu Bakar memutuskan untuk nenek bagian seperenam (1/6)."</p>
+            </div>
+            
+            <div>
+              <div class="font-semibold mb-2">🔹 Referensi Kitab Fiqih:</div>
+              <p>• Bidayatul Mujtahid (Ibnu Rusyd)</p>
+              <p>• Al-Mughni (Ibnu Qudamah)</p>
+              <p>• QS. An-Nisa: 11</p>
+            </div>
+
+            <div>
+              <div class="font-semibold mb-2">🔹 Catatan Penting:</div>
+              <p>Kakek dan Nenek TIDAK terhalang oleh keberadaan anak kandung. Mereka tetap mendapat bagian fardh (1/6) bersama dengan anak-anak pewaris.</p>
+            </div>
+          </div>
         </div>
 
         <div class="flex gap-4">
-          <button type="button" onclick="showStep(2)" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
+          <button type="button" id="backStep3" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
             ← Kembali
           </button>
           <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
@@ -300,37 +326,53 @@
       </form>
     </div>
 
-    <!-- Step 4: Suami/Istri -->
+    <!-- Step 4: Saudara Seayah & Seibu -->
     <div id="step4" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
       <div class="text-center mb-8">
-        <div class="text-5xl mb-4">💑</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step4_title">Ahli Waris - Suami/Istri</h2>
+        <div class="text-5xl mb-4">👥</div>
+        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step4_title">Saudara Seayah & Seibu</h2>
         <p class="text-gray-600 dark:text-gray-400 mt-2" data-i18n="step4_subtitle">Langkah 4 dari 6</p>
       </div>
 
       <form id="formStep4" class="space-y-8">
-        <div id="suamiSection" style="display: none;" class="grid grid-cols-2 gap-6">
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="suami">👨‍🦱 Suami</label>
-            <input type="number" id="suami" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
+        <div class="space-y-6">
+          <div>
+            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-4" data-i18n="saudara_seayah">Saudara Seayah</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_laki_seayah">Laki-laki</label>
+                <input type="number" id="saudaraLakiSeayah" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+              </div>
+              <div class="space-y-2">
+                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_perempuan_seayah">Perempuan</label>
+                <input type="number" id="saudaraPerempuanSeayah" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="grid grid-cols-2 gap-6" id="istriSection">
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="istri">👩‍🦰 Istri</label>
-            <input type="number" id="istri" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
+          <div>
+            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-4" data-i18n="saudara_seibu">Saudara Seibu</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_laki_seibu">Laki-laki</label>
+                <input type="number" id="saudaraLakiSeibu" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+              </div>
+              <div class="space-y-2">
+                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_perempuan_seibu">Perempuan</label>
+                <input type="number" id="saudaraPerempuanSeibu" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-xl border-l-4 border-blue-500">
-          <p class="text-sm text-blue-800 dark:text-blue-200" data-i18n="suami_istri_note">
-            💡 Suami: 1/4 (ada anak), 1/2 (tanpa anak). Istri: 1/8 (ada anak), 1/4 (tanpa anak, dibagi rata).
+          <p class="text-sm text-blue-800 dark:text-blue-200" data-i18n="saudara_note">
+            💡 Saudara seayah/seibu hanya berhak jika tidak ada anak kandung atau ayah pewaris.
           </p>
         </div>
 
         <div class="flex gap-4">
-          <button type="button" onclick="showStep(3)" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
+          <button type="button" id="backStep4" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
             ← Kembali
           </button>
           <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
@@ -371,12 +413,6 @@
           </div>
         </div>
 
-        <div class="text-center">
-          <button type="button" onclick="showNasabModal()" class="py-3 px-6 bg-yellow-500 text-white rounded-lg font-bold hover:bg-yellow-600 transition" data-i18n="nasab_verify">
-            Verifikasi Status Nasab Anak/Cucu
-          </button>
-        </div>
-
         <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-xl border-l-4 border-blue-500">
           <p class="text-sm text-blue-800 dark:text-blue-200" data-i18n="cucu_note">
             💡 Cucu dapat dipilih walaupun anak masih ada, sesuai kaidah 4 mazhab klasik untuk kasus tertentu.
@@ -384,7 +420,7 @@
         </div>
 
         <div class="flex gap-4">
-          <button type="button" onclick="showStep(4)" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
+          <button type="button" id="backStep5" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
             ← Kembali
           </button>
           <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
@@ -394,28 +430,15 @@
       </form>
     </div>
 
-    <!-- Step 6: Saudara -->
+    <!-- Step 6: Saudara Kandung -->
     <div id="step6" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
       <div class="text-center mb-8">
         <div class="text-5xl mb-4">👥</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step6_title">Ahli Waris - Saudara</h2>
+        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step6_title">Ahli Waris - Saudara Kandung</h2>
         <p class="text-gray-600 dark:text-gray-400 mt-2" data-i18n="step6_subtitle">Langkah 6 dari 6</p>
       </div>
 
       <form id="formStep6" class="space-y-8">
-        <div class="space-y-3">
-          <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer transition">
-            <input type="checkbox" id="isKalalah" class="w-5 h-5">
-            <div>
-              <div class="font-bold text-gray-800 dark:text-gray-200" data-i18n="kalalah_label">Kasus Kalalah (tanpa anak & saudara kandung)</div>
-              <div class="text-sm text-gray-600 dark:text-gray-400" data-i18n="kalalah_desc">QS. An-Nisa:176 - Saudara seayah dapat 2/3</div>
-            </div>
-          </label>
-          <div id="kalalahNote" class="kalalah-note hidden">
-            <p class="text-sm text-yellow-800 dark:text-yellow-200" data-i18n="kalalah_note">Saudara seayah mendapat bagian utama jika kalalah dikonfirmasi.</p>
-          </div>
-        </div>
-
         <div class="space-y-6">
           <div>
             <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-4" data-i18n="saudara_kandung">Saudara Kandung</h3>
@@ -430,41 +453,13 @@
               </div>
             </div>
           </div>
-
-          <div>
-            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-4" data-i18n="saudara_seayah">Saudara Seayah</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_laki_seayah">Laki-laki</label>
-                <input type="number" id="saudaraLakiSeayah" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_perempuan_seayah">Perempuan</label>
-                <input type="number" id="saudaraPerempuanSeayah" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-4" data-i18n="saudara_seibu">Saudara Seibu</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_laki_seibu">Laki-laki</label>
-                <input type="number" id="saudaraLakiSeibu" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_perempuan_seibu">Perempuan</label>
-                <input type="number" id="saudaraPerempuanSeibu" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-            </div>
-          </div>
         </div>
 
         <div class="flex gap-4">
-          <button type="button" onclick="showStep(5)" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
+          <button type="button" id="backStep6" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
             ← Kembali
           </button>
-          <button type="submit" onclick="calculateInheritance()" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 shadow-lg transition" data-i18n="calculate">
+          <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 shadow-lg transition" data-i18n="calculate">
             🧮 Hitung Waris
           </button>
         </div>
@@ -483,17 +478,11 @@
       <div id="resultBlocked" class="space-y-4"></div>
       <div id="resultVerification" class="space-y-4"></div>
 
-      <div class="text-center">
-        <button type="button" onclick="showMazhabComparison()" class="py-3 px-6 bg-blue-500 text-white rounded-lg font-bold hover:bg-blue-600 transition" data-i18n="mazhab_compare">
-          Lihat Perbedaan Mazhab
-        </button>
-      </div>
-
       <div class="flex gap-4">
-        <button type="button" onclick="resetCalculation()" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="reset">
+        <button type="button" id="btnReset" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="reset">
           🔄 Hitung Ulang
         </button>
-        <button type="button" onclick="exportPDF()" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 shadow-lg transition" data-i18n="export_pdf">
+        <button type="button" id="btnExportPDF" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 shadow-lg transition" data-i18n="export_pdf">
           📄 Export PDF
         </button>
       </div>
@@ -501,59 +490,7 @@
 
   </div>
 
-  <!-- Modal Nasab -->
-  <div id="modalNasab" class="modal-overlay hidden">
-    <div class="modal-content modal-warning">
-      <div class="modal-header">
-        <h3>⚠️ Verifikasi Nasab</h3>
-      </div>
-      <div class="modal-body">
-        <h4>📚 Konfirmasi Status Anak/Cucu:</h4>
-        <div class="warning-item">
-          <h5>1️⃣ Anak Kandung:</h5>
-          <ul>
-            <li>Berhak penuh waris (QS. An-Nisa:11)</li>
-            <li>Konfirmasi nasab sah</li>
-          </ul>
-        </div>
-        <div class="warning-item">
-          <h5>2️⃣ Anak Angkat:</h5>
-          <ul>
-            <li>Wasiat max 1/3 (QS. Al-Ahzab:4)</li>
-            <li>Tidak waris dari orang tua angkat</li>
-          </ul>
-        </div>
-        <div class="warning-item">
-          <h5>3️⃣ Anak Zina:</h5>
-          <ul>
-            <li>Hanya dari ibu (HR. Bukhari 2053)</li>
-            <li>Tidak dari ayah biologis</li>
-          </ul>
-        </div>
-        <p class="info-text">Pilih status untuk adjust perhitungan.</p>
-        <div class="space-y-2 mt-4">
-          <label class="flex items-center">
-            <input type="radio" name="nasabStatus" value="kandung" checked class="w-5 h-5">
-            <span class="ml-2">Kandung</span>
-          </label>
-          <label class="flex items-center">
-            <input type="radio" name="nasabStatus" value="angkat" class="w-5 h-5">
-            <span class="ml-2">Angkat</span>
-          </label>
-          <label class="flex items-center">
-            <input type="radio" name="nasabStatus" value="zina" class="w-5 h-5">
-            <span class="ml-2">Zina</span>
-          </label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button onclick="closeModal('modalNasab')" class="btn btn-secondary">Batal</button>
-        <button onclick="confirmNasab()" class="btn btn-primary">Konfirmasi</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Anak Angkat/Zina (Lama, Unchanged) -->
+  <!-- Modal Pemberitahuan Anak Angkat/Zina -->
   <div id="modalAnakAngkatZina" class="modal-overlay hidden">
     <div class="modal-content modal-warning">
       <div class="modal-header">
@@ -561,6 +498,7 @@
       </div>
       <div class="modal-body">
         <h4>📚 Catatan Hukum Waris Islam:</h4>
+        
         <div class="warning-item">
           <h5>1️⃣ Anak Angkat (Anak Pungut):</h5>
           <ul>
@@ -569,6 +507,7 @@
             <li>📖 <strong>Dalil:</strong> QS. Al-Ahzab: 4, HR. Abu Dawud</li>
           </ul>
         </div>
+        
         <div class="warning-item">
           <h5>2️⃣ Anak Zina (Anak Luar Nikah):</h5>
           <ul>
@@ -577,15 +516,16 @@
             <li>📖 <strong>Dalil:</strong> HR. Bukhari (2053), Muslim (1457)</li>
           </ul>
         </div>
+        
         <p class="info-text">
           ℹ️ Penjelasan lengkap dapat dipelajari di Halaman Beranda → Bagian Edukasi
         </p>
       </div>
       <div class="modal-footer">
-        <button onclick="closeModal('modalAnakAngkatZina')" class="btn btn-secondary">
+        <button id="btnPelajariDetail" class="btn btn-secondary">
           📖 Pelajari Lebih Detail
         </button>
-        <button onclick="closeModal('modalAnakAngkatZina')" class="btn btn-primary">
+        <button id="btnLanjutkanHitung" class="btn btn-primary">
           ➡️ Lanjutkan Perhitungan
         </button>
       </div>
@@ -596,11 +536,19 @@
   <div id="loadingIndicator" class="loading-overlay hidden">
     <div class="loading-spinner">
       <div class="spinner"></div>
-      <p data-i18n="loading">Menghitung...</p>
+      <p>Menghitung...</p>
+    </div>
+  </div>
+  
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="loading">Memproses perhitungan...</p>
     </div>
   </div>
 
-  <!-- Info Modal -->
+  <!-- Modal Info -->
   <div id="infoModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" onclick="closeModal()">
     <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
       <div class="flex justify-between items-center mb-6">
