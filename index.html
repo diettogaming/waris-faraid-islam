@@ -33,6 +33,160 @@
     body {
       font-family: 'Poppins', sans-serif;
     }
+    
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    
+    .modal-warning {
+      border-left: 8px solid #eab308;
+    }
+    
+    .modal-header {
+      padding: 24px 24px 0;
+    }
+    
+    .modal-header h3 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #1e293b;
+    }
+    
+    .modal-body {
+      padding: 24px;
+    }
+    
+    .warning-item {
+      margin-bottom: 20px;
+    }
+    
+    .warning-item h5 {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #1e293b;
+    }
+    
+    .warning-item ul {
+      list-style-type: disc;
+      margin-left: 20px;
+    }
+    
+    .warning-item li {
+      margin-bottom: 4px;
+    }
+    
+    .info-text {
+      background: #f0f9ff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 16px;
+      font-size: 0.9rem;
+    }
+    
+    .modal-footer {
+      padding: 0 24px 24px;
+      display: flex;
+      gap: 12px;
+    }
+    
+    .btn {
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      flex: 1;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(to right, #2563eb, #1e40af);
+      color: white;
+      border: none;
+    }
+    
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #475569;
+      border: none;
+    }
+    
+    /* Loading Styles */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .loading-spinner {
+      text-align: center;
+      color: white;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid white;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .dark .modal-content {
+      background: #1f2937;
+      color: #f9fafb;
+    }
+    
+    .dark .modal-header h3 {
+      color: #f9fafb;
+    }
+    
+    .dark .warning-item h5 {
+      color: #f9fafb;
+    }
+    
+    .dark .info-text {
+      background: #374151;
+      color: #d1d5db;
+    }
+    
+    .dark .btn-secondary {
+      background: #4b5563;
+      color: #e5e7eb;
+    }
   </style>
   
   <link rel="stylesheet" href="style.css">
@@ -106,11 +260,11 @@
      <button 
        type="button" 
        id="btnStart" 
-       onclick="handleCalculateButton()" 
        class="w-full py-5 rounded-2xl font-bold text-xl text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300" 
        data-i18n="start">
        Mulai Perhitungan →
      </button>
+    </div>
 
     <!-- Step 1: Pilih Mazhab & Jenis Kelamin -->
     <div id="step1" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
@@ -202,7 +356,7 @@
           <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="total_harta">💰 Total Harta Warisan</label>
           <div class="relative">
             <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
-            <input type="text" id="totalHarta" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="100.000.000" oninput="formatCurrency(this)">
+            <input type="text" id="totalHarta" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="100.000.000">
           </div>
           <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="harta_hint">Masukkan total semua harta yang ditinggalkan (uang, properti, kendaraan, dll)</p>
         </div>
@@ -210,13 +364,13 @@
         <div class="space-y-3">
           <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="biaya_jenazah">⚰️ Biaya Pengurusan Jenazah</label>
           <div class="flex items-center gap-3 mb-3">
-            <input type="checkbox" id="biayaDitanggung" class="w-5 h-5" onchange="toggleBiayaJenazah()">
+            <input type="checkbox" id="biayaDitanggung" class="w-5 h-5">
             <label for="biayaDitanggung" class="text-gray-700 dark:text-gray-300" data-i18n="biaya_ditanggung">Sudah ditanggung keluarga sebagai sedekah</label>
           </div>
           <div id="biayaJenazahInput">
             <div class="relative">
               <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
-              <input type="text" id="biayaJenazah" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="5.000.000" oninput="formatCurrency(this)">
+              <input type="text" id="biayaJenazah" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="5.000.000">
             </div>
           </div>
           <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="biaya_hint">Biaya memandikan, mengkafani, dan menguburkan jenazah</p>
@@ -226,7 +380,7 @@
           <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="hutang">💳 Hutang yang Belum Lunas</label>
           <div class="relative">
             <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
-            <input type="text" id="hutang" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="0" oninput="formatCurrency(this)">
+            <input type="text" id="hutang" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="0">
           </div>
           <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="hutang_hint">Semua hutang harus dilunasi sebelum harta dibagi</p>
         </div>
@@ -235,7 +389,7 @@
           <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="wasiat">📝 Wasiat (Opsional)</label>
           <div class="relative">
             <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
-            <input type="text" id="wasiat" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="0" oninput="formatCurrency(this); validateWasiat()">
+            <input type="text" id="wasiat" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="0">
           </div>
           <div id="wasiatWarning" class="hidden bg-red-100 dark:bg-red-900 border-l-4 border-red-500 p-4 rounded-lg">
             <p class="text-red-800 dark:text-red-200 font-bold" data-i18n="wasiat_warning">⚠️ Wasiat melebihi 1/3 harta! Akan disesuaikan otomatis.</p>
@@ -247,20 +401,20 @@
           <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="asuransi">🛡️ Klaim Asuransi</label>
           <div class="space-y-3">
             <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 cursor-pointer transition">
-              <input type="radio" name="asuransi" value="none" checked class="w-5 h-5" onchange="toggleAsuransi()">
+              <input type="radio" name="asuransi" value="none" checked class="w-5 h-5">
               <div>
                 <div class="font-bold text-gray-800 dark:text-gray-200" data-i18n="asuransi_none">❌ Tidak Ada Asuransi</div>
               </div>
             </label>
             <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 cursor-pointer transition">
-              <input type="radio" name="asuransi" value="syariah" class="w-5 h-5" onchange="toggleAsuransi()">
+              <input type="radio" name="asuransi" value="syariah" class="w-5 h-5">
               <div>
                 <div class="font-bold text-gray-800 dark:text-gray-200" data-i18n="asuransi_syariah">✅ Asuransi Syariah (Takaful)</div>
                 <div class="text-sm text-gray-600 dark:text-gray-400" data-i18n="asuransi_syariah_desc">Halal dan masuk sebagai harta waris</div>
               </div>
             </label>
             <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 cursor-pointer transition">
-              <input type="radio" name="asuransi" value="konvensional" class="w-5 h-5" onchange="toggleAsuransi()">
+              <input type="radio" name="asuransi" value="konvensional" class="w-5 h-5">
               <div>
                 <div class="font-bold text-gray-800 dark:text-gray-200" data-i18n="asuransi_konvensional">⚠️ Asuransi Konvensional</div>
                 <div class="text-sm text-gray-600 dark:text-gray-400" data-i18n="asuransi_konvensional_desc">Tidak masuk harta waris</div>
@@ -270,7 +424,7 @@
           <div id="asuransiInput" class="hidden mt-4">
             <div class="relative">
               <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
-              <input type="text" id="nilaiAsuransi" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="0" oninput="formatCurrency(this)">
+              <input type="text" id="nilaiAsuransi" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="0">
             </div>
           </div>
         </div>
@@ -298,7 +452,7 @@
         <!-- Checkbox: Tidak ada pasangan -->
         <div class="bg-yellow-50 dark:bg-yellow-900 p-6 rounded-xl border-l-4 border-yellow-500">
           <label class="flex items-start gap-3 cursor-pointer">
-            <input type="checkbox" id="tidakAdaPasangan" class="w-5 h-5 mt-1" onchange="togglePasanganOptions()">
+            <input type="checkbox" id="tidakAdaPasangan" class="w-5 h-5 mt-1">
             <div>
               <div class="font-bold text-yellow-900 dark:text-yellow-300">❌ Tidak ada pasangan</div>
               <div class="text-sm text-yellow-800 dark:text-yellow-200 mt-1">(Belum menikah / Janda / Duda tanpa pasangan saat meninggal)</div>
@@ -318,7 +472,7 @@
 
           <div id="istriOption" class="hidden">
             <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 cursor-pointer transition">
-              <input type="checkbox" id="istri" class="w-5 h-5" onchange="toggleIstriCount()">
+              <input type="checkbox" id="istri" class="w-5 h-5">
               <div class="flex-1">
                 <div class="font-bold text-gray-800 dark:text-gray-200" data-i18n="istri">Istri</div>
               </div>
@@ -359,7 +513,7 @@
           
           <div class="space-y-3">
             <label class="flex items-start gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 cursor-pointer transition">
-              <input type="radio" name="statusOrangTua" value="keduanya" class="w-5 h-5 mt-1" onchange="updateOrangTuaOptions()">
+              <input type="radio" name="statusOrangTua" value="keduanya" class="w-5 h-5 mt-1">
               <div>
                 <div class="font-bold text-gray-800 dark:text-gray-200">✅ Keduanya masih hidup (Ayah & Ibu)</div>
                 <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Kakek dan Nenek otomatis terhalang (mahjub)</div>
@@ -367,7 +521,7 @@
             </label>
             
             <label class="flex items-start gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 cursor-pointer transition">
-              <input type="radio" name="statusOrangTua" value="salahSatu" class="w-5 h-5 mt-1" onchange="updateOrangTuaOptions()">
+              <input type="radio" name="statusOrangTua" value="salahSatu" class="w-5 h-5 mt-1">
               <div>
                 <div class="font-bold text-gray-800 dark:text-gray-200">⚠️ Salah satu masih hidup</div>
                 <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Pilih yang masih hidup, Kakek/Nenek yang sesuai akan terbuka</div>
@@ -375,7 +529,7 @@
             </label>
             
             <label class="flex items-start gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 cursor-pointer transition">
-              <input type="radio" name="statusOrangTua" value="keduanyaTidak" class="w-5 h-5 mt-1" onchange="updateOrangTuaOptions()">
+              <input type="radio" name="statusOrangTua" value="keduanyaTidak" class="w-5 h-5 mt-1">
               <div>
                 <div class="font-bold text-gray-800 dark:text-gray-200">❌ Keduanya sudah meninggal</div>
                 <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">Kakek dan Nenek dapat mewarisi</div>
@@ -389,12 +543,12 @@
           <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200">👨‍👩‍👦 Orang Tua Kandung</h3>
           
           <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 cursor-pointer transition">
-            <input type="checkbox" id="ayah" class="w-5 h-5" onchange="updateKakekNenekStatus()">
+            <input type="checkbox" id="ayah" class="w-5 h-5">
             <div class="font-bold text-gray-800 dark:text-gray-200">Ayah</div>
           </label>
 
           <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 cursor-pointer transition">
-            <input type="checkbox" id="ibu" class="w-5 h-5" onchange="updateKakekNenekStatus()">
+            <input type="checkbox" id="ibu" class="w-5 h-5">
             <div class="font-bold text-gray-800 dark:text-gray-200">Ibu</div>
           </label>
         </div>
@@ -605,54 +759,54 @@
   </div>
 
   <!-- Modal Pemberitahuan Anak Angkat/Zina -->
-<div id="modalAnakAngkatZina" class="modal-overlay hidden">
-  <div class="modal-content modal-warning">
-    <div class="modal-header">
-      <h3>⚠️ Pemberitahuan Penting</h3>
-    </div>
-    <div class="modal-body">
-      <h4>📚 Catatan Hukum Waris Islam:</h4>
-      
-      <div class="warning-item">
-        <h5>1️⃣ Anak Angkat (Anak Pungut):</h5>
-        <ul>
-          <li>Tidak dapat warisan dari orang tua angkat</li>
-          <li>Dapat wasiat maksimal 1/3 harta</li>
-          <li>📖 <strong>Dalil:</strong> QS. Al-Ahzab: 4, HR. Abu Dawud</li>
-        </ul>
+  <div id="modalAnakAngkatZina" class="modal-overlay hidden">
+    <div class="modal-content modal-warning">
+      <div class="modal-header">
+        <h3>⚠️ Pemberitahuan Penting</h3>
       </div>
-      
-      <div class="warning-item">
-        <h5>2️⃣ Anak Zina (Anak Luar Nikah):</h5>
-        <ul>
-          <li>Tidak dapat warisan dari ayah biologis</li>
-          <li>Hanya dapat warisan dari ibu kandung</li>
-          <li>📖 <strong>Dalil:</strong> HR. Bukhari (2053), Muslim (1457)</li>
-        </ul>
+      <div class="modal-body">
+        <h4>📚 Catatan Hukum Waris Islam:</h4>
+        
+        <div class="warning-item">
+          <h5>1️⃣ Anak Angkat (Anak Pungut):</h5>
+          <ul>
+            <li>Tidak dapat warisan dari orang tua angkat</li>
+            <li>Dapat wasiat maksimal 1/3 harta</li>
+            <li>📖 <strong>Dalil:</strong> QS. Al-Ahzab: 4, HR. Abu Dawud</li>
+          </ul>
+        </div>
+        
+        <div class="warning-item">
+          <h5>2️⃣ Anak Zina (Anak Luar Nikah):</h5>
+          <ul>
+            <li>Tidak dapat warisan dari ayah biologis</li>
+            <li>Hanya dapat warisan dari ibu kandung</li>
+            <li>📖 <strong>Dalil:</strong> HR. Bukhari (2053), Muslim (1457)</li>
+          </ul>
+        </div>
+        
+        <p class="info-text">
+          ℹ️ Penjelasan lengkap dapat dipelajari di Halaman Beranda → Bagian Edukasi
+        </p>
       </div>
-      
-      <p class="info-text">
-        ℹ️ Penjelasan lengkap dapat dipelajari di Halaman Beranda → Bagian Edukasi
-      </p>
-    </div>
-    <div class="modal-footer">
-      <button id="btnPelajariDetail" class="btn btn-secondary">
-        📖 Pelajari Lebih Detail
-      </button>
-      <button id="btnLanjutkanHitung" class="btn btn-primary">
-        ➡️ Lanjutkan Perhitungan
-      </button>
+      <div class="modal-footer">
+        <button id="btnPelajariDetail" class="btn btn-secondary">
+          📖 Pelajari Lebih Detail
+        </button>
+        <button id="btnLanjutkanHitung" class="btn btn-primary">
+          ➡️ Lanjutkan Perhitungan
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Loading Indicator -->
-<div id="loadingIndicator" class="loading-overlay hidden">
-  <div class="loading-spinner">
-    <div class="spinner"></div>
-    <p>Menghitung...</p>
+  <!-- Loading Indicator -->
+  <div id="loadingIndicator" class="loading-overlay hidden">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      <p>Menghitung...</p>
+    </div>
   </div>
-</div>
   
   <!-- Loading Overlay -->
   <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
@@ -663,11 +817,11 @@
   </div>
 
   <!-- Modal Info -->
-  <div id="infoModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" onclick="closeModal()">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
+  <div id="infoModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
       <div class="flex justify-between items-center mb-6">
         <h3 class="text-2xl font-bold text-blue-900 dark:text-blue-300" id="modalTitle">Info</h3>
-        <button onclick="closeModal()" class="text-4xl text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">&times;</button>
+        <button class="text-4xl text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">&times;</button>
       </div>
       <div id="modalBody" class="text-gray-700 dark:text-gray-300"></div>
     </div>
@@ -676,6 +830,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
-
-
