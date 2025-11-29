@@ -1448,10 +1448,8 @@ function calculateFardhHeirs(data) {
   // Logika cucu mirip dengan anak, tapi hanya jika tidak ada anak
   // Implementasi lengkap untuk cucu...
   
-  // (Kode cucu akan dilanjutkan di bagian berikutnya)
-  
-  logStep(3, 'Perhitungan Fardh selesai', {
-  
+  // (Kode cucu akan dilanjutkan di bagian berikutnya) 
+     
   // ===== CUCU PEREMPUAN (jika tidak terhalang) =====
   // 
   // SYARAT: Tidak ada anak laki-laki
@@ -1754,6 +1752,7 @@ function calculateFardhHeirs(data) {
   
   return heirs;
 }
+
 
 /**
  * ========================================
