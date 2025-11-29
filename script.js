@@ -2218,8 +2218,20 @@ function performCalculation(data) {
   // ===== 6. TERAPKAN HUKUM 'AUL JIKA TOTAL FARDH > 1 =====
   const aulResult = applyAul(heirs, hartaBersih);
   // ===== 7. HITUNG SISA HARTA UNTUK ASHABAH =====
-  const actualTotalFardh = aulResult.occurred ? 1 : totalFardh;
-  const sisaHarta = hartaBersih * (1 - actualTotalFardh);
+
+  // Hitung total fardh yang SUDAH DIBAGIKAN (dalam rupiah, bukan persentase)
+  let totalFardhRupiah = 0;
+  heirs.forEach(h => {
+    if (!h.isAshabah) {
+      totalFardhRupiah += h.share * hartaBersih;
+    }
+  });
+
+  // Sisa harta = harta bersih - total fardh yang sudah dibagikan
+  const sisaHarta = hartaBersih - totalFardhRupiah;
+
+  log('info', `Total Fardh (Rupiah): ${formatRupiah(totalFardhRupiah)}`);
+  log('info', `Sisa harta untuk ashabah: ${formatRupiah(sisaHarta)} (${((sisaHarta/hartaBersih)*100).toFixed(2)}%)`);
   
   log('info', `Sisa harta untuk ashabah: ${formatRupiah(sisaHarta)} (${((1-actualTotalFardh)*100).toFixed(2)}%)`);
   
