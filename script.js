@@ -2056,7 +2056,6 @@ function applyAul(heirs, hartaBersih) {
   
   log('success', 'Tidak terjadi \'Aul (total fardh <= 100%)');
   
-  return { occurred: false };
 }
 
 /**
