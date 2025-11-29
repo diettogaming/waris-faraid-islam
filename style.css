@@ -1,6 +1,6 @@
 /* ===================================
    KALKULATOR WARIS ISLAM - 4 MAZHAB
-   Enhanced Styles (Tailwind Complement) - v2.0
+   Custom Styles (Tailwind Complement)
    =================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Poppins:wght@400;600;700;900&display=swap');
@@ -61,53 +61,27 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 
 /* ===== ANIMATIONS ===== */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
-.fade-in {
-  animation: fadeIn 0.5s ease-out;
-}
-
-.slide-in {
-  animation: slideIn 0.5s ease-out;
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
+.fade-in { animation: fadeIn 0.5s ease-out; }
+.slide-in { animation: slideIn 0.5s ease-out; }
+.animate-spin { animation: spin 1s linear infinite; }
 
 /* ===== CUSTOM COMPONENTS ===== */
 
@@ -472,14 +446,8 @@ html.dark .warning-box {
 }
 
 @keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-50px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-50px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .modal-warning {
@@ -618,11 +586,6 @@ html.dark .warning-box {
   margin: 0 auto 15px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .modal-content {
@@ -638,6 +601,7 @@ html.dark .warning-box {
     width: 100%;
   }
 }
+
 .modal-backdrop {
   backdrop-filter: blur(4px);
 }
@@ -739,36 +703,9 @@ textarea {
 }
 
 /* Status Indicators */
-.status-active {
-  color: #10b981;
-}
-
-.status-blocked {
-  color: #ef4444;
-}
-
-.status-warning {
-  color: #f59e0b;
-}
-
-/* Tooltip (if needed) */
-.tooltip {
-  position: absolute;
-  background: #1f2937;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  z-index: 1000;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-  white-space: nowrap;
-}
-
-.tooltip.show {
-  opacity: 1;
-}
+.status-active { color: #10b981; }
+.status-blocked { color: #ef4444; }
+.status-warning { color: #f59e0b; }
 
 /* Notification Styles */
 .notification {
@@ -784,35 +721,14 @@ textarea {
   font-weight: 600;
 }
 
-.notification-success {
-  background: #10b981;
-  color: white;
-}
-
-.notification-error {
-  background: #ef4444;
-  color: white;
-}
-
-.notification-info {
-  background: #3b82f6;
-  color: white;
-}
-
-.notification-warning {
-  background: #f59e0b;
-  color: white;
-}
+.notification-success { background: #10b981; color: white; }
+.notification-error { background: #ef4444; color: white; }
+.notification-info { background: #3b82f6; color: white; }
+.notification-warning { background: #f59e0b; color: white; }
 
 @keyframes slideOut {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(100%);
-  }
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(100%); }
 }
 
 /* Loading Spinner */
@@ -825,7 +741,7 @@ textarea {
   animation: spin 1s linear infinite;
 }
 
-/* Step Indicator (if needed) */
+/* Step Indicator */
 .step-indicator {
   display: flex;
   justify-content: center;
@@ -989,7 +905,7 @@ html.dark a:hover {
   color: #93c5fd;
 }
 
-/* Table Styles (if needed) */
+/* Table Styles */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -1015,7 +931,7 @@ html.dark th {
   background: #1f2937;
 }
 
-/* Code Block (if needed) */
+/* Code Block */
 code, pre {
   font-family: 'Courier New', monospace;
   background: #f3f4f6;
@@ -1094,7 +1010,7 @@ html.dark ::placeholder {
   border-radius: 3px;
 }
 
-/* Skeleton Loading (if needed) */
+/* Skeleton Loading */
 .skeleton {
   background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
   background-size: 200% 100%;
@@ -1102,72 +1018,13 @@ html.dark ::placeholder {
 }
 
 @keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 html.dark .skeleton {
   background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
   background-size: 200% 100%;
-}
-
-/* NEW: Mazhab Comparison Table */
-.mazhab-comparison {
-  background: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  border: 2px solid #e5e7eb;
-  margin-top: 1rem;
-}
-
-html.dark .mazhab-comparison {
-  background: #1f2937;
-  border-color: #374151;
-}
-
-.mazhab-row {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-  padding: 1rem;
-  border-bottom: 1px solid #e5e7eb;
-  gap: 0.5rem;
-}
-
-html.dark .mazhab-row {
-  border-bottom-color: #374151;
-}
-
-.mazhab-header {
-  font-weight: 700;
-  background: #f3f4f6;
-  text-align: center;
-}
-
-html.dark .mazhab-header {
-  background: #374151;
-}
-
-.mazhab-cell {
-  text-align: center;
-  padding: 0.5rem;
-  font-size: 0.875rem;
-}
-
-/* NEW: Kalalah Note */
-.kalalah-note {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-left: 6px solid #f59e0b;
-  padding: 1rem;
-  border-radius: 1rem;
-  margin: 1rem 0;
-}
-
-html.dark .kalalah-note {
-  background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
 }
 
 /* End of Styles */
