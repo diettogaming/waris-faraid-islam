@@ -3,653 +3,208 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kalkulator Waris Islam Pro - 4 Mazhab (Sesuai Kitab Klasik)</title>
-  <meta name="description" content="Kalkulator Waris Islam dengan logika fiqih perbandingan 4 Mazhab (Hanafi, Maliki, Syafi'i, Hanbali)">
+  <title>Kalkulator Waris Islam Pro - Edukasi 4 Mazhab</title>
+  <meta name="description" content="Kalkulator Waris Islam dengan Dalil Lengkap Al-Quran dan Hadits">
   
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Amiri:wght@400;700&display=swap');
-    
-    :root {
-      --primary: #1e3c72;
-      --secondary: #2a5298;
-    }
-
-    body { font-family: 'Poppins', sans-serif; }
-    .font-arab { font-family: 'Amiri', serif; }
-    
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: #555; }
-
-    /* Animations */
-    .fade-in { animation: fadeIn 0.5s ease-in; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Card Styles */
-    .card-result {
-      background: linear-gradient(145deg, #ffffff, #f3f4f6);
-      border-left: 5px solid;
-    }
-  </style>
-
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+  
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            primary: '#1e3c72',
-            secondary: '#2a5298',
-            gold: '#D4AF37',
+            primary: '#0f172a',
+            gold: '#d97706',
+            islamic: '#065f46'
           }
         }
       }
     }
   </script>
 </head>
-<body class="bg-gray-50 min-h-screen text-gray-800">
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans">
 
-  <nav class="bg-primary text-white p-4 shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto flex justify-between items-center">
+  <nav class="bg-primary text-white p-4 sticky top-0 z-40 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center max-w-4xl">
       <div class="flex items-center gap-3">
-        <span class="text-2xl">🕌</span>
+        <span class="text-2xl">📖</span>
         <div>
-          <h1 class="font-bold text-lg leading-tight">Faraid Calculator Pro</h1>
-          <p class="text-xs text-blue-200">Algoritma Fiqih 4 Mazhab</p>
+          <h1 class="font-bold text-lg leading-tight">Faraid Edukasi</h1>
+          <p class="text-xs text-slate-400">Belajar Waris 4 Mazhab</p>
         </div>
       </div>
-      <button onclick="resetApp()" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm font-bold transition">
-        🔄 Reset
+      <button onclick="window.location.reload()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1 rounded text-sm transition">
+        Reset
       </button>
     </div>
   </nav>
 
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     
-    <div id="introSection" class="bg-white rounded-2xl shadow-xl p-8 mb-8 fade-in">
-      <div class="text-center mb-8">
-        <h2 class="text-3xl font-bold text-primary mb-2">Hitung Waris Sesuai Syariat</h2>
-        <p class="text-gray-600">Perhitungan presisi dengan referensi kitab klasik (Al-Mughni, Bidayatul Mujtahid, dll).</p>
-      </div>
-
-      <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-8 rounded-r-lg">
-        <div class="flex gap-3">
-          <span class="text-2xl">⚠️</span>
-          <div>
-            <h3 class="font-bold text-yellow-800">Penting:</h3>
-            <p class="text-sm text-yellow-700 mt-1">
-              Aplikasi ini menangani perbedaan pendapat (khilafiyah) seperti:
-              <ul class="list-disc ml-5 mt-1">
-                <li><b>Kakek vs Saudara:</b> Hanafi (Kakek memblokir) vs Jumhur (Berbagi).</li>
-                <li><b>Musyarakah:</b> Syafi'i/Maliki (Berbagi) vs Hanafi/Hanbali (Gugur).</li>
-                <li><b>Radd:</b> Perbedaan pendapat tentang pengembalian sisa harta.</li>
-              </ul>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="calculatorForm" class="space-y-6 fade-in">
+    <div id="inputSection" class="space-y-6 fade-in">
       
-      <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-blue-600">
-        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-          <span class="bg-blue-100 text-blue-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">1</span>
-          Pilih Mazhab Fiqih
-        </h3>
+      <div class="card p-6">
+        <h2 class="section-title">1. Konfigurasi Awal</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <label class="cursor-pointer relative">
-            <input type="radio" name="mazhab" value="syafii" checked class="peer sr-only">
-            <div class="p-4 border-2 rounded-xl hover:bg-blue-50 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition">
-              <div class="font-bold text-blue-900">Mazhab Syafi'i</div>
-              <div class="text-xs text-gray-500">Umum di Indonesia / Asia Tenggara</div>
-            </div>
-          </label>
-          <label class="cursor-pointer relative">
-            <input type="radio" name="mazhab" value="hanafi" class="peer sr-only">
-            <div class="p-4 border-2 rounded-xl hover:bg-blue-50 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition">
-              <div class="font-bold text-blue-900">Mazhab Hanafi</div>
-              <div class="text-xs text-gray-500">Logika Kakek = Ayah (Memblokir Saudara)</div>
-            </div>
-          </label>
-          <label class="cursor-pointer relative">
-            <input type="radio" name="mazhab" value="maliki" class="peer sr-only">
-            <div class="p-4 border-2 rounded-xl hover:bg-blue-50 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition">
-              <div class="font-bold text-blue-900">Mazhab Maliki</div>
-              <div class="text-xs text-gray-500">Mendukung Musyarakah</div>
-            </div>
-          </label>
-          <label class="cursor-pointer relative">
-            <input type="radio" name="mazhab" value="hanbali" class="peer sr-only">
-            <div class="p-4 border-2 rounded-xl hover:bg-blue-50 peer-checked:border-blue-600 peer-checked:bg-blue-50 transition">
-              <div class="font-bold text-blue-900">Mazhab Hanbali</div>
-              <div class="text-xs text-gray-500">Pendapat di Arab Saudi / Timur Tengah</div>
-            </div>
-          </label>
-        </div>
-      </div>
-
-      <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-green-600">
-        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-          <span class="bg-green-100 text-green-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">2</span>
-          Total Harta Bersih
-        </h3>
-        <div class="relative">
-          <span class="absolute left-4 top-3 text-gray-500 font-bold">Rp</span>
-          <input type="number" id="harta" class="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none font-bold text-lg" placeholder="0" value="100000000">
-        </div>
-        <p class="text-xs text-gray-500 mt-2">*Harta setelah dikurangi hutang, biaya jenazah, dan wasiat.</p>
-      </div>
-
-      <div class="bg-white p-6 rounded-2xl shadow-md border-t-4 border-purple-600">
-        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
-          <span class="bg-purple-100 text-purple-600 w-8 h-8 flex items-center justify-center rounded-full text-sm">3</span>
-          Ahli Waris yang Masih Hidup
-        </h3>
-
-        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-          <label class="block font-bold mb-2">Jenis Kelamin Pewaris (Yang Meninggal):</label>
-          <div class="flex gap-4">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="gender" value="male" checked onclick="togglePasangan('male')">
-              <span>Laki-laki (Suami meninggal)</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="gender" value="female" onclick="togglePasangan('female')">
-              <span>Perempuan (Istri meninggal)</span>
-            </label>
+          <div class="form-group">
+            <label class="label">Pilih Mazhab Fiqih</label>
+            <select id="mazhab" class="input-field">
+              <option value="syafii">Syafi'i (Umum di Indonesia)</option>
+              <option value="hanafi">Hanafi</option>
+              <option value="maliki">Maliki</option>
+              <option value="hanbali">Hanbali</option>
+            </select>
+            <p class="text-xs text-slate-500 mt-1">Mempengaruhi hukum Kakek, Musyarakah, & Radd.</p>
+          </div>
+          <div class="form-group">
+            <label class="label">Total Harta Bersih (Rp)</label>
+            <input type="number" id="harta" value="100000000" class="input-field">
+            <p class="text-xs text-slate-500 mt-1">*Setelah dikurangi hutang & wasiat.</p>
           </div>
         </div>
+      </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+      <div class="card p-6">
+        <div class="flex justify-between items-center mb-4 border-b pb-2">
+          <h2 class="section-title mb-0">2. Siapa Ahli Warisnya?</h2>
           
-          <div class="col-span-full border-b pb-4 mb-2">
-            <h4 class="font-bold text-gray-700 mb-2">Pasangan</h4>
-            <div id="box-istri">
-              <label class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+          <div class="bg-slate-100 p-1 rounded-lg flex gap-2">
+            <label class="gender-toggle cursor-pointer">
+              <input type="radio" name="gender" value="male" checked onclick="toggleSpouse('male')" class="hidden peer">
+              <span class="px-3 py-1 rounded text-sm peer-checked:bg-white peer-checked:shadow peer-checked:font-bold block transition">Pewaris Laki-laki</span>
+            </label>
+            <label class="gender-toggle cursor-pointer">
+              <input type="radio" name="gender" value="female" onclick="toggleSpouse('female')" class="hidden peer">
+              <span class="px-3 py-1 rounded text-sm peer-checked:bg-white peer-checked:shadow peer-checked:font-bold block transition">Pewaris Perempuan</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <div class="space-y-3">
+            <h3 class="subsection-title">Pasangan & Orang Tua</h3>
+            
+            <div id="input-istri">
+              <div class="flex items-center justify-between input-row">
                 <span>Istri (Maks 4)</span>
-                <div class="flex items-center gap-2">
-                  <input type="checkbox" id="check-istri" class="w-5 h-5 accent-purple-600" onchange="toggleInput('input-istri', this.checked)">
-                  <input type="number" id="input-istri" value="1" min="1" max="4" class="w-16 border rounded p-1 text-center hidden">
-                </div>
-              </label>
+                <input type="number" id="count-istri" min="0" max="4" value="1" class="w-16 text-center border rounded p-1">
+              </div>
             </div>
-            <div id="box-suami" class="hidden">
-              <label class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+            
+            <div id="input-suami" class="hidden">
+              <label class="flex items-center justify-between input-row cursor-pointer">
                 <span>Suami</span>
-                <input type="checkbox" id="check-suami" class="w-5 h-5 accent-purple-600">
+                <input type="checkbox" id="check-suami" class="w-5 h-5 accent-islamic">
               </label>
             </div>
+
+            <label class="flex items-center justify-between input-row cursor-pointer">
+              <span>Ayah</span>
+              <input type="checkbox" id="check-ayah" class="w-5 h-5 accent-islamic">
+            </label>
+            <label class="flex items-center justify-between input-row cursor-pointer">
+              <span>Ibu</span>
+              <input type="checkbox" id="check-ibu" class="w-5 h-5 accent-islamic">
+            </label>
+            <label class="flex items-center justify-between input-row cursor-pointer">
+              <span>Kakek (dari Ayah)</span>
+              <input type="checkbox" id="check-kakek" class="w-5 h-5 accent-islamic">
+            </label>
+            <label class="flex items-center justify-between input-row cursor-pointer">
+              <span>Nenek (Ibu/Ayah)</span>
+              <input type="checkbox" id="check-nenek" class="w-5 h-5 accent-islamic">
+            </label>
           </div>
 
-          <div>
-            <h4 class="font-bold text-gray-700 mb-2">Keturunan (Fru')</h4>
-            <div class="space-y-2">
-              <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                <label>Anak Laki-laki</label>
-                <input type="number" id="anak-lk" value="0" min="0" class="w-20 border rounded p-1 text-center">
-              </div>
-              <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                <label>Anak Perempuan</label>
-                <input type="number" id="anak-pr" value="0" min="0" class="w-20 border rounded p-1 text-center">
-              </div>
-              <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                <label>Cucu Laki-laki</label>
-                <input type="number" id="cucu-lk" value="0" min="0" class="w-20 border rounded p-1 text-center">
-              </div>
-              <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                <label>Cucu Perempuan</label>
-                <input type="number" id="cucu-pr" value="0" min="0" class="w-20 border rounded p-1 text-center">
-              </div>
+          <div class="space-y-3">
+            <h3 class="subsection-title">Anak & Saudara</h3>
+            
+            <div class="flex items-center justify-between input-row">
+              <span>Anak Laki-laki</span>
+              <input type="number" id="count-anak-lk" min="0" value="0" class="w-16 text-center border rounded p-1">
             </div>
-          </div>
-
-          <div>
-            <h4 class="font-bold text-gray-700 mb-2">Leluhur (Ushul)</h4>
-            <div class="space-y-2">
-              <label class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <span>Ayah</span>
-                <input type="checkbox" id="check-ayah" class="w-5 h-5 accent-purple-600">
-              </label>
-              <label class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <span>Ibu</span>
-                <input type="checkbox" id="check-ibu" class="w-5 h-5 accent-purple-600">
-              </label>
-              <label class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <span>Kakek (Ayah dari Ayah)</span>
-                <input type="checkbox" id="check-kakek" class="w-5 h-5 accent-purple-600">
-              </label>
-              <label class="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <span>Nenek (Ibu dari Ibu/Ayah)</span>
-                <input type="checkbox" id="check-nenek" class="w-5 h-5 accent-purple-600">
-              </label>
+            <div class="flex items-center justify-between input-row">
+              <span>Anak Perempuan</span>
+              <input type="number" id="count-anak-pr" min="0" value="0" class="w-16 text-center border rounded p-1">
             </div>
-          </div>
-
-          <div class="col-span-full border-t pt-4 mt-2">
-            <h4 class="font-bold text-gray-700 mb-2">Saudara (Hawasyi)</h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-               <div class="space-y-2">
-                <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <label>Sdr. Kandung Laki</label>
-                  <input type="number" id="sdr-kandung-lk" value="0" min="0" class="w-20 border rounded p-1 text-center">
+            
+            <div class="border-t pt-2 mt-2">
+              <p class="text-xs font-bold text-slate-400 mb-2">SAUDARA (KANDUNG/SEAYAH/SEIBU)</p>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                   <label class="text-xs">Sdr. Kandung Lk</label>
+                   <input type="number" id="count-sdr-kandung-lk" min="0" value="0" class="w-full border rounded p-1">
                 </div>
-                <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <label>Sdr. Kandung Pr</label>
-                  <input type="number" id="sdr-kandung-pr" value="0" min="0" class="w-20 border rounded p-1 text-center">
+                <div>
+                   <label class="text-xs">Sdr. Kandung Pr</label>
+                   <input type="number" id="count-sdr-kandung-pr" min="0" value="0" class="w-full border rounded p-1">
                 </div>
-               </div>
-               <div class="space-y-2">
-                <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <label>Sdr. Seayah Laki</label>
-                  <input type="number" id="sdr-seayah-lk" value="0" min="0" class="w-20 border rounded p-1 text-center">
+                <div>
+                   <label class="text-xs">Sdr. Seibu (Lk+Pr)</label>
+                   <input type="number" id="count-sdr-seibu" min="0" value="0" class="w-full border rounded p-1">
                 </div>
-                <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
-                  <label>Sdr. Seibu (Lk/Pr sama)</label>
-                  <input type="number" id="sdr-seibu" value="0" min="0" class="w-20 border rounded p-1 text-center">
+                 <div>
+                   <label class="text-xs">Sdr. Seayah Lk</label>
+                   <input type="number" id="count-sdr-seayah-lk" min="0" value="0" class="w-full border rounded p-1">
                 </div>
-               </div>
+              </div>
             </div>
           </div>
 
         </div>
       </div>
 
-      <button onclick="calculate()" class="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-bold text-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition">
-        🧮 Hitung Pembagian Waris
+      <button onclick="calculateInheritance()" class="w-full bg-islamic hover:bg-emerald-800 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:scale-[1.01]">
+        Hitung Waris & Tampilkan Dalil ➔
       </button>
-
     </div>
 
-    <div id="resultSection" class="hidden mt-8 space-y-6 fade-in">
-      <div class="text-center mb-6">
-        <h2 class="text-2xl font-bold text-primary">Hasil Perhitungan</h2>
-        <p id="mazhabDisplay" class="text-gray-600 font-semibold"></p>
-        
-        <div id="specialCasesContainer" class="flex justify-center gap-2 mt-2"></div>
+    <div id="resultSection" class="hidden mt-8 fade-in space-y-6">
+      
+      <div class="card p-6 text-center bg-gradient-to-br from-white to-emerald-50 border-emerald-100">
+        <h2 class="text-2xl font-bold text-islamic mb-2">Hasil Pembagian</h2>
+        <div class="flex justify-center gap-4 text-sm mt-4">
+           <div>
+             <span class="block text-slate-500">Total Harta</span>
+             <span class="font-bold text-lg" id="res-harta">Rp 0</span>
+           </div>
+           <div>
+             <span class="block text-slate-500">Sisa Harta</span>
+             <span class="font-bold text-lg text-red-600" id="res-sisa">Rp 0</span>
+           </div>
+        </div>
       </div>
 
-      <div id="heirsList" class="space-y-4">
+      <div id="heirs-container" class="space-y-4">
         </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-         <div class="bg-blue-100 p-4 rounded-xl text-center">
-            <span class="block text-sm text-blue-800">Total Harta</span>
-            <span id="resTotalHarta" class="font-bold text-lg text-blue-900"></span>
-         </div>
-         <div class="bg-green-100 p-4 rounded-xl text-center">
-            <span class="block text-sm text-green-800">Total Dibagikan</span>
-            <span id="resTotalBagian" class="font-bold text-lg text-green-900"></span>
-         </div>
-         <div class="bg-gray-100 p-4 rounded-xl text-center">
-            <span class="block text-sm text-gray-800">Sisa Harta</span>
-            <span id="resSisa" class="font-bold text-lg text-gray-900"></span>
-         </div>
-      </div>
+
     </div>
 
   </div>
 
-  <footer class="bg-gray-800 text-white text-center p-6 mt-12">
-    <p class="opacity-75">Dibuat dengan ❤️ berdasarkan Kitab Fiqih Klasik 4 Mazhab.</p>
-    <p class="text-xs mt-2 opacity-50">Konsultasikan hasil akhir dengan Ulama/Ahli Waris terpercaya sebelum pembagian.</p>
-  </footer>
-
-  <script>
-    // === 1. KONFIGURASI MAZHAB ===
-    const MAZHAB_RULES = {
-      hanafi: {
-        name: "Mazhab Hanafi",
-        kakekBlocksSaudara: true, // Kakek memblokir saudara sepenuhnya
-        musyarakah: false,        // Tidak mengakui Musyarakah
-        raddToHeirs: true         // Menerima Radd
-      },
-      maliki: {
-        name: "Mazhab Maliki",
-        kakekBlocksSaudara: false, // Kakek berbagi (Muqasamah)
-        musyarakah: true,          // Mengakui Musyarakah
-        raddToHeirs: false         // Sisa ke Baitul Mal (Klasik)
-      },
-      syafii: {
-        name: "Mazhab Syafi'i",
-        kakekBlocksSaudara: false, // Kakek berbagi
-        musyarakah: true,          // Mengakui Musyarakah
-        raddToHeirs: false         // Sisa ke Baitul Mal (Klasik), tapi Fatwa modern boleh ke ahli waris
-      },
-      hanbali: {
-        name: "Mazhab Hanbali",
-        kakekBlocksSaudara: false, // Kakek berbagi
-        musyarakah: false,         // Umumnya menolak Musyarakah
-        raddToHeirs: true          // Menerima Radd
-      }
-    };
-
-    // === 2. HELPER FUNCTIONS ===
-    function formatRupiah(num) {
-      return "Rp " + Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-    
-    function fractionToText(val) {
-      if (Math.abs(val - 0.5) < 0.001) return "1/2";
-      if (Math.abs(val - 0.25) < 0.001) return "1/4";
-      if (Math.abs(val - 0.125) < 0.001) return "1/8";
-      if (Math.abs(val - 0.6666) < 0.001) return "2/3";
-      if (Math.abs(val - 0.3333) < 0.001) return "1/3";
-      if (Math.abs(val - 0.1666) < 0.001) return "1/6";
-      return val.toFixed(3);
-    }
-
-    // UI Helpers
-    function togglePasangan(gender) {
-      if(gender === 'male') {
-        document.getElementById('box-istri').classList.remove('hidden');
-        document.getElementById('box-suami').classList.add('hidden');
-        document.getElementById('check-suami').checked = false;
-      } else {
-        document.getElementById('box-istri').classList.add('hidden');
-        document.getElementById('box-suami').classList.remove('hidden');
-        document.getElementById('check-istri').checked = false;
-      }
-    }
-
-    function toggleInput(targetId, isChecked) {
-      const el = document.getElementById(targetId);
-      if(isChecked) el.classList.remove('hidden');
-      else el.classList.add('hidden');
-    }
-
-    function resetApp() {
-      location.reload();
-    }
-
-    // === 3. CORE CALCULATION ENGINE ===
-    function calculate() {
-      // Input Data
-      const selectedMazhab = document.querySelector('input[name="mazhab"]:checked').value;
-      const rules = MAZHAB_RULES[selectedMazhab];
-      const harta = parseFloat(document.getElementById('harta').value) || 0;
-      
-      const genderPewaris = document.querySelector('input[name="gender"]:checked').value;
-      
-      // Heirs Data
-      let heirs = {
-        suami: document.getElementById('check-suami').checked ? 1 : 0,
-        istri: document.getElementById('check-istri').checked ? parseInt(document.getElementById('input-istri').value) : 0,
-        ayah: document.getElementById('check-ayah').checked,
-        ibu: document.getElementById('check-ibu').checked,
-        kakek: document.getElementById('check-kakek').checked,
-        nenek: document.getElementById('check-nenek').checked,
-        anakLk: parseInt(document.getElementById('anak-lk').value),
-        anakPr: parseInt(document.getElementById('anak-pr').value),
-        cucuLk: parseInt(document.getElementById('cucu-lk').value),
-        cucuPr: parseInt(document.getElementById('cucu-pr').value),
-        sdrKandungLk: parseInt(document.getElementById('sdr-kandung-lk').value),
-        sdrKandungPr: parseInt(document.getElementById('sdr-kandung-pr').value),
-        sdrSeayahLk: parseInt(document.getElementById('sdr-seayah-lk').value),
-        sdrSeibu: parseInt(document.getElementById('sdr-seibu').value),
-      };
-
-      // --- LOGIC START ---
-      let result = [];
-      let totalShare = 0;
-      let notes = [];
-      let specialCases = [];
-
-      // 1. MAHJUB (BLOCKING) RULES
-      // Anak laki-laki memblokir cucu, saudara, dll.
-      let hasAnakLk = heirs.anakLk > 0;
-      let hasAnak = heirs.anakLk > 0 || heirs.anakPr > 0 || heirs.cucuLk > 0 || heirs.cucuPr > 0;
-      let hasAnakOrCucuLk = heirs.anakLk > 0 || heirs.cucuLk > 0;
-      
-      // Ayah memblokir Kakek & Saudara (Mutlak di semua mazhab)
-      if (heirs.ayah) {
-        heirs.kakek = false; 
-        heirs.sdrKandungLk = 0; heirs.sdrKandungPr = 0;
-        heirs.sdrSeayahLk = 0; heirs.sdrSeibu = 0;
-        notes.push("Ayah menghijab (memblokir) Kakek dan seluruh Saudara.");
-      }
-
-      // Kakek vs Saudara (THE BIG MAZHAB DIFFERENCE)
-      if (heirs.kakek && !heirs.ayah) {
-        if (rules.kakekBlocksSaudara) {
-          // Hanafi Style
-          heirs.sdrKandungLk = 0; heirs.sdrKandungPr = 0;
-          heirs.sdrSeayahLk = 0; heirs.sdrSeibu = 0;
-          notes.push(`Sesuai ${rules.name}, Kakek berkedudukan seperti Ayah, memblokir seluruh saudara.`);
-        } else {
-          // Jumhur Style
-          notes.push(`Sesuai ${rules.name}, Kakek tidak memblokir saudara kandung/seayah sepenuhnya (Muqasamah).`);
-          // Note: Full implementation of Muqasamah logic is extremely complex (optimizing 1/3 vs 1/6 vs sharing).
-          // For this MVP, we will treat Kakek as sharing Residu with Brothers if no Fardh owner consumes it all.
-        }
-      }
-
-      // Ibu memblokir Nenek
-      if (heirs.ibu) {
-        heirs.nenek = false;
-        notes.push("Ibu memblokir Nenek.");
-      }
-      
-      // Anak/Cucu memblokir Saudara Seibu
-      if (hasAnakOrCucuLk || heirs.anakPr > 0 || heirs.cucuPr > 0 || heirs.ayah || heirs.kakek) {
-        heirs.sdrSeibu = 0;
-      }
-      
-      // --- ASSIGN SHARES (FARDH) ---
-      
-      // Suami
-      if (heirs.suami) {
-        let share = hasAnak ? 0.25 : 0.5;
-        result.push({ name: "Suami", share: share, type: "Fardh", note: hasAnak ? "Ada keturunan" : "Tidak ada keturunan" });
-        totalShare += share;
-      }
-
-      // Istri
-      if (heirs.istri > 0) {
-        let share = hasAnak ? 0.125 : 0.25;
-        result.push({ name: `Istri (${heirs.istri})`, share: share, count: heirs.istri, type: "Fardh", note: hasAnak ? "Ada keturunan" : "Tidak ada keturunan" });
-        totalShare += share;
-      }
-
-      // Ayah
-      if (heirs.ayah) {
-        let share = 0;
-        let type = "Ashabah";
-        if (hasAnakOrCucuLk) {
-          share = 1/6; type = "Fardh";
-        } else if (hasAnak) { // Hanya ada anak perempuan
-          share = 1/6; type = "Fardh + Ashabah"; // Akan dapat sisa nanti
-        } else {
-          type = "Ashabah"; // Dapat sisa total
-        }
-        result.push({ name: "Ayah", share: share, type: type });
-        totalShare += share;
-      }
-
-      // Ibu
-      if (heirs.ibu) {
-        // Cek Saudara jamak (lebih dari 1)
-        let totalSiblings = heirs.sdrKandungLk + heirs.sdrKandungPr + heirs.sdrSeayahLk + heirs.sdrSeibu;
-        let share = (hasAnak || totalSiblings >= 2) ? 1/6 : 1/3;
-        
-        // Kasus Gharrawain (Umariyatain) check
-        if (!hasAnak && totalSiblings == 0 && heirs.ayah && (heirs.suami || heirs.istri > 0)) {
-           share = "1/3 Sisa"; // Placeholder Logic, handled by math usually as (Rem * 1/3)
-           // Simplified for JS:
-           let sisaAfterSpouse = 1 - (heirs.suami ? 0.5 : 0.25);
-           share = sisaAfterSpouse / 3;
-           specialCases.push("Gharrawain");
-           notes.push("Kasus Gharrawain: Ibu mendapat 1/3 dari sisa setelah pasangan.");
-        }
-
-        result.push({ name: "Ibu", share: share, type: "Fardh" });
-        totalShare += share;
-      }
-
-      // Anak Perempuan (Tanpa Anak Laki)
-      if (heirs.anakPr > 0 && heirs.anakLk === 0) {
-        let share = heirs.anakPr > 1 ? 2/3 : 0.5;
-        result.push({ name: `Anak Perempuan (${heirs.anakPr})`, share: share, count: heirs.anakPr, type: "Fardh" });
-        totalShare += share;
-      }
-      
-      // Saudara Seibu
-      if (heirs.sdrSeibu > 0) {
-        let share = heirs.sdrSeibu > 1 ? 1/3 : 1/6;
-        
-        // CEK MUSYARAKAH (HIMARIYAH)
-        // Syarat: Suami (1/2), Ibu/Nenek (1/6), Sdr Seibu > 1 (1/3), Ada Sdr Kandung Laki-laki
-        // Total shares = 1/2 + 1/6 + 1/3 = 1. Habis. Sdr Kandung dapat 0 (Ashabah).
-        // Syafi'i & Maliki: Sdr Kandung join Sdr Seibu di 1/3.
-        
-        let isHimariyahPotential = heirs.suami && (heirs.ibu || heirs.nenek) && heirs.sdrSeibu > 1 && heirs.sdrKandungLk > 0;
-        
-        if (isHimariyahPotential && rules.musyarakah) {
-           specialCases.push("Musyarakah");
-           notes.push(`Kasus Musyarakah (${rules.name}): Saudara Kandung bergabung dengan Saudara Seibu berbagi bagian 1/3.`);
-           // Logic handled in display or custom share, for simplicity we label it share logic here
-           // Real math: They share the 1/3.
-        } else if (isHimariyahPotential && !rules.musyarakah) {
-           notes.push(`Kasus Musyarakah ditolak (${rules.name}): Saudara Kandung gugur karena harta habis.`);
-        }
-
-        result.push({ name: `Saudara Seibu (${heirs.sdrSeibu})`, share: share, count: heirs.sdrSeibu, type: "Fardh" });
-        totalShare += share;
-      }
-
-      // --- CALCULATE ASHABAH (SISA) ---
-      let sisa = 1 - totalShare;
-      let sisaRupiah = sisa * harta;
-      
-      // Handling 'Aul (Defisit)
-      if (totalShare > 1) {
-        specialCases.push("'Aul (Defisit)");
-        let aulFactor = totalShare; // Normalisasi
-        result.forEach(r => {
-          r.originalShare = r.share;
-          r.share = r.share / aulFactor;
-        });
-        sisa = 0; // Tidak ada sisa untuk Ashabah
-        notes.push("Terjadi 'Aul: Total bagian melebihi 1, bagian dikurangi secara proporsional.");
-      }
-
-      // Logic Ashabah
-      let ashabahReceivers = [];
-      
-      // 1. Anak Laki (+ Anak Pr)
-      if (heirs.anakLk > 0) {
-        ashabahReceivers.push({ name: "Anak Laki & Pr", type: "Bin Nafs / Bil Ghair" });
-        // Pembagian 2:1 handled in display logic usually
-      } 
-      // 2. Cucu Laki (+ Cucu Pr) - jika tidak ada Anak Laki
-      else if (heirs.cucuLk > 0) {
-        ashabahReceivers.push({ name: "Cucu Laki & Pr", type: "Bin Nafs" });
-      }
-      // 3. Ayah (Jika ada sisa dan tidak ada anak laki)
-      else if (heirs.ayah) {
-        ashabahReceivers.push({ name: "Ayah", type: "Bin Nafs" });
-      }
-      // 4. Kakek (Jika tidak ada Ayah)
-      else if (heirs.kakek) {
-        // Jika Jumhur, Kakek berbagi dengan saudara (Complex). Simplified: Kakek takes residue if no siblings, or shares.
-        ashabahReceivers.push({ name: "Kakek", type: "Bin Nafs" });
-      }
-      // 5. Saudara Kandung Laki (+ Pr)
-      else if (heirs.sdrKandungLk > 0) {
-        ashabahReceivers.push({ name: "Saudara Kandung", type: "Bin Nafs/Ghair" });
-      }
-      
-      // Distribute Sisa to Ashabah
-      if (sisa > 0 && ashabahReceivers.length > 0) {
-        let receiver = ashabahReceivers[0]; // Priority logic simple version
-        result.push({ name: receiver.name, share: sisa, type: "Ashabah (" + receiver.type + ")" });
-      } else if (sisa > 0 && ashabahReceivers.length === 0) {
-        // RADD (Pengembalian)
-        if (rules.raddToHeirs) {
-          specialCases.push("Radd (Surplus)");
-          // Simple Radd: Return proportional to Fardh owners (except Husband/Wife usually)
-          // For MVP visual:
-          notes.push(`Sisa harta dikembalikan (Radd) kepada ahli waris Dzawil Furudh (sesuai ${rules.name}).`);
-          // Note: Math not implemented perfectly for mixed Husband+Radd, kept simple
-          result.push({ name: "Sisa (Radd)", share: sisa, type: "Dikembalikan ke Ahli Waris" });
-        } else {
-          result.push({ name: "Baitul Mal", share: sisa, type: "Kas Negara" });
-          notes.push(`Sisa harta diserahkan ke Baitul Mal (Sesuai pandangan klasik ${rules.name}).`);
-        }
-      }
-
-      // --- RENDER ---
-      renderResult(result, harta, notes, specialCases, selectedMazhab);
-    }
-
-    function renderResult(resultData, totalHarta, notes, specialCases, mazhab) {
-      const container = document.getElementById('heirsList');
-      container.innerHTML = '';
-      
-      document.getElementById('resultSection').classList.remove('hidden');
-      document.getElementById('introSection').classList.add('hidden');
-      document.getElementById('calculatorForm').classList.add('hidden');
-      
-      // Set Header Info
-      document.getElementById('mazhabDisplay').innerText = MAZHAB_RULES[mazhab].name;
-      document.getElementById('resTotalHarta').innerText = formatRupiah(totalHarta);
-      
-      // Special Cases Badges
-      const specialDiv = document.getElementById('specialCasesContainer');
-      specialDiv.innerHTML = '';
-      specialCases.forEach(c => {
-        specialDiv.innerHTML += `<span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm font-bold border border-red-200">${c}</span>`;
-      });
-
-      let totalBagianRupiah = 0;
-
-      resultData.forEach(item => {
-        let rupiah = item.share * totalHarta;
-        totalBagianRupiah += rupiah;
-        
-        let shareText = (item.share * 100).toFixed(2) + "%";
-        if (item.share < 1 && item.share > 0) shareText += ` (${fractionToText(item.share)})`;
-
-        let card = `
-          <div class="card-result p-4 rounded-xl shadow-sm border-l-blue-500 relative overflow-hidden">
-            <div class="flex justify-between items-start">
-              <div>
-                <h4 class="font-bold text-lg text-gray-800">${item.name}</h4>
-                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">${item.type}</span>
-                ${item.note ? `<p class="text-xs text-gray-500 mt-1 italic">"${item.note}"</p>` : ''}
-              </div>
-              <div class="text-right">
-                <div class="font-bold text-xl text-primary font-mono">${formatRupiah(rupiah)}</div>
-                <div class="text-sm text-gray-500">${shareText}</div>
-              </div>
-            </div>
+  <div id="dalilModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-scale-up">
+      <div class="bg-islamic p-4 flex justify-between items-center text-white">
+        <h3 class="font-bold text-lg">📚 Dalil Syar'i</h3>
+        <button onclick="closeModal()" class="text-2xl hover:text-red-200">&times;</button>
+      </div>
+      <div class="p-6 max-h-[70vh] overflow-y-auto">
+        <div id="dalilContent">
           </div>
-        `;
-        container.innerHTML += card;
-      });
+      </div>
+      <div class="p-4 bg-slate-50 text-right border-t">
+        <button onclick="closeModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded font-bold text-slate-700">Tutup</button>
+      </div>
+    </div>
+  </div>
 
-      // Notes
-      if (notes.length > 0) {
-        container.innerHTML += `
-          <div class="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-sm text-yellow-800">
-            <strong>📝 Catatan Fiqih (${MAZHAB_RULES[mazhab].name}):</strong>
-            <ul class="list-disc ml-4 mt-2 space-y-1">
-              ${notes.map(n => `<li>${n}</li>`).join('')}
-            </ul>
-          </div>
-        `;
-      }
-
-      document.getElementById('resTotalBagian').innerText = formatRupiah(totalBagianRupiah);
-      document.getElementById('resSisa').innerText = formatRupiah(totalHarta - totalBagianRupiah);
-      
-      // Scroll to result
-      document.getElementById('resultSection').scrollIntoView({behavior: 'smooth'});
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
