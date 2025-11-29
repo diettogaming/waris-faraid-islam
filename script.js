@@ -3592,13 +3592,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // ===== 2. SETUP EVENT LISTENERS =====
   
   // Tombol Hitung Waris
-  const btnCalculate = document.getElementById('btnStart'); // ✅ UBAH INI
+  const btnCalculate = document.getElementById('btnStart'); // ✅ Ubah ke btnStart
   if (btnCalculate) {
-    btnCalculate.addEventListener('click', function(e) {
-      e.preventDefault(); // Prevent form submit jika di dalam form
-      console.log('🖱️ Button Mulai Perhitungan diklik');
-      handleCalculateButton();
-    });
+    btnCalculate.addEventListener('click', handleCalculateButton);
     log('success', 'Event listener btnStart terpasang');
   } else {
     console.error('❌ Button btnStart tidak ditemukan!');
