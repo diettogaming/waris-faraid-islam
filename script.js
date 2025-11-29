@@ -750,7 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== PART 2: CALCULATION ENGINE =====
 
-// ===== FUNGSI DETEKSI MAHJUB (PENGHALANGAN) - FIXED =====
+// ===== FUNGSI DETEKSI MAHJUB (PENGHALANGAN) - FIXED FOR GHARRAWAIN =====
 
 function detectMahjub(data) {
   const blocked = [];
@@ -758,7 +758,12 @@ function detectMahjub(data) {
   const hasAyah = data.ayah;
   const hasIbu = data.ibu;
   const hasAnakLaki = data.anakLaki > 0;
-  const hasAnakPerempuan = data.anakPerempuan > 0; // ✅ TAMBAHKAN INI
+  const hasAnakPerempuan = data.anakPerempuan > 0;
+  
+  // ✅ SIMPAN DATA SAUDARA SEBELUM DIHAPUS (UNTUK GHARRAWAIN)
+  const originalSaudaraKandungSeayah = data.saudaraLakiKandung + data.saudaraPerempuanKandung +
+                                        data.saudaraLakiSeayah + data.saudaraPerempuanSeayah;
+  const originalSaudaraSeibu = data.saudaraLakiSeibu + data.saudaraPerempuanSeibu;
   
   // Cucu terhalang oleh anak laki-laki
   if (hasAnakLaki && hasCucu(data)) {
@@ -804,13 +809,13 @@ function detectMahjub(data) {
         penjelasan_en: 'Full siblings and paternal siblings are blocked (mahjub) by the presence of father, son, or daughter.',
         dalil: 'الأب يحجب الإخوة',
         sumber: 'Ijma\' Ulama 4 Mazhab'
-    }
-  });
-  data.saudaraLakiKandung = 0;
-  data.saudaraPerempuanKandung = 0;
-  data.saudaraLakiSeayah = 0;
-  data.saudaraPerempuanSeayah = 0;
-}
+      }
+    });
+    data.saudaraLakiKandung = 0;
+    data.saudaraPerempuanKandung = 0;
+    data.saudaraLakiSeayah = 0;
+    data.saudaraPerempuanSeayah = 0;
+  }
   
   // Saudara seibu terhalang oleh anak, cucu, ayah, atau kakek
   if ((hasAnakOrCucu || hasAyah || data.kakek) && 
@@ -824,12 +829,18 @@ function detectMahjub(data) {
     data.saudaraPerempuanSeibu = 0;
   }
   
-  return { data, blocked };
+  // ✅ RETURN DATA SAUDARA ASLI (SEBELUM DIHAPUS)
+  return { 
+    data, 
+    blocked,
+    originalSaudaraKandungSeayah,
+    originalSaudaraSeibu
+  };
 }
 
-// ===== FUNGSI HITUNG AHLI WARIS FARDH - FIXED GHARRAWAIN =====
+// ===== FUNGSI HITUNG AHLI WARIS FARDH - FIXED GHARRAWAIN 100% =====
 
-function calculateFardhHeirs(data) {
+function calculateFardhHeirs(data, originalSaudaraKandungSeayah = 0, originalSaudaraSeibu = 0) {
   const heirs = [];
   const hasAnakOrCucu = hasAnak(data);
   
@@ -859,11 +870,8 @@ function calculateFardhHeirs(data) {
   
   // ===== AYAH - FIXED UNTUK GHARRAWAIN =====
   if (data.ayah) {
-    // Hitung saudara yang AKAN terhalang oleh ayah
-    const totalSaudaraKandungSeayah = data.saudaraLakiKandung + data.saudaraPerempuanKandung +
-                                       data.saudaraLakiSeayah + data.saudaraPerempuanSeayah;
-    
-    const hasSaudaraYangAkanTerhalang = totalSaudaraKandungSeayah >= 2;
+    // ✅ GUNAKAN PARAMETER originalSaudaraKandungSeayah (BUKAN data.saudaraLakiKandung!)
+    const hasSaudaraYangAkanTerhalang = originalSaudaraKandungSeayah >= 2;
     
     if (hasAnakOrCucu) {
       // Ada anak/cucu: Ayah dapat 1/6 fardh + sisa (jika tidak ada anak laki)
@@ -906,18 +914,11 @@ function calculateFardhHeirs(data) {
     }
   }
   
-  // ===== IBU - FIXED UNTUK GHARRAWAIN (VERSI FINAL) =====
+  // ===== IBU - FIXED UNTUK GHARRAWAIN =====
   if (data.ibu) {
-    // Untuk Gharrawain: Saudara kandung/seayah yang terhalang TETAP mempengaruhi bagian ibu
-    const totalSaudaraKandungSeayah = data.saudaraLakiKandung + data.saudaraPerempuanKandung +
-                                       data.saudaraLakiSeayah + data.saudaraPerempuanSeayah;
-    
-    // Saudara seibu terhalang oleh ayah/kakek/anak
-    const saudaraSeibuTerhalang = data.ayah || data.kakek || hasAnakOrCucu;
-    const totalSaudaraSeibu = saudaraSeibuTerhalang ? 0 : (data.saudaraLakiSeibu + data.saudaraPerempuanSeibu);
-    
-    // Total saudara yang mempengaruhi bagian ibu (termasuk yang terhalang oleh ayah!)
-    const totalSaudaraYangMempengaruhiIbu = totalSaudaraKandungSeayah + totalSaudaraSeibu;
+    // ✅ GUNAKAN PARAMETER originalSaudaraKandungSeayah dan originalSaudaraSeibu
+    // Total saudara yang mempengaruhi bagian ibu (GUNAKAN DATA ASLI!)
+    const totalSaudaraYangMempengaruhiIbu = originalSaudaraKandungSeayah + originalSaudaraSeibu;
     
     // ✅ Ibu dapat 1/6 jika: ada anak ATAU ada 2+ saudara (termasuk yang terhalang!)
     const ibuGet1_6 = hasAnakOrCucu || totalSaudaraYangMempengaruhiIbu >= 2;
@@ -927,7 +928,7 @@ function calculateFardhHeirs(data) {
     let explanation = currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en;
     
     // Penjelasan khusus untuk Gharrawain
-    if (data.ayah && !hasAnakOrCucu && totalSaudaraKandungSeayah >= 2) {
+    if (data.ayah && !hasAnakOrCucu && originalSaudaraKandungSeayah >= 2) {
       explanation = currentLang === 'id' ? 
         'Ibu mendapat 1/6 karena ada 2+ saudara (meskipun terhalang oleh ayah) - Kasus Gharrawain' : 
         'Mother gets 1/6 because there are 2+ siblings (even though blocked by father) - Gharrawain case';
