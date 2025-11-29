@@ -600,6 +600,56 @@
 
   </div>
 
+  <!-- Modal Pemberitahuan Anak Angkat/Zina -->
+<div id="modalAnakAngkatZina" class="modal-overlay hidden">
+  <div class="modal-content modal-warning">
+    <div class="modal-header">
+      <h3>⚠️ Pemberitahuan Penting</h3>
+    </div>
+    <div class="modal-body">
+      <h4>📚 Catatan Hukum Waris Islam:</h4>
+      
+      <div class="warning-item">
+        <h5>1️⃣ Anak Angkat (Anak Pungut):</h5>
+        <ul>
+          <li>Tidak dapat warisan dari orang tua angkat</li>
+          <li>Dapat wasiat maksimal 1/3 harta</li>
+          <li>📖 <strong>Dalil:</strong> QS. Al-Ahzab: 4, HR. Abu Dawud</li>
+        </ul>
+      </div>
+      
+      <div class="warning-item">
+        <h5>2️⃣ Anak Zina (Anak Luar Nikah):</h5>
+        <ul>
+          <li>Tidak dapat warisan dari ayah biologis</li>
+          <li>Hanya dapat warisan dari ibu kandung</li>
+          <li>📖 <strong>Dalil:</strong> HR. Bukhari (2053), Muslim (1457)</li>
+        </ul>
+      </div>
+      
+      <p class="info-text">
+        ℹ️ Penjelasan lengkap dapat dipelajari di Halaman Beranda → Bagian Edukasi
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button id="btnPelajariDetail" class="btn btn-secondary">
+        📖 Pelajari Lebih Detail
+      </button>
+      <button id="btnLanjutkanHitung" class="btn btn-primary">
+        ➡️ Lanjutkan Perhitungan
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loadingIndicator" class="loading-overlay hidden">
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Menghitung...</p>
+  </div>
+</div>
+  
   <!-- Loading Overlay -->
   <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
     <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center">
@@ -622,4 +672,5 @@
   <script src="script.js"></script>
 </body>
 </html>
+
 
