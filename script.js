@@ -1297,12 +1297,12 @@ function applyAul(heirs, hartaBersih) {
 function distributeAshabah(heirs, sisaHarta, hartaBersih) {
   const ashabahHeirs = heirs.filter(h => h.isAshabah);
   
-  // ✅ Jika tidak ada ashabah, return
+  // Jika tidak ada ashabah, return
   if (ashabahHeirs.length === 0) {
     return;
   }
   
-  // ✅ Jika sisa harta <= 0, ashabah hanya dapat fardh (jika ada)
+  // Jika sisa harta <= 0, ashabah hanya dapat fardh (jika ada)
   if (sisaHarta <= 0) {
     ashabahHeirs.forEach(h => {
       if (h.share > 0) {
@@ -1316,8 +1316,10 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
     return;
   }
   
-  // ✅ Cek apakah ada anak/cucu yang juga ashabah
-  const anakAshabah = ashabahHeirs.filter(h => h.ashabahRatio && h.ashabahTotal);
+  // ✅ KODE DI BAWAH INI AKAN DIEKSEKUSI UNTUK KASUS GHARRAWAIN
+  
+  // Pisahkan anak/cucu ashabah vs orang tua ashabah
+  const anakAshabah = heirs.filter(h => h.ashabahRatio && h.ashabahTotal);
   const orangTuaAshabah = ashabahHeirs.filter(h => !h.ashabahRatio && !h.ashabahTotal);
   
   if (anakAshabah.length > 0) {
@@ -1335,7 +1337,7 @@ function distributeAshabah(heirs, sisaHarta, hartaBersih) {
       h.perPerson = h.total;
     });
   } else {
-    // ✅ Tidak ada anak, orang tua dapat fardh + semua sisa
+    // ✅ KUNCI: Tidak ada anak, orang tua dapat fardh + semua sisa
     orangTuaAshabah.forEach(h => {
       const fardh = h.share > 0 ? hartaBersih * h.share : 0;
       h.total = fardh + sisaHarta; // ✅ INI YANG BENAR!
