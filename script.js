@@ -2949,41 +2949,158 @@ function generateDetailHTML(result) {
 
 /**
  * FUNGSI: handleCalculateButton()
- * TUJUAN: Handle klik tombol "Hitung Waris"
+ * TUJUAN: Handle klik tombol "Mulai Perhitungan"
+ * 
+ * CATATAN: Fungsi ini harus di global scope agar bisa dipanggil dari onclick
  */
-function handleCalculateButton() {
-  log('info', 'Tombol Hitung Waris diklik');
+window.handleCalculateButton = function() {
+  console.log('========================================');
+  console.log('🖱️ BUTTON DIKLIK!');
+  console.log('========================================');
+  
+  // Capture form data
+  console.log('📋 Capturing form data...');
+  
+  // Pastikan formData global ada
+  if (typeof formData === 'undefined') {
+    window.formData = {};
+  }
+  
+  // Capture data dari form
+  captureFormData();
+  
+  console.log('✅ Form data:', formData);
   
   // Validasi form
+  console.log('🔍 Validasi form...');
   const validation = validateForm();
   
   if (!validation.valid) {
+    console.error('❌ Validasi gagal:', validation.errors);
     showValidationErrors(validation.errors);
     return;
   }
   
+  console.log('✅ Validasi berhasil');
+  
   // Tampilkan loading
+  console.log('⏳ Menampilkan loading...');
   showLoading();
   
   // Delay untuk animasi loading
   setTimeout(() => {
     try {
+      console.log('🧮 Memulai perhitungan...');
+      
       // Lakukan perhitungan
       const result = performCalculation(formData);
+      
+      console.log('✅ Perhitungan selesai');
+      console.log('📊 Hasil:', result);
       
       // Sembunyikan loading
       hideLoading();
       
       // Tampilkan modal anak angkat/zina
+      console.log('📢 Menampilkan modal pemberitahuan...');
       showModalAnakAngkatZina();
       
     } catch (error) {
       hideLoading();
-      logError('handleCalculateButton', error);
-      showError('Terjadi kesalahan dalam perhitungan. Silakan coba lagi.');
+      console.error('❌ ERROR dalam perhitungan:');
+      console.error(error);
+      console.error('Stack trace:', error.stack);
+      
+      // Tampilkan error ke user
+      alert('Terjadi kesalahan dalam perhitungan:\n\n' + error.message + '\n\nSilakan cek console (F12) untuk detail.');
     }
   }, 500);
+};
+
+// Alias untuk kompatibilitas
+if (typeof handleCalculateButton === 'undefined') {
+  var handleCalculateButton = window.handleCalculateButton;
 }
+
+/**
+ * FUNGSI: captureFormData()
+ * TUJUAN: Capture data dari form HTML
+ */
+window.captureFormData = function() {
+  console.log('📋 Capturing form data...');
+  
+  // Helper function
+  const getValue = (id, defaultValue = 0) => {
+    const el = document.getElementById(id);
+    if (!el) {
+      console.warn(`⚠️ Element ${id} tidak ditemukan`);
+      return defaultValue;
+    }
+    
+    if (el.type === 'checkbox') {
+      return el.checked;
+    } else if (el.type === 'number' || el.type === 'text') {
+      const val = el.value;
+      return val === '' ? defaultValue : parseFloat(val);
+    } else {
+      return el.value || defaultValue;
+    }
+  };
+  
+  const getRadio = (name, defaultValue) => {
+    const checked = document.querySelector(`input[name="${name}"]:checked`);
+    return checked ? checked.value : defaultValue;
+  };
+  
+  // Capture semua data
+  window.formData = {
+    // Pewaris
+    gender: getRadio('gender', 'male'),
+    mazhab: getRadio('mazhab', 'jumhur'),
+    
+    // Pasangan
+    suami: getValue('suami', false),
+    istri: getValue('istri', false),
+    istriCount: getValue('istriCount', 1),
+    
+    // Orang tua
+    ayah: getValue('ayah', false),
+    ibu: getValue('ibu', false),
+    kakek: getValue('kakek', false),
+    nenek: getValue('nenek', false),
+    
+    // Anak
+    anakLaki: getValue('anakLaki', 0),
+    anakPerempuan: getValue('anakPerempuan', 0),
+    
+    // Cucu
+    cucuLaki: getValue('cucuLaki', 0),
+    cucuPerempuan: getValue('cucuPerempuan', 0),
+    
+    // Saudara kandung
+    saudaraLakiKandung: getValue('saudaraLakiKandung', 0),
+    saudaraPerempuanKandung: getValue('saudaraPerempuanKandung', 0),
+    
+    // Saudara seayah
+    saudaraLakiSeayah: getValue('saudaraLakiSeayah', 0),
+    saudaraPerempuanSeayah: getValue('saudaraPerempuanSeayah', 0),
+    
+    // Saudara seibu
+    saudaraLakiSeibu: getValue('saudaraLakiSeibu', 0),
+    saudaraPerempuanSeibu: getValue('saudaraPerempuanSeibu', 0),
+    
+    // Harta
+    totalHarta: getValue('totalHarta', 0),
+    biayaJenazah: getValue('biayaJenazah', 0),
+    hutang: getValue('hutang', 0),
+    wasiat: getValue('wasiat', 0),
+    asuransi: getRadio('asuransi', 'tidak'),
+    nilaiAsuransi: getValue('nilaiAsuransi', 0)
+  };
+  
+  console.log('✅ Form data captured:', formData);
+  return formData;
+};
 
 /**
  * FUNGSI: handleResetButton()
