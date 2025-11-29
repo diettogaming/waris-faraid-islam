@@ -2233,8 +2233,6 @@ function performCalculation(data) {
   log('info', `Total Fardh (Rupiah): ${formatRupiah(totalFardhRupiah)}`);
   log('info', `Sisa harta untuk ashabah: ${formatRupiah(sisaHarta)} (${((sisaHarta/hartaBersih)*100).toFixed(2)}%)`);
   
-  log('info', `Sisa harta untuk ashabah: ${formatRupiah(sisaHarta)} (${((1-actualTotalFardh)*100).toFixed(2)}%)`);
-  
   // ===== 8. DISTRIBUSIKAN SISA HARTA KE ASHABAH =====
   distributeAshabah(heirs, sisaHarta, hartaBersih);
   
@@ -3594,10 +3592,16 @@ document.addEventListener('DOMContentLoaded', function() {
   // ===== 2. SETUP EVENT LISTENERS =====
   
   // Tombol Hitung Waris
-  const btnCalculate = document.getElementById('btnHitung');
+  const btnCalculate = document.getElementById('btnStart'); // ✅ UBAH INI
   if (btnCalculate) {
-    btnCalculate.addEventListener('click', handleCalculateButton);
-    log('success', 'Event listener btnHitung terpasang');
+    btnCalculate.addEventListener('click', function(e) {
+      e.preventDefault(); // Prevent form submit jika di dalam form
+      console.log('🖱️ Button Mulai Perhitungan diklik');
+      handleCalculateButton();
+    });
+    log('success', 'Event listener btnStart terpasang');
+  } else {
+    console.error('❌ Button btnStart tidak ditemukan!');
   }
   
   // Tombol Reset
