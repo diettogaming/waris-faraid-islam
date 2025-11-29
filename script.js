@@ -151,6 +151,51 @@ function logError(functionName, error) {
 // ===== UTILITY FUNCTIONS =====
 
 /**
+ * @desc Mencari FPB (GCD) menggunakan algoritma Euclidean.
+ * Ini digunakan untuk menyederhanakan pecahan (misalnya 2/4 menjadi 1/2).
+ * @param {number} a
+ * @param {number} b
+ * @returns {number} FPB (GCD)
+ */
+function gcd(a, b) {
+    // Pastikan input adalah bilangan bulat non-negatif
+    a = Math.abs(Math.round(a));
+    b = Math.abs(Math.round(b));
+    if (!b) {
+        return a;
+    }
+    return gcd(b, a % b);
+}
+
+/**
+ * @desc Mencari KPK (LCM/LCD) dari array penyebut (denominators).
+ * Ini adalah 'Asl Mas'alah' atau 'Awwal Al-Masa'il'.
+ * @param {number[]} denominators - Array penyebut
+ * @returns {number} KPK
+ */
+function lcm(denominators) {
+    if (denominators.length === 0) return 1;
+    
+    // Hanya ambil penyebut yang valid (lebih dari 1)
+    const validDenominators = denominators.filter(d => d > 1);
+
+    if (validDenominators.length === 0) return 1;
+
+    let result = validDenominators[0];
+    for (let i = 1; i < validDenominators.length; i++) {
+        // Rumus: LCM(a, b) = |a * b| / GCD(a, b)
+        result = (result * validDenominators[i]) / gcd(result, validDenominators[i]);
+    }
+    return Math.round(result); // Pastikan hasil LCM adalah bilangan bulat
+}
+
+// Tambahkan fungsi untuk menyederhanakan pecahan (bersihkan dari FPB)
+function simplifyFraction(num, den) {
+    const common = gcd(num, den);
+    return { num: num / common, den: den / common };
+}
+
+/**
  * FUNGSI: formatRupiah()
  * TUJUAN: Format angka ke format Rupiah
  * 
@@ -1183,8 +1228,8 @@ function calculateFardhHeirs(data) {
       
       addHeir(heirs, {
         name: currentLang === 'id' ? 'Ayah' : 'Father',
-        share: dalil.bagian, // 1/6
-        count: 1,
+        share: { num: 1, den: 6 }, // Fardh 1/6 (Objek Pecahan)
+        count: 1,
         explanation: currentLang === 'id' ? dalil.penjelasan_id : dalil.penjelasan_en,
         dalil: dalil,
         isAshabah: !hasAnakLaki // Dapat sisa jika tidak ada anak laki
@@ -1473,7 +1518,7 @@ function calculateFardhHeirs(data) {
         name: currentLang === 'id' ? 
           `Cucu Perempuan (${data.cucuPerempuan} orang)` : 
           `Granddaughter (${data.cucuPerempuan})`,
-        share: 1/6,
+        share: { num: 1, den: 6 }, // Pecahan 1/6
         count: data.cucuPerempuan,
         explanation: currentLang === 'id' ? 
           'Cucu perempuan mendapat 1/6 sebagai pelengkap bersama 1 anak perempuan (total 2/3)' : 
@@ -1585,7 +1630,7 @@ function calculateFardhHeirs(data) {
   const hasAnakCucuOrAyah = hasAnakOrCucu || data.ayah;
   
   if (data.saudaraPerempuanKandung > 0 && data.saudaraLakiKandung === 0 && !hasAnakCucuOrAyah) {
-    const bagian = data.saudaraPerempuanKandung === 1 ? 0.5 : 2/3;
+    const bagian = data.saudaraPerempuanKandung === 1 ? { num: 1, den: 2 } : { num: 2, den: 3 };
     const fraction = data.saudaraPerempuanKandung === 1 ? '1/2' : '2/3';
     
     addHeir(heirs, {
@@ -1695,18 +1740,19 @@ function calculateFardhHeirs(data) {
   
   if (data.saudaraLakiSeibu > 0 || data.saudaraPerempuanSeibu > 0) {
     const totalSaudaraSeibu = data.saudaraLakiSeibu + data.saudaraPerempuanSeibu;
-    const bagian = totalSaudaraSeibu === 1 ? 1/6 : 1/3;
-    const fraction = totalSaudaraSeibu === 1 ? '1/6' : '1/3';
-    
-    const perPerson = bagian / totalSaudaraSeibu;
+    // Tentukan bagian total (1/6 atau 1/3) dalam objek pecahan
+    const bagianTotal = totalSaudaraSeibu === 1 ? { num: 1, den: 6 } : { num: 1, den: 3 };
+    const fraction = totalSaudaraSeibu === 1 ? '1/6' : '1/3';
     
     if (data.saudaraLakiSeibu > 0) {
       addHeir(heirs, {
         name: currentLang === 'id' ? 
-          `Saudara Laki-laki Seibu (${data.saudaraLakiSeibu} orang)` : 
-          `Maternal Brother (${data.saudaraLakiSeibu})`,
-        share: perPerson * data.saudaraLakiSeibu,
-        count: data.saudaraLakiSeibu,
+          `Saudara Laki-laki Seibu (${data.saudaraLakiSeibu} orang)` : 
+          `Maternal Brother (${data.saudaraLakiSeibu})`,
+        share: bagianTotal, // SHARE TOTAL MEREKA
+        count: data.saudaraLakiSeibu,
+        isSharedFardh: true, // TANDAI BAHWA SHARE INI AKAN DIBAGI RATA
+        totalShareCount: totalSaudaraSeibu, // JUMLAH ORANG YANG BERBAGI
         explanation: currentLang === 'id' ? 
           `Saudara seibu mendapat ${fraction} dibagi rata` : 
           `Maternal siblings get ${fraction} divided equally`,
@@ -1725,10 +1771,12 @@ function calculateFardhHeirs(data) {
     if (data.saudaraPerempuanSeibu > 0) {
       addHeir(heirs, {
         name: currentLang === 'id' ? 
-          `Saudara Perempuan Seibu (${data.saudaraPerempuanSeibu} orang)` : 
-          `Maternal Sister (${data.saudaraPerempuanSeibu})`,
-        share: perPerson * data.saudaraPerempuanSeibu,
-        count: data.saudaraPerempuanSeibu,
+          `Saudara Perempuan Seibu (${data.saudaraPerempuanSeibu} orang)` : 
+          `Maternal Sister (${data.saudaraPerempuanSeibu})`,
+        share: bagianTotal, // SHARE TOTAL MEREKA
+        count: data.saudaraPerempuanSeibu,
+        isSharedFardh: true, // TANDAI BAHWA SHARE INI AKAN DIBAGI RATA
+        totalShareCount: totalSaudaraSeibu, // JUMLAH ORANG YANG BERBAGI
         explanation: currentLang === 'id' ? 
           `Saudara seibu mendapat ${fraction} dibagi rata` : 
           `Maternal siblings get ${fraction} divided equally`,
@@ -1752,7 +1800,6 @@ function calculateFardhHeirs(data) {
   
   return heirs;
 }
-
 
 /**
  * ========================================
@@ -1931,12 +1978,27 @@ function applyAul(heirs, hartaBersih) {
   
   log('debug', `Total Fardh: ${(totalFardh * 100).toFixed(2)}%`);
   
-  // Jika total fardh > 1, terapkan 'Aul
-  if (totalFardh > 1) {
-    log('warning', `'AUL TERJADI! Total fardh ${(totalFardh * 100).toFixed(2)}% > 100%`);
+  // 3. Terapkan Aul (jika total saham > Asl Mas'alah)
+  if (totalSahamFardh > aslMasalah) {
+      logStep(4, 'Menerapkan Kasus AUL');
+      const newAslMasalah = totalSahamFardh; // Total Saham menjadi Asl Mas'alah baru
     
-    const factor = 1 / totalFardh;
+      // Semua saham (num) tetap, tetapi penyebut (den) total berubah
+      heirs.forEach(h => {
+          if (h.saham > 0) {
+              // Hitung kembali persentase berbasis Saham Bulat baru (newAslMasalah)
+              h.share = h.saham / newAslMasalah; // Kunci: Konversi ke desimal hanya di akhir
+              h.note = 'Total Saham Aul: ' + newAslMasalah;
+          }
+      });
+
+      logStep(4, `Aul berhasil diterapkan. Asl Mas'alah Baru: ${newAslMasalah}`);
+      // Karena Aul, tidak ada sisa (remainder)
+      remainderSaham = 0;
     
+      // Ganti nilai aslMasalah untuk perhitungan Rupiah
+      // *kita akan menangani konversi Rupiah di akhir fungsi*
+  }
     // Simpan data sebelum 'Aul untuk ditampilkan
     const beforeAul = heirs.map(h => ({
       name: h.name,
@@ -2206,26 +2268,80 @@ function performCalculation(data) {
   // ===== 5. HITUNG TOTAL BAGIAN FARDH =====
   logStep(4, 'Hitung Total Bagian Fardh');
   
-  let totalFardh = 0;
+  // A. Kumpulkan semua penyebut (denominator) dari ahli waris Fardh
+  let denominators = [];
   heirs.forEach(h => {
-    if (!h.isAshabah) {
-      totalFardh += h.share;
-    }
+      if (h.type === 'Fardh' && h.share && h.share.den > 1) {
+          // Jika saudara seibu, gandakan penyebutnya (karena 1/6 dibagi N orang)
+          if (h.isSharedFardh) {
+              denominators.push(h.share.den * h.totalShareCount);
+          } else {
+              denominators.push(h.share.den);
+          }
+      }
   });
-  
-  log('info', `Total Fardh: ${(totalFardh * 100).toFixed(2)}% (${fractionToString(totalFardh)})`);
+
+  // B. Hitung Asl Mas'alah (KPK dari semua penyebut)
+  const aslMasalah = lcm(denominators); // Menggunakan fungsi LCM yang kita buat di Tahap 1
+  logStep('Asl Masalah (Penyebut Utama)', aslMasalah);
+
+  let totalSahamFardh = 0;
+
+  // C. Ubah share pecahan menjadi Saham Bulat (Integer Share)
+  heirs.forEach(h => {
+     h.saham = 0; // Inisialisasi Saham Bulat
+     
+      if (h.type === 'Fardh' && h.share && h.share.num > 0) {
+          if (h.share.num > 0) {
+              let num = h.share.num;
+              let den = h.share.den;
+
+              // Jika share harus dibagi (seperti saudara seibu)
+              if (h.isSharedFardh) {
+                  // Saham Total Fardh = (Asl Mas'alah / Denominator) * Numerator
+                  const sahamTotalFardhGroup = (aslMasalah / den) * num;
+                
+                  // Saham per Orang = Saham Total / Jumlah Orang
+                  h.saham = Math.round(sahamTotalFardhGroup / h.totalShareCount); 
+
+                  // Kurangi total Saham untuk menghindari perhitungan berulang
+                  if (h.saham > 0) {
+                      totalSahamFardh += h.saham * h.count; 
+                  }
+                
+              } else {
+                  // Saham Bulat = (Asl Mas'alah / Denominator) * Numerator
+                  h.saham = (aslMasalah / den) * num;
+                  totalSahamFardh += h.saham;
+              }
+          } else {
+              h.saham = 0;
+          }
+      } else {
+          h.saham = 0; // Ashabah atau Mahjub
+      }
+  });
+
+  logStep('Total Saham Fardh', totalSahamFardh);
   
   // ===== 6. TERAPKAN HUKUM 'AUL JIKA TOTAL FARDH > 1 =====
-  const aulResult = applyAul(heirs, hartaBersih);
+  if (totalSahamFardh > aslMasalah) {
+    logStep(4, 'Menerapkan Kasus AUL');
+    finalAslMasalah = totalSahamFardh; // Total Saham menjadi Asl Mas'alah baru
+    
+    // Semua saham (num) tetap. Final Asl Mas'alah dinaikkan.
+    remainderSaham = 0;
+    log('warning', `Kasus 'Aul terdeteksi: Asl Mas'alah baru adalah ${finalAslMasalah}`);
+  }
   // ===== 7. HITUNG SISA HARTA UNTUK ASHABAH =====
 
   // Hitung total fardh yang SUDAH DIBAGIKAN (dalam rupiah, bukan persentase)
-  let totalFardhRupiah = 0;
-  heirs.forEach(h => {
-    if (!h.isAshabah) {
-      totalFardhRupiah += h.share * hartaBersih;
-    }
-  });
+  let remainderSaham = aslMasalah - totalSahamFardh;
+  // Jika total saham > Asl Mas'alah, kasus AUL
+  if (totalSahamFardh > aslMasalah) {
+      remainderSaham = 0; // Sisa = 0 (atau negatif, yang akan ditangani Aul)
+      log('warning', `Kasus 'Aul terdeteksi: Total saham (${totalSahamFardh}) > Asl Mas'alah (${aslMasalah})`);
+  }
 
   // Sisa harta = harta bersih - total fardh yang sudah dibagikan
   const sisaHarta = hartaBersih - totalFardhRupiah;
@@ -2234,7 +2350,11 @@ function performCalculation(data) {
   log('info', `Sisa harta untuk ashabah: ${formatRupiah(sisaHarta)} (${((sisaHarta/hartaBersih)*100).toFixed(2)}%)`);
   
   // ===== 8. DISTRIBUSIKAN SISA HARTA KE ASHABAH =====
-  distributeAshabah(heirs, sisaHarta, hartaBersih);
+  const ashabahHeirs = heirs.filter(h => h.isAshabah);
+  if (remainderSaham > 0 && ashabahHeirs.length > 0) {
+      // ... Logika Ashabah akan dijalankan di fungsi distributeAshabah
+      log('info', `Sisa Saham (${remainderSaham}) dialokasikan untuk Ashabah`);
+  }
   
   // ===== 9. HITUNG TOTAL UNTUK AHLI WARIS FARDH YANG BELUM DAPAT NILAI =====
   heirs.forEach(h => {
@@ -2245,7 +2365,38 @@ function performCalculation(data) {
   });
   
   // ===== 10. TERAPKAN HUKUM RADD JIKA ADA SISA DAN TIDAK ADA ASHABAH =====
-  const raddResult = applyRadd(heirs, sisaHarta, hartaBersih);
+  if (remainderSaham > 0 && ashabahHeirs.length === 0) {
+    logStep(5, 'Menerapkan Kasus RADD');
+    
+    // Filter ahli waris Fardh yang berhak menerima Radd (tidak termasuk Suami/Istri)
+    const raddHeirs = heirs.filter(h => 
+        (h.type === 'Fardh' || h.isSharedFardh) && 
+        h.saham > 0 && 
+        h.id !== 'suami' && 
+        h.id !== 'istri' &&
+        h.id !== 'istri_plural'
+    );
+    
+    if (raddHeirs.length > 0) {
+        // Hitung total saham Fardh yang berhak mendapat Radd
+        const totalRaddSaham = raddHeirs.reduce((sum, h) => sum + h.saham, 0);
+        
+        // Redistribusi sisa saham (remainderSaham) secara proporsional
+        raddHeirs.forEach(h => {
+            // Saham baru = Saham lama + (sisa Saham * (Saham lama / Total Saham Radd))
+            const tambahanSaham = remainderSaham * (h.saham / totalRaddSaham);
+            h.saham += Math.round(tambahanSaham);
+        });
+        
+        // Total Saham Akhir (Asl Mas'alah Baru setelah Radd)
+        finalAslMasalah = heirs.reduce((sum, h) => sum + h.saham, 0); 
+        
+        logStep(5, `Radd berhasil diterapkan. Asl Mas'alah Baru: ${finalAslMasalah}`);
+        remainderSaham = 0; // Sisa sudah terdistribusi
+    } else {
+        log('warning', 'Sisa harta tidak bisa di Radd (hanya ada Suami/Istri). Sisa dialokasikan ke Baitul Maal.');
+    }
+  }
   
   // ===== 11. VERIFIKASI TOTAL PEMBAGIAN =====
   logStep(8, 'Verifikasi Total Pembagian');
