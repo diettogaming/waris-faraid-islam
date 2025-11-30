@@ -1,0 +1,64 @@
+{
+  "suami": {
+    "dengan_anak": {
+      "arabic": "فَإِن كَانَ لَكُمْ وَلَدٌ فَلَكُمُ الرُّبُعُ مِمَّا تَرَكْتُمْ",
+      "translation": "Jika kamu mempunyai anak, maka bagi mereka seperempat dari harta yang kamu tinggalkan.",
+      "source": "QS. An-Nisa 12",
+      "kitab": "Tafsir al-Jalalayn",
+      "fiqh": "Syafi'i"
+    },
+    "tanpa_anak": {
+      "arabic": "وَلَكُمْ نِصْفُ مَا تَرَكَتْ أَزْوَاجُكُمْ إِن لَّمْ يَكُنْ لَكُمْ وَلَدٌ",
+      "translation": "Dan bagi kalian separuh dari apa yang ditinggalkan istri-istrimu, jika mereka tidak mempunyai anak.",
+      "source": "QS. An-Nisa 12",
+      "kitab": "Tafsir al-Jalalayn",
+      "fiqh": "Syafi'i"
+    }
+  },
+  "istri": {
+    "dengan_anak": {
+      "arabic": "وَلَهُنَّ الثُّمَنُ مِمَّا تَرَكْتُمْ إِن كَانَ لَكُمْ وَلَدٌ",
+      "translation": "Dan bagi mereka seperdelapan dari harta yang kamu tinggalkan jika kamu mempunyai anak.",
+      "source": "QS. An-Nisa 12",
+      "kitab": "Tafsir al-Tabari",
+      "fiqh": "Syafi'i"
+    },
+    "tanpa_anak": {
+      "arabic": "وَلَكُنَّ رُبُعُ مَا تَرَكْتُمْ إِن لَّمْ يَكُنْ لَكُمْ وَلَدٌ",
+      "translation": "Dan bagi mereka seperempat dari harta yang kamu tinggalkan jika kamu tidak mempunyai anak.",
+      "source": "QS. An-Nisa 12",
+      "kitab": "Tafsir al-Tabari",
+      "fiqh": "Syafi'i"
+    }
+  },
+  "anak": {
+    "perempuan": {
+      "arabic": "وَإِن كَانَتْ وَاحِدَةً فَلَهَا النِّصْفُ",
+      "translation": "Dan jika anak itu seorang (perempuan) saja, maka dia memperoleh separuh (harta yang ditinggalkan).",
+      "source": "QS. An-Nisa 11",
+      "kitab": "Tafsir al-Jalalayn",
+      "fiqh": "Syafi'i"
+    },
+    "laki": {
+      "arabic": "يُقَسَّمُ بَيْنَ الذَّكَرِ وَالْأُنثَى",
+      "translation": "Pembagian antara anak laki-laki dan perempuan dilakukan dengan dua bagian untuk laki-laki dan satu bagian untuk perempuan.",
+      "source": "QS. An-Nisa 11",
+      "kitab": "Tafsir al-Tabari",
+      "fiqh": "Jumhur"
+    }
+  },
+  "penghalang_waris": {
+    "pembunuhan": {
+      "arabic": "لَا يَرِثُ الْقَاتِلُ مِنَ الْمَقْتُولِ شَيْئًا",
+      "translation": "Pembunuh tidak mewarisi dari orang yang dibunuhnya sedikit pun.",
+      "source": "Hadis Tirmidzi No. 2109",
+      "fiqh": "Jumhur"
+    },
+    "perbedaan_agama": {
+      "arabic": "لَا يَرِثُ الْمُسْلِمُ الْكَافِرَ وَلَا الْكَافِرُ الْمُسْلِمَ",
+      "translation": "Seorang Muslim tidak mewarisi orang kafir, dan orang kafir tidak mewarisi seorang Muslim.",
+      "source": "Hadis Bukhari No. 6781",
+      "fiqh": "Jumhur"
+    }
+  }
+}
