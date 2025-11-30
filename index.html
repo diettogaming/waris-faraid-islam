@@ -1,561 +1,100 @@
 <!DOCTYPE html>
-<html lang="id" class="scroll-smooth">
+<html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kalkulator Waris Islam - 4 Mazhab</title>
-  <meta name="description" content="Kalkulator Waris Islam - Perhitungan Faraid sesuai 4 Mazhab dengan dalil lengkap">
-  
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            primary: '#1e3c72',
-            secondary: '#2a5298',
-          }
-        }
-      }
-    }
-  </script>
-  
-  <style>
-    html.dark {
-      color-scheme: dark;
-      background-color: #1e293b;
-    }
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
-  </style>
-  
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/jspdf"></script> <!-- Library untuk PDF -->
 </head>
-<body class="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-900 min-h-screen">
-
-  <!-- Language & Dark Mode Toggle -->
-  <div class="fixed top-5 left-5 flex gap-3 z-50">
-    <button id="btn-id" class="px-4 py-2 rounded-lg bg-blue-600 text-white font-bold shadow-lg hover:bg-blue-700 transition">🇮🇩 ID</button>
-    <button id="btn-en" class="px-4 py-2 rounded-lg bg-blue-300 text-blue-900 font-semibold shadow-lg hover:bg-blue-400 transition">🇬🇧 EN</button>
-  </div>
-
-  <div class="fixed top-5 right-5 z-50">
-    <button id="btnDarkMode" class="px-4 py-2 rounded-lg bg-gray-700 text-white font-bold shadow-lg hover:bg-gray-600 transition">
-      <span id="darkModeIcon">🌙</span>
-    </button>
-  </div>
-
-  <!-- Main Container -->
-  <div class="container mx-auto px-4 py-10 max-w-4xl">
-
-    <!-- Landing Page -->
-    <div id="landingPage" class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
-      <div class="text-center">
-        <div class="text-7xl mb-4">🕌</div>
-        <h1 class="title text-4xl font-black text-blue-900 dark:text-blue-300 mb-3" data-i18n="title">
-          Kalkulator Waris Islam - 4 Mazhab
-        </h1>
-        <p class="subtitle text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" data-i18n="subtitle">
-          Aplikasi ini membantu Anda menghitung pembagian waris sesuai hukum Islam berdasarkan Al-Quran dan Sunnah dengan pendapat 4 Mazhab.
-        </p>
-      </div>
-
-      <div class="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 rounded-2xl p-8 border-l-8 border-blue-500">
-        <h2 class="text-2xl font-bold text-blue-900 dark:text-blue-300 mb-4" data-i18n="features">✨ Fitur Aplikasi:</h2>
-        <ul class="space-y-3 text-blue-800 dark:text-blue-200">
-          <li class="flex items-start gap-3">
-            <span class="text-2xl">📊</span>
-            <span data-i18n="feature1">Perhitungan akurat sesuai 4 mazhab (Hanafi, Maliki, Syafi'i, Hanbali)</span>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="text-2xl">📖</span>
-            <span data-i18n="feature2">Penjelasan lengkap dengan dalil Al-Quran & Hadits (teks Arab, terjemah, sumber, status)</span>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="text-2xl">📄</span>
-            <span data-i18n="feature3">Export PDF dengan detail lengkap</span>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="text-2xl">🌐</span>
-            <span data-i18n="feature4">Multi-bahasa (Indonesia & English)</span>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="text-2xl">⚖️</span>
-            <span data-i18n="feature5">Deteksi otomatis penghalangan (Mahjub) dengan penjelasan lengkap</span>
-          </li>
-          <li class="flex items-start gap-3">
-            <span class="text-2xl">🌙</span>
-            <span data-i18n="feature6">Mode gelap untuk kenyamanan mata</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900 dark:to-yellow-800 rounded-2xl p-8 border-l-8 border-yellow-500">
-        <h3 class="text-xl font-bold text-yellow-900 dark:text-yellow-300 mb-3" data-i18n="disclaimer_title">⚠️ Disclaimer:</h3>
-        <p class="text-yellow-800 dark:text-yellow-200" data-i18n="disclaimer_text">
-          Aplikasi ini adalah alat bantu perhitungan. Untuk kasus kompleks atau sengketa, konsultasikan dengan ulama atau hakim syariah yang kompeten. Perhitungan menggunakan pendapat Jumhur Ulama sebagai default.
-        </p>
-      </div>
-
-      <button 
-        type="button" 
-        id="btnStart" 
-        onclick="handleCalculateButton()" 
-        class="w-full py-5 rounded-2xl font-bold text-xl text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300" 
-        data-i18n="start">
-        Mulai Perhitungan →
-      </button>
+<body>
+  <div class="container">
+    <h1>Kalkulator Waris Islam - 4 Mazhab</h1>
+    
+    <!-- Step 1: Pilih Mazhab -->
+    <div id="step1">
+      <label>Pilih Mazhab</label>
+      <select id="mazhab">
+        <option value="jumhur">Jumhur Ulama (Default)</option>
+        <option value="hanafi">Mazhab Hanafi</option>
+        <option value="maliki">Mazhab Maliki</option>
+        <option value="syafii">Mazhab Syafi'i</option>
+        <option value="hanbali">Mazhab Hanbali</option>
+      </select>
     </div>
 
-    <!-- Step 1: Pilih Mazhab & Jenis Kelamin -->
-    <div id="step1" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
-      <div class="text-center mb-8">
-        <div class="text-5xl mb-4">⚖️</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step1_title">Pilih Mazhab & Data Pewaris</h2>
-        <p class="text-gray-600 dark:text-gray-400 mt-2" data-i18n="step1_subtitle">Langkah 1 dari 6</p>
-      </div>
+    <!-- Step 2: Input Data Almarhum -->
+    <div id="step2">
+      <h2>Data Almarhum</h2>
+      <label for="gender">Jenis Kelamin</label>
+      <select id="gender">
+        <option value="male">Laki-laki</option>
+        <option value="female">Perempuan</option>
+      </select>
 
-      <form id="formStep1" class="space-y-8">
-        <div class="space-y-4">
-          <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="mazhab_label">Pilih Mazhab</label>
-          <div class="space-y-3">
-            <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer transition">
-              <input type="radio" name="mazhab" value="jumhur" checked class="w-5 h-5">
-              <div>
-                <div class="font-bold text-gray-800 dark:text-gray-200" data-i18n="mazhab_jumhur">✅ Jumhur Ulama (Default)</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400" data-i18n="mazhab_jumhur_desc">Konsensus mayoritas 4 mazhab - Direkomendasikan</div>
-              </div>
-            </label>
-            <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer transition">
-              <input type="radio" name="mazhab" value="hanafi" class="w-5 h-5">
-              <div>
-                <div class="font-bold text-gray-800 dark:text-gray-200">Mazhab Hanafi</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400" data-i18n="mazhab_hanafi_desc">Imam Abu Hanifah</div>
-              </div>
-            </label>
-            <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer transition">
-              <input type="radio" name="mazhab" value="maliki" class="w-5 h-5">
-              <div>
-                <div class="font-bold text-gray-800 dark:text-gray-200">Mazhab Maliki</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400" data-i18n="mazhab_maliki_desc">Imam Malik bin Anas</div>
-              </div>
-            </label>
-            <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer transition">
-              <input type="radio" name="mazhab" value="syafii" class="w-5 h-5">
-              <div>
-                <div class="font-bold text-gray-800 dark:text-gray-200">Mazhab Syafi'i</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400" data-i18n="mazhab_syafii_desc">Imam Muhammad bin Idris asy-Syafi'i</div>
-              </div>
-            </label>
-            <label class="flex items-center gap-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer transition">
-              <input type="radio" name="mazhab" value="hanbali" class="w-5 h-5">
-              <div>
-                <div class="font-bold text-gray-800 dark:text-gray-200">Mazhab Hanbali</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400" data-i18n="mazhab_hanbali_desc">Imam Ahmad bin Hanbal</div>
-              </div>
-            </label>
-          </div>
-        </div>
+      <label for="harta">Jumlah Harta</label>
+      <input type="number" id="harta" placeholder="Masukkan jumlah harta" />
 
-        <div class="space-y-4">
-          <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="gender_label">Siapa yang Meninggal Dunia?</label>
-          <div class="grid grid-cols-2 gap-4">
-            <label class="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer transition">
-              <input type="radio" name="gender" value="male" checked class="w-5 h-5">
-              <div class="text-5xl">👨</div>
-              <div class="font-bold text-gray-800 dark:text-gray-200" data-i18n="male">Laki-laki</div>
-            </label>
-            <label class="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-400 cursor-pointer transition">
-              <input type="radio" name="gender" value="female" class="w-5 h-5">
-              <div class="text-5xl">🧕</div>
-              <div class="font-bold text-gray-800 dark:text-gray-200" data-i18n="female">Perempuan</div>
-            </label>
-          </div>
-        </div>
+      <label for="biaya_jenazah">Biaya Pengurusan Jenazah</label>
+      <input type="number" id="biaya_jenazah" placeholder="Masukkan biaya pengurusan jenazah" />
 
-        <div class="flex gap-4">
-          <button type="button" id="backStep1" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
-            ← Kembali
-          </button>
-          <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
-            Lanjut →
-          </button>
-        </div>
-      </form>
+      <button id="nextStep">Selanjutnya</button>
     </div>
 
-    <!-- Step 2: Harta & Kewajiban -->
-    <div id="step2" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
-      <div class="text-center mb-8">
-        <div class="text-5xl mb-4">💰</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step2_title">Harta & Kewajiban</h2>
-        <p class="text-gray-600 dark:text-gray-400 mt-2" data-i18n="step2_subtitle">Langkah 2 dari 6</p>
-      </div>
-
-      <form id="formStep2" class="space-y-8">
-        <div class="space-y-3">
-          <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="total_harta">💰 Total Harta Warisan</label>
-          <div class="relative">
-            <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
-            <input type="text" id="totalHarta" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="100.000.000" oninput="formatCurrency(this)">
-          </div>
-          <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="harta_hint">Masukkan total semua harta yang ditinggalkan (uang, properti, kendaraan, dll)</p>
-        </div>
-
-        <div class="space-y-3">
-          <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="biaya_jenazah">⚰️ Biaya Pengurusan Jenazah</label>
-          <div class="flex items-center gap-3 mb-3">
-            <input type="checkbox" id="biayaDitanggung" class="w-5 h-5" onchange="toggleBiayaJenazah()">
-            <label for="biayaDitanggung" class="text-gray-700 dark:text-gray-300" data-i18n="biaya_ditanggung">Sudah ditanggung keluarga sebagai sedekah</label>
-          </div>
-          <div id="biayaJenazahInput">
-            <div class="relative">
-              <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
-              <input type="text" id="biayaJenazah" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="5.000.000" oninput="formatCurrency(this)">
-            </div>
-          </div>
-          <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="biaya_hint">Biaya memandikan, mengkafani, dan menguburkan jenazah</p>
-        </div>
-
-        <div class="space-y-3">
-          <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="hutang">💳 Hutang yang Belum Lunas</label>
-          <div class="relative">
-            <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
-            <input type="text" id="hutang" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="0" oninput="formatCurrency(this)">
-          </div>
-          <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="hutang_hint">Semua hutang harus dilunasi sebelum harta dibagi</p>
-        </div>
-
-        <div class="space-y-3">
-          <label class="block text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="wasiat">📝 Wasiat (Opsional)</label>
-          <div class="relative">
-            <span class="absolute left-4 top-4 text-gray-500 font-bold">Rp</span>
-            <input type="text" id="wasiat" class="w-full pl-14 pr-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg" placeholder="0" oninput="formatCurrency(this)">
-          </div>
-          <p class="text-sm text-gray-600 dark:text-gray-400" data-i18n="wasiat_hint">Wasiat maksimal 1/3 harta, untuk non-ahli waris</p>
-        </div>
-
-        <div class="flex gap-4">
-          <button type="button" id="backStep2" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
-            ← Kembali
-          </button>
-          <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
-            Lanjut →
-          </button>
-        </div>
-      </form>
+    <!-- Step 3: Input Data Pasangan -->
+    <div id="step3">
+      <h2>Data Pasangan</h2>
+      <label for="pasangan">Status Pasangan</label>
+      <select id="pasangan">
+        <option value="single">Lajang</option>
+        <option value="married">Menikah</option>
+        <option value="widowed">Duda/Janda</option>
+      </select>
+      <button id="nextStep2">Selanjutnya</button>
     </div>
 
-    <!-- Step 3: Orang Tua & Kakek Nenek -->
-    <div id="step3" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
-      <div class="text-center mb-8">
-        <div class="text-5xl mb-4">👴👵</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step3_title">Orang Tua & Kakek Nenek</h2>
-        <p class="text-gray-600 dark:text-gray-400 mt-2" data-i18n="step3_subtitle">Langkah 3 dari 6</p>
-      </div>
-
-      <form id="formStep3" class="space-y-8">
-        <div class="grid grid-cols-2 gap-6">
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="ayah">👨‍🦳 Ayah</label>
-            <input type="number" id="ayah" min="0" max="1" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
-          </div>
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="ibu">👩‍🦳 Ibu</label>
-            <input type="number" id="ibu" min="0" max="1" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-6">
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="kakek">👨‍🦳 Kakek (Ayah dari Ayah)</label>
-            <input type="number" id="kakek" min="0" max="1" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
-          </div>
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="nenek">👩‍🦳 Nenek (Ibu dari Ibu)</label>
-            <input type="number" id="nenek" min="0" max="1" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
-          </div>
-        </div>
-
-        <div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-xl border-l-4 border-yellow-500">
-          <h4 class="font-bold mb-3 text-yellow-900 dark:text-yellow-300">📖 Dalil & Kaidah Hukum Waris</h4>
-          
-          <div class="space-y-4 text-sm text-yellow-800 dark:text-yellow-200">
-            <div>
-              <div class="font-semibold mb-2">🔹 Prinsip Hijab (Penghalangan):</div>
-              <p class="mb-2">"Ahli waris yang lebih dekat derajatnya menghalangi ahli waris yang lebih jauh dari garis keturunan yang sama."</p>
-              <p class="text-xs italic">📚 Hadits Bukhari & Muslim dari Ibnu Abbas RA</p>
-            </div>
-            
-            <div>
-              <div class="font-semibold mb-2">🔹 Bagian Kakek & Nenek (jika berhak):</div>
-              <p>• Kakek mendapat 1/6 (jika ada anak kandung)</p>
-              <p>• Nenek mendapat 1/6</p>
-              <p class="text-xs mt-2 italic">📚 Hadits Riwayat Abu Daud, Tirmidzi, Ibnu Majah (Hasan)</p>
-              <p class="text-xs italic">Dari Qabishah bin Zu'aib: "Nenek datang kepada Abu Bakar RA menanyakan bagian warisnya... lalu Abu Bakar memutuskan untuk nenek bagian seperenam (1/6)."</p>
-            </div>
-            
-            <div>
-              <div class="font-semibold mb-2">🔹 Referensi Kitab Fiqih:</div>
-              <p>• Bidayatul Mujtahid (Ibnu Rusyd)</p>
-              <p>• Al-Mughni (Ibnu Qudamah)</p>
-              <p>• QS. An-Nisa: 11</p>
-            </div>
-
-            <div>
-              <div class="font-semibold mb-2">🔹 Catatan Penting:</div>
-              <p>Kakek dan Nenek TIDAK terhalang oleh keberadaan anak kandung. Mereka tetap mendapat bagian fardh (1/6) bersama dengan anak-anak pewaris.</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <button type="button" id="backStep3" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
-            ← Kembali
-          </button>
-          <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
-            Lanjut →
-          </button>
-        </div>
-      </form>
+    <!-- Step 4: Input Data Orang Tua -->
+    <div id="step4">
+      <h2>Orang Tua</h2>
+      <label>Ayah</label>
+      <input type="checkbox" id="ayah" checked>
+      <label>Ibu</label>
+      <input type="checkbox" id="ibu" checked>
+      <button id="nextStep3">Selanjutnya</button>
     </div>
 
-    <!-- Step 4: Saudara Seayah & Seibu -->
-    <div id="step4" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
-      <div class="text-center mb-8">
-        <div class="text-5xl mb-4">👥</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step4_title">Saudara Seayah & Seibu</h2>
-        <p class="text-gray-600 dark:text-gray-400 mt-2" data-i18n="step4_subtitle">Langkah 4 dari 6</p>
-      </div>
+    <!-- Step 5: Input Data Anak -->
+    <div id="step5">
+      <h2>Data Anak</h2>
+      <label for="anak_laki">Jumlah Anak Laki-laki</label>
+      <input type="number" id="anak_laki" />
 
-      <form id="formStep4" class="space-y-8">
-        <div class="space-y-6">
-          <div>
-            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-4" data-i18n="saudara_seayah">Saudara Seayah</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_laki_seayah">Laki-laki</label>
-                <input type="number" id="saudaraLakiSeayah" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_perempuan_seayah">Perempuan</label>
-                <input type="number" id="saudaraPerempuanSeayah" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-4" data-i18n="saudara_seibu">Saudara Seibu</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_laki_seibu">Laki-laki</label>
-                <input type="number" id="saudaraLakiSeibu" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_perempuan_seibu">Perempuan</label>
-                <input type="number" id="saudaraPerempuanSeibu" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-xl border-l-4 border-blue-500">
-          <p class="text-sm text-blue-800 dark:text-blue-200" data-i18n="saudara_note">
-            💡 Saudara seayah/seibu hanya berhak jika tidak ada anak kandung atau ayah pewaris.
-          </p>
-        </div>
-
-        <div class="flex gap-4">
-          <button type="button" id="backStep4" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
-            ← Kembali
-          </button>
-          <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
-            Lanjut →
-          </button>
-        </div>
-      </form>
+      <label for="anak_perempuan">Jumlah Anak Perempuan</label>
+      <input type="number" id="anak_perempuan" />
+      <button id="nextStep4">Selanjutnya</button>
     </div>
 
-    <!-- Step 5: Anak & Cucu -->
-    <div id="step5" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
-      <div class="text-center mb-8">
-        <div class="text-5xl mb-4">👶</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step5_title">Ahli Waris - Anak & Cucu</h2>
-        <p class="text-gray-600 dark:text-gray-400 mt-2" data-i18n="step5_subtitle">Langkah 5 dari 6</p>
-      </div>
-
-      <form id="formStep5" class="space-y-8">
-        <div class="grid grid-cols-2 gap-6">
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="anak_laki">👦 Anak Laki-laki</label>
-            <input type="number" id="anakLaki" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
-          </div>
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="anak_perempuan">👧 Anak Perempuan</label>
-            <input type="number" id="anakPerempuan" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-6">
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="cucu_laki">👦 Cucu Laki-laki</label>
-            <input type="number" id="cucuLaki" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
-          </div>
-          <div class="space-y-3">
-            <label class="block font-bold text-gray-800 dark:text-gray-200" data-i18n="cucu_perempuan">👧 Cucu Perempuan</label>
-            <input type="number" id="cucuPerempuan" min="0" value="0" class="w-full px-4 py-4 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-bold text-lg">
-          </div>
-        </div>
-
-        <div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-xl border-l-4 border-blue-500">
-          <p class="text-sm text-blue-800 dark:text-blue-200" data-i18n="cucu_note">
-            💡 Cucu dapat dipilih walaupun anak masih ada, sesuai kaidah 4 mazhab klasik untuk kasus tertentu.
-          </p>
-        </div>
-
-        <div class="flex gap-4">
-          <button type="button" id="backStep5" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
-            ← Kembali
-          </button>
-          <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 shadow-lg transition" data-i18n="next">
-            Lanjut →
-          </button>
-        </div>
-      </form>
+    <!-- Step 6: Input Data Saudara -->
+    <div id="step6">
+      <h2>Data Saudara</h2>
+      <label for="saudara_kandung">Jumlah Saudara Kandung Laki-laki</label>
+      <input type="number" id="saudara_kandung" />
+      <button id="nextStep5">Hitung</button>
     </div>
 
-    <!-- Step 6: Saudara Kandung -->
-    <div id="step6" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
-      <div class="text-center mb-8">
-        <div class="text-5xl mb-4">👥</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="step6_title">Ahli Waris - Saudara Kandung</h2>
-        <p class="text-gray-600 dark:text-gray-400 mt-2" data-i18n="step6_subtitle">Langkah 6 dari 6</p>
-      </div>
-
-      <form id="formStep6" class="space-y-8">
-        <div class="space-y-6">
-          <div>
-            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-4" data-i18n="saudara_kandung">Saudara Kandung</h3>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_laki_kandung">Laki-laki</label>
-                <input type="number" id="saudaraLakiKandung" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-              <div class="space-y-2">
-                <label class="block text-gray-700 dark:text-gray-300" data-i18n="saudara_perempuan_kandung">Perempuan</label>
-                <input type="number" id="saudaraPerempuanKandung" min="0" value="0" class="w-full px-4 py-3 border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex gap-4">
-          <button type="button" id="backStep6" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="back">
-            ← Kembali
-          </button>
-          <button type="submit" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-green-600 to-green-800 hover:from-green-700 hover:to-green-900 shadow-lg transition" data-i18n="calculate">
-            🧮 Hitung Waris
-          </button>
-        </div>
-      </form>
+    <!-- Hasil Perhitungan -->
+    <div id="result">
+      <h2>Hasil Perhitungan</h2>
+      <div id="resultDetails"></div>
     </div>
 
-    <!-- Result Page -->
-    <div id="resultPage" class="hidden bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-10 space-y-8">
-      <div class="text-center mb-8">
-        <div class="text-5xl mb-4">📊</div>
-        <h2 class="text-3xl font-bold text-blue-900 dark:text-blue-300" data-i18n="result_title">Hasil Pembagian Waris</h2>
+    <!-- Modal untuk Penjelasan Edukasi -->
+    <div id="eduPopup" class="modal">
+      <div class="modal-content">
+        <h2>Penjelasan Penghalang Waris</h2>
+        <p id="eduText"></p>
+        <button onclick="closeEduPopup()">Tutup</button>
       </div>
-
-      <div id="resultSummary" class="space-y-4"></div>
-      <div id="resultHeirs" class="space-y-4"></div>
-      <div id="resultBlocked" class="space-y-4"></div>
-      <div id="resultVerification" class="space-y-4"></div>
-
-      <div class="flex gap-4">
-        <button type="button" id="btnReset" class="flex-1 py-4 rounded-xl font-bold text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition" data-i18n="reset">
-          🔄 Hitung Ulang
-        </button>
-        <button type="button" id="btnExportPDF" class="flex-1 py-4 rounded-xl font-bold text-white bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 shadow-lg transition" data-i18n="export_pdf">
-          📄 Export PDF
-        </button>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Modal Pemberitahuan Anak Angkat/Zina -->
-  <div id="modalAnakAngkatZina" class="modal-overlay hidden">
-    <div class="modal-content modal-warning">
-      <div class="modal-header">
-        <h3>⚠️ Pemberitahuan Penting</h3>
-      </div>
-      <div class="modal-body">
-        <h4>📚 Catatan Hukum Waris Islam:</h4>
-        
-        <div class="warning-item">
-          <h5>1️⃣ Anak Angkat (Anak Pungut):</h5>
-          <ul>
-            <li>Tidak dapat warisan dari orang tua angkat</li>
-            <li>Dapat wasiat maksimal 1/3 harta</li>
-            <li>📖 <strong>Dalil:</strong> QS. Al-Ahzab: 4, HR. Abu Dawud</li>
-          </ul>
-        </div>
-        
-        <div class="warning-item">
-          <h5>2️⃣ Anak Zina (Anak Luar Nikah):</h5>
-          <ul>
-            <li>Tidak dapat warisan dari ayah biologis</li>
-            <li>Hanya dapat warisan dari ibu kandung</li>
-            <li>📖 <strong>Dalil:</strong> HR. Bukhari (2053), Muslim (1457)</li>
-          </ul>
-        </div>
-        
-        <p class="info-text">
-          ℹ️ Penjelasan lengkap dapat dipelajari di Halaman Beranda → Bagian Edukasi
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button id="btnPelajariDetail" class="btn btn-secondary">
-          📖 Pelajari Lebih Detail
-        </button>
-        <button id="btnLanjutkanHitung" class="btn btn-primary">
-          ➡️ Lanjutkan Perhitungan
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading Indicator -->
-  <div id="loadingIndicator" class="loading-overlay hidden">
-    <div class="loading-spinner">
-      <div class="spinner"></div>
-      <p>Menghitung...</p>
-    </div>
-  </div>
-  
-  <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 text-center">
-      <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
-      <p class="text-xl font-bold text-gray-800 dark:text-gray-200" data-i18n="loading">Memproses perhitungan...</p>
-    </div>
-  </div>
-
-  <!-- Modal Info -->
-  <div id="infoModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" onclick="closeModal()">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto" onclick="event.stopPropagation()">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-2xl font-bold text-blue-900 dark:text-blue-300" id="modalTitle">Info</h3>
-        <button onclick="closeModal()" class="text-4xl text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">&times;</button>
-      </div>
-      <div id="modalBody" class="text-gray-700 dark:text-gray-300"></div>
     </div>
   </div>
 
